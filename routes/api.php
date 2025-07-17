@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +57,15 @@ Route::get('/languages', function () {
 });
 
 
+// Public event routes
+Route::prefix('events')->group(function () {
+    Route::get('/', [EventController::class, 'index']);
+    Route::get('/upcoming', [EventController::class, 'upcoming']);
+    Route::get('/featured', [EventController::class, 'featured']);
+    Route::get('/search', [EventController::class, 'search']);
+    Route::get('/{event}', [EventController::class, 'show']);
+});
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
@@ -69,6 +80,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/countries', [CountryController::class, 'store']);
     Route::put('/countries/{id}', [CountryController::class, 'update']);
     Route::delete('/countries/{id}', [CountryController::class, 'destroy']);
+
+    // Protected event routes
+    Route::prefix('events')->group(function () {
+        Route::post('/', [EventController::class, 'store']);
+        Route::put('/{event}', [EventController::class, 'update']);
+        Route::delete('/{event}', [EventController::class, 'destroy']);
+    });
+
+    // Profile routes
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::put('/', [ProfileController::class, 'update']);
+        Route::post('/picture', [ProfileController::class, 'updateProfilePicture']);
+        Route::delete('/picture', [ProfileController::class, 'deleteProfilePicture']);
+        Route::post('/location', [ProfileController::class, 'updateLocation']);
+    });
 
 });
 

@@ -61,7 +61,7 @@ class AuthController extends Controller
     /**
      * Login user with email or phone number
      */
-    
+
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [

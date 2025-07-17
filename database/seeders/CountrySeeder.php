@@ -39,5 +39,7 @@ class CountrySeeder extends Seeder
         foreach ($countries as $country) {
             Country::create($country);
         }
+
+        
     }
 }
