@@ -71,7 +71,9 @@ Route::prefix('events')->group(function () {
     Route::get('/featured', [EventController::class, 'featured']);
     Route::get('/search', [EventController::class, 'search']);
     Route::get('/{event}', [EventController::class, 'show']);
+    
 });
+
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -103,6 +105,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/picture', [ProfileController::class, 'deleteProfilePicture']);
         Route::post('/location', [ProfileController::class, 'updateLocation']);
     });
+
 
 
 });

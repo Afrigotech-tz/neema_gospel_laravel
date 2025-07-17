@@ -19,35 +19,20 @@ class EventController extends Controller
 
         // Filter by type
         if ($request->has('type')) {
-            $query->type($request->type);
-        }
-
-        // Filter by status
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Filter by featured
-        if ($request->has('featured')) {
-            $query->featured();
-        }
-
-        // Search events
-        if ($request->has('search')) {
-            $query->search($request->search);
+            $query->where('type', $request->type);
         }
 
         // Date filtering
         if ($request->has('date_from')) {
-            $query->where('start_date', '>=', $request->date_from);
+            $query->where('date', '>=', $request->date_from);
         }
 
         if ($request->has('date_to')) {
-            $query->where('start_date', '<=', $request->date_to);
+            $query->where('date', '<=', $request->date_to);
         }
 
         // Sorting
-        $sortBy = $request->get('sort_by', 'start_date');
+        $sortBy = $request->get('sort_by', 'date');
         $sortOrder = $request->get('sort_order', 'asc');
         $query->orderBy($sortBy, $sortOrder);
 
@@ -69,24 +54,10 @@ class EventController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'type' => 'required|in:live_recording,concert,service,conference,workshop,other',
-            'start_date' => 'required|date|after:now',
-            'end_date' => 'nullable|date|after:start_date',
-            'venue' => 'required|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'capacity' => 'nullable|integer|min:1',
-            'is_featured' => 'boolean',
-            'is_public' => 'boolean',
-            'ticket_price' => 'nullable|numeric|min:0',
-            'ticket_url' => 'nullable|url',
-            'tags' => 'nullable|array',
-            'metadata' => 'nullable|array',
+            'type' => 'required|in:concert,service,live_recording,conference,other',
+            'date' => 'required|date|after:now',
+            'location' => 'required|string|max:255',
+            'picture' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -97,14 +68,14 @@ class EventController extends Controller
             ], 422);
         }
 
-        $data = $request->except(['image']);
+        $data = $request->all();
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
+        // Handle picture upload if provided
+        if ($request->hasFile('picture')) {
+            $file = $request->file('picture');
             $filename = 'event_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('events', $filename, 'public');
-            $data['image_url'] = $path;
+            $data['picture'] = $path;
         }
 
         $event = Event::create($data);
@@ -135,25 +106,10 @@ class EventController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'type' => 'sometimes|in:live_recording,concert,service,conference,workshop,other',
-            'start_date' => 'sometimes|date|after:now',
-            'end_date' => 'nullable|date|after:start_date',
-            'venue' => 'sometimes|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'capacity' => 'nullable|integer|min:1',
-            'is_featured' => 'boolean',
-            'is_public' => 'boolean',
-            'status' => 'sometimes|in:upcoming,ongoing,completed,cancelled',
-            'ticket_price' => 'nullable|numeric|min:0',
-            'ticket_url' => 'nullable|url',
-            'tags' => 'nullable|array',
-            'metadata' => 'nullable|array',
+            'type' => 'sometimes|in:concert,service,live_recording,conference,other',
+            'date' => 'sometimes|date|after:now',
+            'location' => 'sometimes|string|max:255',
+            'picture' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -164,19 +120,19 @@ class EventController extends Controller
             ], 422);
         }
 
-        $data = $request->except(['image']);
+        $data = $request->all();
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
-                Storage::disk('public')->delete($event->image_url);
+        // Handle picture upload if provided
+        if ($request->hasFile('picture')) {
+            // Delete old picture if exists
+            if ($event->picture && Storage::disk('public')->exists($event->picture)) {
+                Storage::disk('public')->delete($event->picture);
             }
 
-            $file = $request->file('image');
+            $file = $request->file('picture');
             $filename = 'event_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('events', $filename, 'public');
-            $data['image_url'] = $path;
+            $data['picture'] = $path;
         }
 
         $event->update($data);
@@ -193,9 +149,9 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        // Delete associated image
-        if ($event->image_url && Storage::disk('public')->exists($event->image_url)) {
-            Storage::disk('public')->delete($event->image_url);
+        // Delete associated picture
+        if ($event->picture && Storage::disk('public')->exists($event->picture)) {
+            Storage::disk('public')->delete($event->picture);
         }
 
         $event->delete();
@@ -211,9 +167,8 @@ class EventController extends Controller
      */
     public function upcoming()
     {
-        $events = Event::upcoming()
-            ->public()
-            ->orderBy('start_date')
+        $events = Event::where('date', '>', now())
+            ->orderBy('date')
             ->limit(10)
             ->get();
 
@@ -221,25 +176,6 @@ class EventController extends Controller
             'success' => true,
             'data' => $events,
             'message' => 'Upcoming events retrieved successfully'
-        ]);
-    }
-
-    /**
-     * Get featured events
-     */
-    public function featured()
-    {
-        $events = Event::featured()
-            ->public()
-            ->upcoming()
-            ->orderBy('start_date')
-            ->limit(5)
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $events,
-            'message' => 'Featured events retrieved successfully'
         ]);
     }
 
@@ -260,9 +196,9 @@ class EventController extends Controller
             ], 422);
         }
 
-        $events = Event::public()
-            ->search($request->query)
-            ->orderBy('start_date')
+        $events = Event::where('title', 'like', '%' . $request->query . '%')
+            ->orWhere('location', 'like', '%' . $request->query . '%')
+            ->orderBy('date')
             ->limit(20)
             ->get();
 

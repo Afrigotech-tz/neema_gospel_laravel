@@ -18,37 +18,14 @@ class EventResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'description' => $this->description,
             'type' => $this->type,
             'type_label' => $this->getTypeLabel(),
-            'start_date' => $this->start_date->toISOString(),
-            'end_date' => $this->end_date?->toISOString(),
-            'date_range' => $this->date_range,
-            'venue' => $this->venue,
+            'date' => $this->date->toISOString(),
             'location' => $this->location,
-            'city' => $this->city,
-            'country' => $this->country,
-            'coordinates' => [
-                'latitude' => $this->latitude,
-                'longitude' => $this->longitude,
-            ],
-            'image_url' => $this->image_url ? Storage::url($this->image_url) : null,
-            'capacity' => $this->capacity,
-            'attendees_count' => $this->attendees_count,
-            'formatted_attendees' => $this->formatted_attendees,
-            'is_featured' => $this->is_featured,
-            'is_public' => $this->is_public,
-            'status' => $this->status,
-            'ticket_price' => $this->ticket_price,
-            'ticket_url' => $this->ticket_url,
-            'tags' => $this->tags ?? [],
-            'metadata' => $this->metadata ?? [],
+            'picture' => $this->picture ? Storage::url($this->picture) : null,
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
         ];
-
-
-
     }
 
     /**
@@ -61,10 +38,8 @@ class EventResource extends JsonResource
             'concert' => 'Concert',
             'service' => 'Service',
             'conference' => 'Conference',
-            'workshop' => 'Workshop',
             'other' => 'Other',
             default => ucfirst($this->type),
         };
     }
-
 }
