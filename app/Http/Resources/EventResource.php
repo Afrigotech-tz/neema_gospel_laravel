@@ -46,6 +46,9 @@ class EventResource extends JsonResource
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
         ];
+
+
+
     }
 
     /**
@@ -63,4 +66,5 @@ class EventResource extends JsonResource
             default => ucfirst($this->type),
         };
     }
+
 }

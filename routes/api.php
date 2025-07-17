@@ -23,6 +23,13 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// OTP verification routes
+Route::prefix('auth')->group(function () {
+    Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
+});
+
 // Countries public routes (for dropdowns, etc.)
 Route::get('/countries', [CountryController::class, 'index']);
 Route::get('/countries/list', [CountryController::class, 'list']);
@@ -97,11 +104,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/location', [ProfileController::class, 'updateLocation']);
     });
 
+
 });
 
 
 // Fallback route for API
 Route::fallback(function () {
+
     return response()->json([
         'success' => false,
         'message' => 'API endpoint not found'
@@ -109,4 +118,7 @@ Route::fallback(function () {
 
 
 });
+
+
+
 

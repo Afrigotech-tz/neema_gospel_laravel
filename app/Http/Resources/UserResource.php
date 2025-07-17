@@ -23,10 +23,20 @@ class UserResource extends JsonResource
             'phone_number' => $this->phone_number,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
+            'status' => $this->status,
+            'is_active' => $this->isActive(),
+            'verification_method' => $this->verification_method,
             'country' => new CountryResource($this->whenLoaded('country')),
             'country_id' => $this->country_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
+
     }
+
+
+
+    
 }
+
+

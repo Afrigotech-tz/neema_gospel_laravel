@@ -25,6 +25,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'country_id' => 'required|exists:countries,id',
+            'verification_method' => 'nullable|in:email,mobile',
         ]);
 
         if ($validator->fails()) {
@@ -43,17 +44,24 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'country_id' => $request->country_id,
+            'verification_method' => $request->verification_method ?? 'email',
+            'status' => User::STATUS_INACTIVE,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Generate and send OTP
+        $otp = $user->generateOtp();
+
+        // In a real application, you would send the OTP via email or SMS
+        // For now, we'll return it in the response for testing purposes
+        // TODO: Implement email/SMS sending functionality
 
         return response()->json([
             'success' => true,
-            'message' => 'User registered successfully',
+            'message' => 'User registered successfully. Please verify your account using the OTP sent to your email.',
             'data' => [
                 'user' => $user->load('country'),
-                'token' => $token,
-                'token_type' => 'Bearer'
+                'otp' => $otp, // Remove this in production
+                'verification_method' => $user->verification_method,
             ]
         ], 201);
     }
@@ -61,7 +69,6 @@ class AuthController extends Controller
     /**
      * Login user with email or phone number
      */
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -93,6 +100,14 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Check if account is verified
+        if (!$user->isActive()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Account not verified. Please verify your account using the OTP sent to your email.'
+            ], 403);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -116,6 +131,139 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Logged out successfully'
+        ]);
+    }
+
+    /**
+     * Send OTP to user's email or phone
+     */
+    public function sendOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        // Generate new OTP
+        $otp = $user->generateOtp();
+
+        // TODO: Implement email sending functionality
+        // For now, return OTP in response for testing
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP sent successfully to your email',
+            'data' => [
+                'otp' => $otp, // Remove in production
+                'expires_at' => $user->otp_expires_at,
+            ]
+        ]);
+    }
+
+    /**
+     * Verify OTP and activate account
+     */
+    public function verifyOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'otp_code' => 'required|string|size:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        // Check if OTP is valid
+        if (!$user->isOtpValid($request->otp_code)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired OTP'
+            ], 422);
+        }
+
+        // Activate user account
+        $user->activate();
+
+        // Generate token for the user
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account verified successfully',
+            'data' => [
+                'user' => $user->load('country'),
+                'token' => $token,
+                'token_type' => 'Bearer'
+            ]
+        ]);
+    }
+
+    /**
+     * Resend OTP to user's email
+     */
+    public function resendOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        // Generate new OTP
+        $otp = $user->generateOtp();
+
+        // TODO: Implement email sending functionality
+        return response()->json([
+            'success' => true,
+            'message' => 'New OTP sent successfully to your email',
+            'data' => [
+                'otp' => $otp, // Remove in production
+                'expires_at' => $user->otp_expires_at,
+            ]
         ]);
     }
 
