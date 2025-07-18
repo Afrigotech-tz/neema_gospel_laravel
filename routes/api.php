@@ -25,7 +25,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // OTP verification routes
 Route::prefix('auth')->group(function () {
-    Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+    // Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
 });
@@ -71,7 +71,7 @@ Route::prefix('events')->group(function () {
     Route::get('/featured', [EventController::class, 'featured']);
     Route::get('/search', [EventController::class, 'search']);
     Route::get('/{event}', [EventController::class, 'show']);
-    
+
 });
 
 

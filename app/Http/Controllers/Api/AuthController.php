@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendOtpMail; // <-- Import the Mailable
 use App\Models\User;
+use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail; // <-- Import Mail facade
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     /**
-     * Register a new user
+     * Register a new user with either email or phone number.
      */
     public function register(Request $request)
     {
@@ -21,11 +24,11 @@ class AuthController extends Controller
             'first_name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
             'gender' => 'nullable|in:male,female',
-            'phone_number' => 'required|string|unique:users,phone_number',
-            'email' => 'required|string|email|max:255|unique:users',
+            // Require at least one of phone_number or email
+            'phone_number' => 'required_without:email|nullable|string|unique:users,phone_number',
+            'email' => 'required_without:phone_number|nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'country_id' => 'required|exists:countries,id',
-            'verification_method' => 'nullable|in:email,mobile',
         ]);
 
         if ($validator->fails()) {
@@ -36,6 +39,10 @@ class AuthController extends Controller
             ], 422);
         }
 
+        // Determine the verification method based on input
+        //$verification_method = $request->filled('email') ? 'email' : 'mobile';
+        $verification_method = 'email';
+
         $user = User::create([
             'first_name' => $request->first_name,
             'surname' => $request->surname,
@@ -44,23 +51,38 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'country_id' => $request->country_id,
-            'verification_method' => $request->verification_method ?? 'email',
+            'verification_method' => $verification_method,
             'status' => User::STATUS_INACTIVE,
         ]);
 
         // Generate and send OTP
         $otp = $user->generateOtp();
+        $message = '';
 
-        // In a real application, you would send the OTP via email or SMS
-        // For now, we'll return it in the response for testing purposes
-        // TODO: Implement email/SMS sending functionality
+        // Send OTP based on the verification method used for registration
+        if ($user->verification_method === 'mobile') {
+            $smsService = new SmsService();
+            if ($smsService->isConfigured()) {
+                 $smsService->sendOtp($user->phone_number, $otp);
+                 $message = 'User registered successfully. Please verify your account using the OTP sent to your phone.';
+            } else {
+                // Handle case where SMS service is intended but not configured
+                // For now, we prevent account creation if SMS fails.
+                 return response()->json([
+                    'success' => false,
+                    'message' => 'SMS Service is not configured. Cannot send OTP.',
+                 ], 500);
+            }
+        } else { // 'email'
+            Mail::to($user->email)->send(new SendOtpMail($otp));
+            $message = 'User registered successfully. Please verify your account using the OTP sent to your email.';
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'User registered successfully. Please verify your account using the OTP sent to your email.',
+            'message' => $message,
             'data' => [
                 'user' => $user->load('country'),
-                'otp' => $otp, // Remove this in production
                 'verification_method' => $user->verification_method,
             ]
         ], 201);
@@ -77,35 +99,22 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validator->errors()], 422);
         }
 
         $login = $request->login;
-        $password = $request->password;
 
         // Determine if login is email or phone number
         $loginField = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_number';
 
-        // Find user by email or phone number
         $user = User::where($loginField, $login)->first();
 
-        if (!$user || !Hash::check($password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials'
-            ], 401);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['success' => false, 'message' => 'Invalid credentials'], 401);
         }
 
-        // Check if account is verified
         if (!$user->isActive()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Account not verified. Please verify your account using the OTP sent to your email.'
-            ], 403);
+             return response()->json(['success' => false, 'message' => 'Account not verified. Please verify your account.'], 403);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -122,98 +131,33 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout user
-     */
-    public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Logged out successfully'
-        ]);
-    }
-
-    /**
-     * Send OTP to user's email or phone
-     */
-    public function sendOtp(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
-        }
-
-        // Generate new OTP
-        $otp = $user->generateOtp();
-
-        // TODO: Implement email sending functionality
-        // For now, return OTP in response for testing
-        return response()->json([
-            'success' => true,
-            'message' => 'OTP sent successfully to your email',
-            'data' => [
-                'otp' => $otp, // Remove in production
-                'expires_at' => $user->otp_expires_at,
-            ]
-        ]);
-    }
-
-    /**
      * Verify OTP and activate account
      */
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
+            'login' => 'required|string',
             'otp_code' => 'required|string|size:6',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validator->errors()], 422);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $login = $request->login;
+        $loginField = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_number';
+
+        $user = User::where($loginField, $login)->first();
 
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
+            return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        // Check if OTP is valid
         if (!$user->isOtpValid($request->otp_code)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid or expired OTP'
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 422);
         }
 
-        // Activate user account
         $user->activate();
-
-        // Generate token for the user
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -228,43 +172,56 @@ class AuthController extends Controller
     }
 
     /**
-     * Resend OTP to user's email
+     * Resend OTP to user's email or phone
      */
     public function resendOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
+            'login' => 'required|string',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validator->errors()], 422);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $login = $request->login;
+        $loginField = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_number';
+
+        $user = User::where($loginField, $login)->first();
 
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
+            return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        // Generate new OTP
         $otp = $user->generateOtp();
+        $message = '';
 
-        // TODO: Implement email sending functionality
+        if ($user->verification_method === 'mobile') {
+            $smsService = new SmsService();
+             if ($smsService->isConfigured()) {
+                $smsService->sendOtp($user->phone_number, $otp);
+                $message = 'New OTP sent successfully to your phone.';
+             } else {
+                 return response()->json(['success' => false, 'message' => 'SMS Service is not configured.'], 500);
+             }
+        } else { // 'email'
+            Mail::to($user->email)->send(new SendOtpMail($otp));
+            $message = 'New OTP sent successfully to your email.';
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'New OTP sent successfully to your email',
-            'data' => [
-                'otp' => $otp, // Remove in production
-                'expires_at' => $user->otp_expires_at,
-            ]
+            'message' => $message
         ]);
+    }
+
+    /**
+     * Logout user
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
 
     /**
