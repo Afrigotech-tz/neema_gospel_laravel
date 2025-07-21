@@ -24,15 +24,48 @@ class DonationCategoryController extends Controller
     /**
      * Store a newly created donation category.
      */
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'name' => 'required|string|max:255|unique:donation_categories,name'
+    //     ], [
+    //         'name.unique' => 'Donation category with this name already exists.'
+    //     ]);
+
+    //     $category = DonationCategory::create($validated);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Donation category created successfully',
+    //         'data' => $category
+    //     ], Response::HTTP_CREATED);
+    // }
+
+
     public function store(Request $request)
     {
+        // Step 1: Trim the name
+        $name = trim($request->input('name'));
+
+        // Step 2: Check if a category with the same name already exists (case-insensitive)
+        $exists = DonationCategory::whereRaw('LOWER(name) = ?', [strtolower($name)])->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Donation category with this name already exists.'
+            ], Response::HTTP_CONFLICT);
+        }
+
+        // Step 3: Validate
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:donation_categories,name'
-        ], [
-            'name.unique' => 'Donation category with this name already exists.'
+            'name' => 'required|string|max:255'
         ]);
 
-        $category = DonationCategory::create($validated);
+        // Step 4: Create the category
+        $category = DonationCategory::create([
+            'name' => $name
+        ]);
 
         return response()->json([
             'success' => true,
@@ -41,8 +74,10 @@ class DonationCategoryController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+
     /**
      * Display the specified donation category.
+     * 
      */
     public function show(DonationCategory $category)
     {
@@ -113,6 +148,4 @@ class DonationCategoryController extends Controller
             'message' => 'Donation category name is available'
         ], Response::HTTP_OK);
     }
-
-
 }

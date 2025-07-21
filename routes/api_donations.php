@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 | Donation API Routes
 |--------------------------------------------------------------------------
 | All donation-related API routes
+
 */
 
 Route::prefix('donations')->group(function () {
@@ -43,4 +44,6 @@ Route::prefix('donations')->group(function () {
     Route::get('/campaign/{campaign}', [DonationController::class, 'byCampaign']);
     Route::get('/statistics', [DonationController::class, 'statistics']);
     Route::get('/user/{user}', [DonationController::class, 'byUser']);
+
+
 });
