@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'sms' => [
+        'api_url' => env('SMS_NEXTSMS_URL', 'https://messaging-service.co.tz/api/sms/v1/text/single'),
+        'api_key' => env('SMS_NEXTSMS_API_KEY'),
+        'sender_id' => env('SMS_NEXTSMS_SENDER_NAME', 'NEEMACONNECT'),
+    ],
+
+    
+
 ];

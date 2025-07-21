@@ -1,28 +1,37 @@
-# Neema Gospel Backend API Documentation
+# Neema Gospel API Documentation
 
-This document provides comprehensive information about the available API endpoints for the Neema Gospel Backend application.
+## Overview
+This is the official API documentation for the Neema Gospel backend system. This Laravel-based API provides endpoints for user management, event management, authentication, and country management.
 
 ## Base URL
 ```
-http://localhost:8000/api
+https://api.neemagospel.com/api
 ```
 
 ## Authentication
-The API uses Laravel Sanctum for authentication. Include the Bearer token in the Authorization header for protected routes.
+The API uses Laravel Sanctum for token-based authentication. Include the Bearer token in the Authorization header for protected endpoints.
 
 ```
-Authorization: Bearer {your-token-here}
+Authorization: Bearer {your_token_here}
 ```
 
 ## Response Format
-All API responses follow this standard format:
+All API responses follow a consistent JSON format:
 
 ```json
 {
-    "success": true|false,
-    "message": "Response message",
-    "data": {}, // Response data
-    "errors": {} // Validation errors (if any)
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": {...}
+}
+```
+
+## Error Format
+```json
+{
+  "success": false,
+  "message": "Error description",
+  "errors": {...}
 }
 ```
 
@@ -33,272 +42,89 @@ All API responses follow this standard format:
 ### Register User
 **POST** `/register`
 
-Register a new user account.
+Register a new user with email or phone number verification.
 
 **Request Body:**
 ```json
 {
-    "first_name": "John",
-    "surname": "Doe",
-    "gender": "male", // optional: "male" or "female"
-    "phone_number": "+255712345678",
-    "email": "john.doe@example.com",
-    "password": "password123",
-    "password_confirmation": "password123",
-    "country_id": 1
+  "first_name": "John",
+  "surname": "Doe",
+  "gender": "male",
+  "phone_number": "+255712345678",
+  "email": "john@example.com",
+  "password": "securepassword123",
+  "password_confirmation": "securepassword123",
+  "country_id": 1
 }
 ```
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "User registered successfully",
-    "data": {
-        "user": {
-            "id": 1,
-            "first_name": "John",
-            "surname": "Doe",
-            "full_name": "John Doe",
-            "gender": "male",
-            "phone_number": "+255712345678",
-            "email": "john.doe@example.com",
-            "country": {
-                "id": 1,
-                "name": "Tanzania",
-                "code": "TZ",
-                "dial_code": "+255"
-            }
-        },
-        "token": "1|abc123...",
-        "token_type": "Bearer"
-    }
+  "success": true,
+  "message": "User registered successfully. Please verify your account using the OTP sent to your phone.",
+  "data": {
+    "user": {...},
+    "verification_method": "mobile"
+  }
 }
 ```
 
-### Login User
+### Login
 **POST** `/login`
 
-Authenticate user and get access token.
+Authenticate user with email or phone number.
 
 **Request Body:**
 ```json
 {
-    "email": "john.doe@example.com",
-    "password": "password123"
+  "login": "john@example.com",
+  "password": "securepassword123"
 }
 ```
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Login successful",
-    "data": {
-        "user": {
-            "id": 1,
-            "first_name": "John",
-            "surname": "Doe",
-            "email": "john.doe@example.com",
-            "country": {
-                "id": 1,
-                "name": "Tanzania",
-                "code": "TZ",
-                "dial_code": "+255"
-            }
-        },
-        "token": "1|abc123...",
-        "token_type": "Bearer"
-    }
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {...},
+    "token": "sanctum_token_here",
+    "token_type": "Bearer"
+  }
 }
 ```
 
-### Logout User
-**POST** `/logout` 🔒
+### Verify OTP
+**POST** `/auth/verify-otp`
 
-Logout the authenticated user and revoke the current token.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
-
-**Response:**
-```json
-{
-    "success": true,
-    "message": "Logged out successfully"
-}
-```
-
-### Get User Profile
-**GET** `/profile` 🔒
-
-Get the authenticated user's profile information.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
-
-**Response:**
-```json
-{
-    "success": true,
-    "data": {
-        "id": 1,
-        "first_name": "John",
-        "surname": "Doe",
-        "full_name": "John Doe",
-        "gender": "male",
-        "phone_number": "+255712345678",
-        "email": "john.doe@example.com",
-        "country": {
-            "id": 1,
-            "name": "Tanzania",
-            "code": "TZ",
-            "dial_code": "+255"
-        }
-    }
-}
-```
-
----
-
-## Countries Endpoints
-
-### Get All Countries
-**GET** `/countries`
-
-Get paginated list of all countries with user counts.
-
-**Query Parameters:**
-- `per_page` (optional): Number of items per page (default: 50)
-
-**Response:**
-```json
-{
-    "success": true,
-    "data": {
-        "data": [
-            {
-                "id": 1,
-                "name": "Tanzania",
-                "code": "TZ",
-                "dial_code": "+255",
-                "users_count": 5,
-                "created_at": "2024-01-01T00:00:00.000000Z",
-                "updated_at": "2024-01-01T00:00:00.000000Z"
-            }
-        ],
-        "current_page": 1,
-        "total": 20
-    }
-}
-```
-
-### Get Countries List
-**GET** `/countries/list`
-
-Get simple list of all countries (for dropdowns).
-
-**Response:**
-```json
-{
-    "success": true,
-    "data": [
-        {
-            "id": 1,
-            "name": "Tanzania",
-            "code": "TZ",
-            "dial_code": "+255"
-        }
-    ]
-}
-```
-
-### Get Single Country
-**GET** `/countries/{id}`
-
-Get details of a specific country.
-
-**Response:**
-```json
-{
-    "success": true,
-    "data": {
-        "id": 1,
-        "name": "Tanzania",
-        "code": "TZ",
-        "dial_code": "+255",
-        "users_count": 5,
-        "created_at": "2024-01-01T00:00:00.000000Z",
-        "updated_at": "2024-01-01T00:00:00.000000Z"
-    }
-}
-```
-
-### Search Countries
-**GET** `/countries/search`
-
-Search countries by name, code, or dial code.
-
-**Query Parameters:**
-- `query` (required): Search term
-- `per_page` (optional): Number of items per page (default: 50)
-
-**Example:** `/countries/search?query=tan&per_page=10`
-
-### Get Users by Country
-**GET** `/countries/{id}/users`
-
-Get paginated list of users from a specific country.
-
-**Query Parameters:**
-- `per_page` (optional): Number of items per page (default: 15)
-
-### Create Country
-**POST** `/countries` 🔒
-
-Create a new country.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
+Verify OTP code for account activation.
 
 **Request Body:**
 ```json
 {
-    "name": "Kenya",
-    "code": "KE",
-    "dial_code": "+254"
+  "login": "john@example.com",
+  "otp_code": "123456"
 }
 ```
 
-### Update Country
-**PUT** `/countries/{id}` 🔒
+### Resend OTP
+**POST** `/auth/resend-otp`
 
-Update an existing country.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
+Resend OTP to user's email or phone.
 
 **Request Body:**
 ```json
 {
-    "name": "Kenya Updated",
-    "code": "KE",
-    "dial_code": "+254"
+  "login": "john@example.com"
 }
 ```
 
-### Delete Country
-**DELETE** `/countries/{id}` 🔒
+### Logout
+**POST** `/logout`
 
-Delete a country (only if no users are associated).
+Logout authenticated user (requires authentication).
 
 **Headers:**
 ```
@@ -307,208 +133,332 @@ Authorization: Bearer {token}
 
 ---
 
-## Users Endpoints
+## User Management Endpoints
 
 ### Get All Users
-**GET** `/users` 🔒
+**GET** `/users`
 
-Get paginated list of all users.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
+Retrieve paginated list of all users.
 
 **Query Parameters:**
-- `per_page` (optional): Number of items per page (default: 15)
+- `per_page` (integer): Number of items per page (default: 15)
+- `page` (integer): Page number
 
-### Get Single User
-**GET** `/users/{id}` 🔒
-
-Get details of a specific user.
-
-**Headers:**
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "data": [...],
+    "current_page": 1,
+    "per_page": 15,
+    "total": 100
+  }
+}
 ```
-Authorization: Bearer {token}
+
+### Get User by ID
+**GET** `/users/{id}`
+
+Retrieve specific user details.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "first_name": "John",
+    "surname": "Doe",
+    "email": "john@example.com",
+    "phone_number": "+255712345678",
+    "country": {...}
+  }
+}
 ```
 
 ### Create User
-**POST** `/users` 🔒
+**POST** `/users`
 
-Create a new user.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
+Create a new user (requires authentication).
 
 **Request Body:**
 ```json
 {
-    "first_name": "Jane",
-    "surname": "Smith",
-    "gender": "female",
-    "phone_number": "+254712345678",
-    "email": "jane.smith@example.com",
-    "password": "password123",
-    "country_id": 2
+  "first_name": "Jane",
+  "surname": "Smith",
+  "phone_number": "+255712345679",
+  "email": "jane@example.com",
+  "password": "securepassword123",
+  "country_id": 1
 }
 ```
 
 ### Update User
-**PUT** `/users/{id}` 🔒
+**PUT** `/users/{id}`
 
-Update an existing user.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
+Update user information (requires authentication).
 
 **Request Body:**
 ```json
 {
-    "first_name": "Jane Updated",
-    "surname": "Smith Updated",
-    "gender": "female",
-    "phone_number": "+254712345679",
-    "email": "jane.updated@example.com",
-    "country_id": 2
+  "first_name": "Jane Updated",
+  "email": "jane.updated@example.com"
 }
 ```
 
 ### Delete User
-**DELETE** `/users/{id}` 🔒
+**DELETE** `/users/{id}`
 
-Delete a user.
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
+Delete a user (requires authentication).
 
 ### Search Users
-**GET** `/users/search` 🔒
+**GET** `/users/search`
 
-Search users by name, email, or phone number.
+Search users by name, email, or phone.
+
+**Query Parameters:**
+- `query` (string): Search term
+- `per_page` (integer): Items per page (default: 15)
+
+---
+
+## Event Management Endpoints
+
+### Get All Events
+**GET** `/events`
+
+Retrieve paginated list of events.
+
+**Query Parameters:**
+- `per_page` (integer): Items per page (default: 15)
+- `type` (string): Filter by event type
+- `date_from` (date): Filter events from this date
+- `date_to` (date): Filter events to this date
+- `sort_by` (string): Sort field (default: date)
+- `sort_order` (string): Sort order (asc/desc)
+
+### Get Event by ID
+**GET** `/events/{id}`
+
+Retrieve specific event details.
+
+### Create Event
+**POST** `/events`
+
+Create a new event (requires authentication).
+
+**Request Body:**
+```json
+{
+  "title": "Sunday Service",
+  "type": "service",
+  "start_date": "2024-12-15 09:00:00",
+  "end_date": "2024-12-15 12:00:00",
+  "venue": "Main Auditorium",
+  "location": "123 Church Street",
+  "city": "Dar es Salaam",
+  "description": "Weekly Sunday service"
+}
+```
+
+### Update Event
+**PUT** `/events/{id}`
+
+Update event information (requires authentication).
+
+### Delete Event
+**DELETE** `/events/{id}`
+
+Delete an event (requires authentication).
+
+### Get Upcoming Events
+**GET** `/events/upcoming`
+
+Get list of upcoming events.
+
+### Search Events
+**GET** `/events/search`
+
+Search events by title, location, or description.
+
+**Query Parameters:**
+- `query` (string): Search term
+
+---
+
+## Profile Management Endpoints
+
+### Get User Profile
+**GET** `/profile`
+
+Get authenticated user's profile information.
 
 **Headers:**
 ```
 Authorization: Bearer {token}
 ```
 
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "user": {...},
+    "profile": {...}
+  }
+}
+```
+
+### Update Profile
+**PUT** `/profile`
+
+Update authenticated user's profile.
+
+**Request Body:**
+```json
+{
+  "bio": "Passionate about gospel music",
+  "city": "Dar es Salaam",
+  "occupation": "Musician"
+}
+```
+
+### Update Profile Picture
+**POST** `/profile/picture`
+
+Upload/update profile picture.
+
+**Request Body:**
+- `profile_picture` (file): Image file (max 5MB)
+
+### Update Location
+**POST** `/profile/location`
+
+Update user's location coordinates.
+
+**Request Body:**
+```json
+{
+  "latitude": -6.7924,
+  "longitude": 39.2083,
+  "city": "Dar es Salaam"
+}
+```
+
+### Delete Profile Picture
+**DELETE** `/profile/picture`
+
+Remove profile picture.
+
+---
+
+## Country Management Endpoints
+
+### Get All Countries
+**GET** `/countries`
+
+Retrieve paginated list of countries.
+
 **Query Parameters:**
-- `query` (required): Search term
-- `per_page` (optional): Number of items per page (default: 15)
+- `per_page` (integer): Items per page (default: 50)
 
-**Example:** `/users/search?query=john&per_page=10`
+### Get Country by ID
+**GET** `/countries/{id}`
+
+Retrieve specific country details.
+
+### Get Country List (Simple)
+**GET** `/countries/list`
+
+Get simplified country list for dropdowns.
+
+### Search Countries
+**GET** `/countries/search`
+
+Search countries by name or code.
+
+**Query Parameters:**
+- `query` (string): Search term
+
+### Get Users by Country
+**GET** `/countries/{id}/users`
+
+Get users from a specific country.
 
 ---
 
-## Error Responses
+## Language Endpoints
 
-### Validation Error (422)
+### Get Available Languages
+**GET** `/languages`
+
+Get list of available languages for the application.
+
+**Response:**
 ```json
 {
-    "success": false,
-    "message": "Validation errors",
-    "errors": {
-        "email": ["The email field is required."],
-        "password": ["The password field is required."]
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "English",
+      "code": "en",
+      "is_default": true
+    },
+    {
+      "id": 2,
+      "name": "Swahili",
+      "code": "sw",
+      "is_default": false
     }
-}
-```
-
-### Unauthorized (401)
-```json
-{
-    "success": false,
-    "message": "Invalid credentials"
-}
-```
-
-### Not Found (404)
-```json
-{
-    "success": false,
-    "message": "User not found"
-}
-```
-
-### Server Error (500)
-```json
-{
-    "success": false,
-    "message": "Internal server error"
+  ]
 }
 ```
 
 ---
 
-## Testing the API
+## Error Codes
 
-### Using cURL
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 422 | Validation Error |
+| 500 | Internal Server Error |
 
-**Register a new user:**
-```bash
-curl -X POST http://localhost:8000/api/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "first_name": "John",
-    "surname": "Doe",
-    "gender": "male",
-    "phone_number": "+255712345678",
-    "email": "john.doe@example.com",
-    "password": "password123",
-    "password_confirmation": "password123",
-    "country_id": 1
-  }'
-```
+## Rate Limiting
+- Authentication endpoints: 10 requests per minute
+- General API endpoints: 60 requests per minute
 
-**Login:**
-```bash
-curl -X POST http://localhost:8000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john.doe@example.com",
-    "password": "password123"
-  }'
-```
+## Pagination
+All list endpoints support pagination with the following parameters:
+- `per_page`: Number of items per page (default varies by endpoint)
+- `page`: Page number to retrieve
 
-**Get countries:**
-```bash
-curl -X GET http://localhost:8000/api/countries/list
-```
+## File Uploads
+- Maximum file size: 5MB
+- Supported image formats: JPEG, PNG, JPG, GIF, WebP
+- Files are stored in public storage with optimized naming
 
-**Get user profile (with token):**
-```bash
-curl -X GET http://localhost:8000/api/profile \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
+## Webhooks
+Currently, no webhooks are implemented. Future versions may include:
+- Event registration notifications
+- User activity alerts
+- System maintenance notifications
 
-### Using Postman
+## SDK and Libraries
+- **Backend**: Laravel 11.x with Sanctum for API authentication
+- **Database**: MySQL with Eloquent ORM
+- **File Storage**: Local public storage with optimization
+- **SMS Service**: Configurable SMS provider integration
+- **Email Service**: Laravel Mail with queue support
 
-1. Import the endpoints into Postman
-2. Set the base URL to `http://localhost:8000/api`
-3. For protected routes, add Authorization header with Bearer token
-4. Set Content-Type to `application/json` for POST/PUT requests
-
----
-
-## Database Setup
-
-Before using the API, make sure to run the migrations and seeders:
-
-```bash
-# Run migrations
-php artisan migrate
-
-# Run seeders (optional - adds sample data)
-php artisan db:seed
-```
-
-This will create the database tables and populate them with sample countries and users.
-
----
-
-🔒 = Protected route (requires authentication)
+## Support
+For API support or questions, please contact:
+- Email: support@neemagospel.com
+- Documentation Updates: This documentation is updated with each API release

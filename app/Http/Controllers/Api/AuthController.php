@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Mail\SendOtpMail; // <-- Import the Mailable
 use App\Models\User;
-use App\Services\SmsService;
+use App\Services\SmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -41,7 +41,7 @@ class AuthController extends Controller
 
         // Determine the verification method based on input
         //$verification_method = $request->filled('email') ? 'email' : 'mobile';
-        $verification_method = 'email';
+        $verification_method = 'mobile';
 
         $user = User::create([
             'first_name' => $request->first_name,
@@ -61,7 +61,7 @@ class AuthController extends Controller
 
         // Send OTP based on the verification method used for registration
         if ($user->verification_method === 'mobile') {
-            $smsService = new SmsService();
+            $smsService = new SmService();
             if ($smsService->isConfigured()) {
                  $smsService->sendOtp($user->phone_number, $otp);
                  $message = 'User registered successfully. Please verify your account using the OTP sent to your phone.';
@@ -197,7 +197,7 @@ class AuthController extends Controller
         $message = '';
 
         if ($user->verification_method === 'mobile') {
-            $smsService = new SmsService();
+            $smsService = new SmService();
              if ($smsService->isConfigured()) {
                 $smsService->sendOtp($user->phone_number, $otp);
                 $message = 'New OTP sent successfully to your phone.';
@@ -234,4 +234,7 @@ class AuthController extends Controller
             'data' => $request->user()->load('country')
         ]);
     }
+
+
 }
+
