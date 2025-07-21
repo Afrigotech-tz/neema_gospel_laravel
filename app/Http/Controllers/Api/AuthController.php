@@ -74,6 +74,7 @@ class AuthController extends Controller
                     'message' => 'SMS Service is not configured. Cannot send OTP.',
                  ], 500);
             }
+
         } else { // 'email'
             Mail::to($user->email)->send(new SendOtpMail($otp));
             $message = 'User registered successfully. Please verify your account using the OTP sent to your email.';
@@ -95,7 +96,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'login' => 'required|string', // Can be email or phone number
+            'login' => 'required|string',
             'password' => 'required|string',
         ]);
 
@@ -170,7 +171,10 @@ class AuthController extends Controller
                 'token_type' => 'Bearer'
             ]
         ]);
+
     }
+
+
 
     /**
      * Resend OTP to user's email or phone

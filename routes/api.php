@@ -106,6 +106,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/location', [ProfileController::class, 'updateLocation']);
     });
 
+    // Donations routes
+    require __DIR__.'/api_donations.php';
+
 
 
 });
