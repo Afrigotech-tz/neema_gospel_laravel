@@ -24,11 +24,11 @@ class AuthController extends Controller
             'first_name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
             'gender' => 'nullable|in:male,female',
-            // Require at least one of phone_number or email
             'phone_number' => 'required_without:email|nullable|string|unique:users,phone_number',
             'email' => 'required_without:phone_number|nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'country_id' => 'required|exists:countries,id',
+            'verification_method' => 'required|in:email,mobile',
         ]);
 
         if ($validator->fails()) {
@@ -40,10 +40,11 @@ class AuthController extends Controller
         }
 
         // Determine the verification method based on input
-        //$verification_method = $request->filled('email') ? 'email' : 'mobile';
-        $verification_method = 'mobile';
+        $verification_method = $request->input("verification_method");
+
 
         $user = User::create([
+
             'first_name' => $request->first_name,
             'surname' => $request->surname,
             'gender' => $request->gender,
@@ -237,4 +238,3 @@ class AuthController extends Controller
 
 
 }
-
