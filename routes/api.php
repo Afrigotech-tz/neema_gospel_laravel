@@ -131,6 +131,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{news}', [App\Http\Controllers\Api\NewsController::class, 'destroy']);
     });
 
+    // Products & Payments Routes
+    require __DIR__.'/api_products_payments.php';
+
 
 
 

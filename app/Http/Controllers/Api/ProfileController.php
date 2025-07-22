@@ -7,6 +7,7 @@ use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
@@ -225,6 +226,7 @@ class ProfileController extends Controller
     private function optimizeImage($path)
     {
         try {
+            // Use Intervention Image to optimize the image
             $image = Image::make(Storage::disk('public')->path($path));
 
             // Resize if too large (max 800x800 while maintaining aspect ratio)
