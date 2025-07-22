@@ -238,7 +238,7 @@ class ProfileController extends Controller
 
         } catch (\Exception $e) {
             // Log error but don't fail the upload
-            \Log::warning('Image optimization failed: ' . $e->getMessage());
+            Log::warning('Image optimization failed: ' . $e->getMessage());
         }
     }
 }

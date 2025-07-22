@@ -71,9 +71,15 @@ Route::prefix('events')->group(function () {
     Route::get('/featured', [EventController::class, 'featured']);
     Route::get('/search', [EventController::class, 'search']);
     Route::get('/{event}', [EventController::class, 'show']);
-
 });
 
+// Public news routes
+Route::prefix('news')->group(function () {
+    Route::get('/', [App\Http\Controllers\Api\NewsController::class, 'index']);
+    Route::get('/featured', [App\Http\Controllers\Api\NewsController::class, 'featured']);
+    Route::get('/recent', [App\Http\Controllers\Api\NewsController::class, 'recent']);
+    Route::get('/{news}', [App\Http\Controllers\Api\NewsController::class, 'show']);
+});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -118,7 +124,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{music}', [App\Http\Controllers\Api\MusicController::class, 'destroy']);
     });
 
-    
+    // Protected news routes
+    Route::prefix('news')->group(function () {
+        Route::post('/', [App\Http\Controllers\Api\NewsController::class, 'store']);
+        Route::put('/{news}', [App\Http\Controllers\Api\NewsController::class, 'update']);
+        Route::delete('/{news}', [App\Http\Controllers\Api\NewsController::class, 'destroy']);
+    });
+
+
+
+
 
 });
 

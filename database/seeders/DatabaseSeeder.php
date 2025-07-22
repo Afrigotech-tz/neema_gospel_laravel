@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProfileSeeder::class,
             EventSeeder::class,
+            NewsSeeder::class,
         ]);
     }
 }
-
