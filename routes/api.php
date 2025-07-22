@@ -109,7 +109,16 @@ Route::middleware('auth:sanctum')->group(function () {
     // Donations routes
     require __DIR__.'/api_donations.php';
 
+    // Music routes
+    Route::prefix('music')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
+        Route::post('/', [App\Http\Controllers\Api\MusicController::class, 'store']);
+        Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
+        Route::put('/{music}', [App\Http\Controllers\Api\MusicController::class, 'update']);
+        Route::delete('/{music}', [App\Http\Controllers\Api\MusicController::class, 'destroy']);
+    });
 
+    
 
 });
 
