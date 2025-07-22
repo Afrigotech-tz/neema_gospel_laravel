@@ -50,6 +50,45 @@ class EventController extends Controller
     /**
      * Store a newly created event
      */
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'title' => 'required|string|max:255',
+    //         'type' => 'required|in:concert,service,live_recording,conference,other',
+    //         'date' => 'required|date|after:now',
+    //         'location' => 'required|string|max:255',
+    //         'picture' => 'nullable|string|max:500',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validation errors',
+    //             'errors' => $validator->errors()
+    //         ], 422);
+    //     }
+
+    //    $data = $validator->validated();
+
+
+    //     // Handle picture upload if provided as file
+    //     if ($request->hasFile('picture')) {
+    //         $file = $request->file('picture');
+    //         $filename = 'event_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+    //         $path = $file->storeAs('events', $filename, 'public');
+    //         $data['picture'] = $path;
+    //     }
+
+    //     $event = Event::create($data);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Event created successfully',
+    //         'data' => $event
+    //     ], 201);
+    // }
+
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -57,7 +96,7 @@ class EventController extends Controller
             'type' => 'required|in:concert,service,live_recording,conference,other',
             'date' => 'required|date|after:now',
             'location' => 'required|string|max:255',
-            'picture' => 'nullable|string|max:500',
+            'picture' => 'nullable|file|mimes:jpg,jpeg,png|max:2048', // if uploading image files
         ]);
 
         if ($validator->fails()) {
@@ -68,9 +107,10 @@ class EventController extends Controller
             ], 422);
         }
 
-        $data = $request->all();
+        // Only use validated data
+        $data = $validator->validated();
 
-        // Handle picture upload if provided
+        // Handle picture upload if provided as file
         if ($request->hasFile('picture')) {
             $file = $request->file('picture');
             $filename = 'event_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
@@ -84,8 +124,9 @@ class EventController extends Controller
             'success' => true,
             'message' => 'Event created successfully',
             'data' => $event
-        ], 201);
+        ], 201);                                                                                        
     }
+
 
     /**
      * Display the specified event

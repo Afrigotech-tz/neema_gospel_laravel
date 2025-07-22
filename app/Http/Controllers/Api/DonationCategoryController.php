@@ -21,26 +21,6 @@ class DonationCategoryController extends Controller
         ], Response::HTTP_OK);
     }
 
-    /**
-     * Store a newly created donation category.
-     */
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255|unique:donation_categories,name'
-    //     ], [
-    //         'name.unique' => 'Donation category with this name already exists.'
-    //     ]);
-
-    //     $category = DonationCategory::create($validated);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Donation category created successfully',
-    //         'data' => $category
-    //     ], Response::HTTP_CREATED);
-    // }
-
 
     public function store(Request $request)
     {
@@ -72,12 +52,13 @@ class DonationCategoryController extends Controller
             'message' => 'Donation category created successfully',
             'data' => $category
         ], Response::HTTP_CREATED);
-    }
 
+
+    }
 
     /**
      * Display the specified donation category.
-     * 
+     *
      */
     public function show(DonationCategory $category)
     {
@@ -147,5 +128,9 @@ class DonationCategoryController extends Controller
             'exists' => false,
             'message' => 'Donation category name is available'
         ], Response::HTTP_OK);
+
+
     }
+
+
 }

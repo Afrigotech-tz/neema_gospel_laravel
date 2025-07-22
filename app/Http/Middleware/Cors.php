@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+
 class Cors
 {
     /**
@@ -26,5 +27,9 @@ class Cors
         }
 
         return $response;
+
+
     }
+
+
 }
