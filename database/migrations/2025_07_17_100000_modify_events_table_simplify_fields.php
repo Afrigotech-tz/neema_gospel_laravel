@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('events', function (Blueprint $table) {
-            // Add date column first (nullable to avoid issues with existing data)
-            $table->date('date')->nullable()->after('type');
+            // Add date column first with default value to avoid issues with existing data
+            $table->date('date')->after('type')->default(now());
 
             // Rename image_url to picture
             $table->renameColumn('image_url', 'picture');
@@ -39,7 +39,7 @@ return new class extends Migration
                 'metadata'
             ]);
 
-            // Make date column not nullable after data migration
+            // Make date column not nullable
             $table->date('date')->nullable(false)->change();
         });
     }
