@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             ProfileSeeder::class,
             EventSeeder::class,
             NewsSeeder::class,
+            RolesAndPermissionsSeeder::class,
         ]);
     }
 }
