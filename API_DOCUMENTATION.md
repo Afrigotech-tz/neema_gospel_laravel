@@ -214,3 +214,4 @@ All endpoints return consistent error responses:
 - OTP codes expire after 15 minutes
 - Tokens expire based on Laravel Sanctum configuration
 - HTTPS is required for production environments
+

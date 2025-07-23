@@ -85,5 +85,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/flutterwave', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.flutterwave');
     });
 
-    
+
 });
+

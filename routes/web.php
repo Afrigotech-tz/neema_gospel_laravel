@@ -13,8 +13,8 @@ Route::get('/login', function () {
     ], 401);
 })->name('login');
 
-// Catch-all route to redirect all non-existent pages to neema_gospel
-Route::fallback(function () {
-    return view('neema_gospel');
-});
+// // Catch-all route to redirect all non-existent pages to neema_gospel
+// Route::fallback(function () {
+//     return view('neema_gospel');
+// });
 
