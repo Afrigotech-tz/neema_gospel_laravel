@@ -189,7 +189,10 @@ class User extends Authenticatable
 
     /**
      * Check if user has all of the given roles
+     *
      */
+
+    
     public function hasAllRoles(...$roles)
     {
         foreach ($roles as $role) {
@@ -318,4 +321,7 @@ class User extends Authenticatable
         }
         return true;
     }
+
+
 };
+

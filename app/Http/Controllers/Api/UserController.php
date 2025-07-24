@@ -258,6 +258,7 @@ class UserController extends Controller
             'message' => 'Role removed successfully',
             'data' => $user->load('roles')
         ]);
+        
     }
 
     /**
