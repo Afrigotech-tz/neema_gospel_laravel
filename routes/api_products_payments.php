@@ -26,7 +26,7 @@ Route::prefix('products')->group(function () {
 });
 
 // Protected routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Product Management Routes (Admin)
     Route::prefix('admin/products')->group(function () {

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             NewsSeeder::class,
             RolesAndPermissionsSeeder::class,
+            ApiKeySeeder::class
         ]);
     }
 

@@ -9,10 +9,13 @@ use Illuminate\Support\Str;
 class ApiKeySeeder extends Seeder
 {
     /**
+     * 
      * Run the database seeds.
+     *
      */
     public function run(): void
     {
+
         // Flutter App API Key
         ApiKey::create([
             'name' => 'Flutter Mobile App',
@@ -51,8 +54,9 @@ class ApiKeySeeder extends Seeder
             'rate_limit' => 5000, // Higher limit for development
             'expires_at' => now()->addMonths(6),
         ]);
-        
 
     }
+
+
 
 }

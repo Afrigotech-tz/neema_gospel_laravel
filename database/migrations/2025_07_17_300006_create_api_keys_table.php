@@ -9,6 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    
     public function up(): void
     {
         Schema::create('api_keys', function (Blueprint $table) {
@@ -25,7 +26,9 @@ return new class extends Migration
 
             $table->index(['key', 'is_active']);
             $table->index('client_type');
+
         });
+
     }
 
     /**
@@ -35,6 +38,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('api_keys');
     }
+
+
 
 };
 

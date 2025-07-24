@@ -19,6 +19,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
+        
     }
 
     /**
@@ -28,4 +30,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('roles');
     }
+
+
 };
