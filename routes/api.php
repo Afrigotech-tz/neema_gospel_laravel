@@ -89,8 +89,8 @@ Route::prefix('news')->group(function () {
     Route::get('/{news}', [App\Http\Controllers\Api\NewsController::class, 'show']);
 });
 
-// Protected routes
-Route::middleware('auth:sanctum')->group(function () {
+// Protected routes with API key authentication
+Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -167,8 +167,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-
-
 });
 
 
@@ -182,7 +180,6 @@ Route::fallback(function () {
 
 
 });
-
 
 
 
