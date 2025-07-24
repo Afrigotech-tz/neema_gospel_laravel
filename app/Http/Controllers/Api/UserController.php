@@ -251,14 +251,21 @@ class UserController extends Controller
      */
     public function removeRole(Request $request, User $user, Role $role)
     {
-        $user->removeRole($role->id);
+        // Check if user has this role before attempting to remove it
+        if (!$user->hasRole($role)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User does not have this role'
+            ], 422);
+        }
+
+        $user->removeRole($role);
 
         return response()->json([
             'success' => true,
             'message' => 'Role removed successfully',
             'data' => $user->load('roles')
         ]);
-        
     }
 
     /**
