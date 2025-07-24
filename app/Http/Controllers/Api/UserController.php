@@ -143,10 +143,13 @@ class UserController extends Controller
             'message' => 'User updated successfully',
             'data' => $user->load('country')
         ]);
+
+
     }
 
     /**
      * Remove the specified user
+     *
      */
     public function destroy($id)
     {
@@ -196,7 +199,7 @@ class UserController extends Controller
     public function assignRole(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            'role_id' => 'required|exists:roles,id',
+            'role_id' => 'required|integer|exists:roles,id',
         ]);
 
         if ($validator->fails()) {
@@ -207,13 +210,40 @@ class UserController extends Controller
             ], 422);
         }
 
-        $user->assignRole($request->role_id);
+        try {
+            $roleId = $request->input('role_id');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Role assigned successfully',
-            'data' => $user->load('roles')
-        ]);
+            // Check if role exists
+            $role = Role::find($roleId);
+            if (!$role) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Role not found'
+                ], 404);
+            }
+
+            // Check if user already has this role
+            if ($user->hasRole($roleId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User already has this role'
+                ], 422);
+            }
+
+            $user->assignRole($roleId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Role assigned successfully',
+                'data' => $user->load('roles')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to assign role',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -258,7 +288,9 @@ class UserController extends Controller
             'success' => true,
             'data' => $users
         ]);
+
     }
+
 
     public function get_user($id)
     {
@@ -273,6 +305,7 @@ class UserController extends Controller
             'success' => true,
             'data' => $user
         ]);
+
     }
 
 
@@ -292,10 +325,8 @@ class UserController extends Controller
             'message' => 'User deleted successfully'
         ]);
 
-        
     }
 
 
-
-
 }
+

@@ -29,7 +29,7 @@ Route::get('test/users/', [UserController::class, 'get_users']);
 Route::get('test/users/{id}', [UserController::class, 'get_user']);
 Route::put('test/users/{id}', [UserController::class, 'update_user']);
 Route::delete('test/users/{id}', [UserController::class, 'delete_user']);
-Route::get('test/users/{id}', [UserController::class, 'get_user']);
+
 
 // OTP verification routes
 Route::prefix('auth')->group(function () {

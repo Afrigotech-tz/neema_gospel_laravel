@@ -132,7 +132,7 @@ class User extends Authenticatable
      * Clear OTP after verification
      */
 
-    
+
     public function clearOtp(): void
     {
         $this->update([
@@ -207,17 +207,35 @@ class User extends Authenticatable
     {
         $roles = collect($roles)
             ->flatten()
-            ->filter() // Remove empty/null values
+            ->filter(function ($role) {
+                return !empty($role);
+            })
             ->map(function ($role) {
                 if (is_string($role)) {
-                    return Role::where('name', $role)->firstOrFail();
+                    $roleModel = Role::where('name', $role)->first();
+                    if (!$roleModel) {
+                        throw new \Exception("Role '{$role}' not found");
+                    }
+                    return $roleModel;
                 }
-                return $role;
+
+                if (is_numeric($role)) {
+                    $roleModel = Role::find($role);
+                    if (!$roleModel) {
+                        throw new \Exception("Role with ID '{$role}' not found");
+                    }
+                    return $roleModel;
+                }
+
+                if ($role instanceof Role) {
+                    return $role;
+                }
+
+                return null;
             })
-            ->filter(function ($role) {
-                return !empty($role) && !empty($role->id);
-            })
+            ->filter()
             ->pluck('id')
+            ->unique()
             ->toArray();
 
         if (!empty($roles)) {
