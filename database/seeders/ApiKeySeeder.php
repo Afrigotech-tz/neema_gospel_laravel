@@ -16,7 +16,7 @@ class ApiKeySeeder extends Seeder
         // Flutter App API Key
         ApiKey::create([
             'name' => 'Flutter Mobile App',
-            'key' => 'flutter_app_key_2024_secure_key_12345',
+            'key' => 'mh8bUvdGP2xD9P4J3BZPYvr6noPBwEwZ',
             'client_type' => 'flutter',
             'is_active' => true,
             'rate_limit' => 1000, // 1000 requests per day
@@ -26,7 +26,7 @@ class ApiKeySeeder extends Seeder
         // React App API Key
         ApiKey::create([
             'name' => 'React Web App',
-            'key' => 'react_app_key_2024_secure_key_67890',
+            'key' => 'h67vhksEYwSV1OTrqK6TTNs36uU5DxOT',
             'client_type' => 'react',
             'is_active' => true,
             'rate_limit' => 2000, // 2000 requests per day
@@ -45,13 +45,14 @@ class ApiKeySeeder extends Seeder
 
         ApiKey::create([
             'name' => 'Development React',
-            'key' => 'dev_react_key_2024_dev_mode_22222',
+            'key' => 'Mgg0ufnqzjirjjyva3SrjIDB0XDs6GOM',
             'client_type' => 'react',
             'is_active' => true,
             'rate_limit' => 5000, // Higher limit for development
             'expires_at' => now()->addMonths(6),
         ]);
+        
 
     }
-    
+
 }
