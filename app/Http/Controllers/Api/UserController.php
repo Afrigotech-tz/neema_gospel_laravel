@@ -280,8 +280,6 @@ class UserController extends Controller
     }
 
 
-
-
     //  temporary functions
     public function get_users()
     {
@@ -316,7 +314,6 @@ class UserController extends Controller
 
     }
 
-
     public  function delete_user($id)
     {
         $user = User::find($id);
@@ -334,6 +331,7 @@ class UserController extends Controller
         ]);
 
     }
+
 
 
 }

@@ -139,16 +139,20 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // Get all permissions from user's roles
+        $permissions = $user->roles->flatMap->permissions->pluck('name')->unique()->values();
+
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
             'data' => [
                 'user' => $user->load(['country', 'roles']),
                 'token' => $token,
-                'token_type' => 'Bearer'
+                'token_type' => 'Bearer',
+                'permissions' => $permissions
             ]
         ]);
-        
+
     }
 
     /**
