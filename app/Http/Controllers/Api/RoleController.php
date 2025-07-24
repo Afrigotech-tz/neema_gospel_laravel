@@ -69,6 +69,7 @@ class RoleController extends Controller
             'success' => true,
             'data' => $role->load('permissions')
         ]);
+        
     }
 
     /**

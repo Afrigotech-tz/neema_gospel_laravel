@@ -159,7 +159,7 @@ class AuthController extends Controller
      * Verify OTP and activate account
      *
      */
-    
+
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
