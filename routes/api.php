@@ -144,6 +144,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{news}', [App\Http\Controllers\Api\NewsController::class, 'destroy']);
     });
 
+    // Role management routes
+    Route::prefix('roles')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\RoleController::class, 'index']);
+        Route::post('/', [App\Http\Controllers\Api\RoleController::class, 'store']);
+        Route::get('/{role}', [App\Http\Controllers\Api\RoleController::class, 'show']);
+        Route::put('/{role}', [App\Http\Controllers\Api\RoleController::class, 'update']);
+        Route::delete('/{role}', [App\Http\Controllers\Api\RoleController::class, 'destroy']);
+
+        // Permission management for roles
+        Route::post('/{role}/permissions', [App\Http\Controllers\Api\RoleController::class, 'addPermissions']);
+        Route::delete('/{role}/permissions', [App\Http\Controllers\Api\RoleController::class, 'removePermissions']);
+    });
+
+    // Permissions routes
+    Route::prefix('permissions')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\RoleController::class, 'getAllPermissions']);
+    });
+
     // Products & Payments Routes
     require __DIR__.'/api_products_payments.php';
 
