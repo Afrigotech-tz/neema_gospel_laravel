@@ -23,6 +23,14 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+
+// Public user routes
+Route::get('test/users/', [UserController::class, 'get_users']);
+Route::get('test/users/{id}', [UserController::class, 'get_user']);
+Route::put('test/users/{id}', [UserController::class, 'update_user']);
+Route::delete('test/users/{id}', [UserController::class, 'delete_user']);
+Route::get('test/users/{id}', [UserController::class, 'get_user']);
+
 // OTP verification routes
 Route::prefix('auth')->group(function () {
     // Route::post('/send-otp', [AuthController::class, 'sendOtp']);
@@ -90,6 +98,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // User routes
     Route::get('/users/search', [UserController::class, 'search']);
     Route::apiResource('users', UserController::class);
+
+    // User role management routes
+    Route::post('/users/{user}/roles', [UserController::class, 'assignRole']);
+    Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole']);
+    Route::get('/users/{user}/roles', [UserController::class, 'getUserRoles']);
 
     // Country management routes (protected)
     Route::post('/countries', [CountryController::class, 'store']);

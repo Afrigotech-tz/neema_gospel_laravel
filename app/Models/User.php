@@ -131,6 +131,8 @@ class User extends Authenticatable
     /**
      * Clear OTP after verification
      */
+
+    
     public function clearOtp(): void
     {
         $this->update([
@@ -157,7 +159,7 @@ class User extends Authenticatable
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class)->using('user_role');
+        return $this->belongsToMany(Role::class, 'user_role');
     }
 
     /**
@@ -205,16 +207,22 @@ class User extends Authenticatable
     {
         $roles = collect($roles)
             ->flatten()
+            ->filter() // Remove empty/null values
             ->map(function ($role) {
                 if (is_string($role)) {
                     return Role::where('name', $role)->firstOrFail();
                 }
                 return $role;
             })
+            ->filter(function ($role) {
+                return !empty($role) && !empty($role->id);
+            })
             ->pluck('id')
             ->toArray();
 
-        $this->roles()->syncWithoutDetaching($roles);
+        if (!empty($roles)) {
+            $this->roles()->syncWithoutDetaching($roles);
+        }
     }
 
     /**

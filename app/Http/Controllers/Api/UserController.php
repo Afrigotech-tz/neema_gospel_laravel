@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -22,7 +23,6 @@ class UserController extends Controller
             'success' => true,
             'data' => $users
         ]);
-
     }
 
     /**
@@ -58,10 +58,16 @@ class UserController extends Controller
             'country_id' => $request->country_id,
         ]);
 
+        // Assign default 'user' role
+        $defaultRole = Role::where('name', 'user')->first();
+        if ($defaultRole) {
+            $user->assignRole($defaultRole->id);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'User created successfully',
-            'data' => $user->load('country')
+            'data' => $user->load('country')->load('roles')
         ], 201);
     }
 
@@ -118,7 +124,12 @@ class UserController extends Controller
         }
 
         $updateData = $request->only([
-            'first_name', 'surname', 'gender', 'phone_number', 'email', 'country_id'
+            'first_name',
+            'surname',
+            'gender',
+            'phone_number',
+            'email',
+            'country_id'
         ]);
 
         if ($request->has('password')) {
@@ -167,9 +178,9 @@ class UserController extends Controller
         $users = User::with('country')
             ->where(function ($q) use ($query) {
                 $q->where('first_name', 'LIKE', "%{$query}%")
-                  ->orWhere('surname', 'LIKE', "%{$query}%")
-                  ->orWhere('email', 'LIKE', "%{$query}%")
-                  ->orWhere('phone_number', 'LIKE', "%{$query}%");
+                    ->orWhere('surname', 'LIKE', "%{$query}%")
+                    ->orWhere('email', 'LIKE', "%{$query}%")
+                    ->orWhere('phone_number', 'LIKE', "%{$query}%");
             })
             ->paginate($perPage);
 
@@ -178,4 +189,113 @@ class UserController extends Controller
             'data' => $users
         ]);
     }
+
+    /**
+     * Assign role to user
+     */
+    public function assignRole(Request $request, User $user)
+    {
+        $validator = Validator::make($request->all(), [
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user->assignRole($request->role_id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role assigned successfully',
+            'data' => $user->load('roles')
+        ]);
+    }
+
+    /**
+     * Remove role from user
+     */
+    public function removeRole(Request $request, User $user, Role $role)
+    {
+        $user->removeRole($role->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role removed successfully',
+            'data' => $user->load('roles')
+        ]);
+    }
+
+    /**
+     * Get user roles
+     */
+    public function getUserRoles(User $user)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $user->roles
+        ]);
+    }
+
+
+
+
+    //  temporary functions
+    public function get_users()
+    {
+        $users = User::all();
+        if (!$users) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+
+    public function get_user($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
+
+
+    public  function delete_user($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $user->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'User deleted successfully'
+        ]);
+
+        
+    }
+
+
+
+
 }

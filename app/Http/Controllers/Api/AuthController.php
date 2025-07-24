@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\SendOtpMail; // <-- Import the Mailable
+use App\Mail\SendOtpMail;
 use App\Models\User;
+use App\Models\Role;
 use App\Services\SmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail; // <-- Import Mail facade
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -21,6 +22,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
+
             'first_name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
             'gender' => 'nullable|in:male,female',
@@ -29,6 +31,8 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'country_id' => 'required|exists:countries,id',
             'verification_method' => 'required|in:email,mobile',
+            'role_id' => 'nullable|exists:roles,id',
+
         ]);
 
         if ($validator->fails()) {
@@ -42,9 +46,7 @@ class AuthController extends Controller
         // Determine the verification method based on input
         $verification_method = $request->input("verification_method");
 
-
         $user = User::create([
-
             'first_name' => $request->first_name,
             'surname' => $request->surname,
             'gender' => $request->gender,
@@ -55,6 +57,18 @@ class AuthController extends Controller
             'verification_method' => $verification_method,
             'status' => User::STATUS_INACTIVE,
         ]);
+
+        // Assign default role if provided, otherwise assign 'user' role
+        if ($request->has('role_id') && !empty($request->role_id)) {
+            $user->assignRole($request->role_id);
+        } else {
+            // Assign default 'user' role
+            $defaultRole = Role::where('name', 'user')->first();
+            if ($defaultRole) {
+                $user->assignRole($defaultRole->id);
+            }
+
+        }
 
         // Generate and send OTP
         $otp = $user->generateOtp();
@@ -75,7 +89,7 @@ class AuthController extends Controller
                  ], 500);
             }
 
-        } else { // 'email'
+        } else {
             Mail::to($user->email)->send(new SendOtpMail($otp));
             $message = 'User registered successfully. Please verify your account using the OTP sent to your email.';
         }
@@ -88,11 +102,15 @@ class AuthController extends Controller
                 'verification_method' => $user->verification_method,
             ]
         ], 201);
+
+
     }
+
 
     /**
      * Login user with email or phone number
      */
+
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -125,11 +143,12 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Login successful',
             'data' => [
-                'user' => $user->load('country'),
+                'user' => $user->load(['country', 'roles']),
                 'token' => $token,
                 'token_type' => 'Bearer'
             ]
         ]);
+        
     }
 
     /**
