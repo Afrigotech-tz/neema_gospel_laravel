@@ -67,20 +67,44 @@ class RabbitMQService
                 'content_type' => 'application/json',
             ]);
 
-            $this->channel->exchange_declare(
-                $exchange,
-                'topic',
-                false,
-                true,
-                false
-            );
+            // Check if we're publishing to a queue directly (when exchange name matches queue name)
+            $queues = config('rabbitmq.queues', []);
+            $isDirectQueue = false;
 
-            $this->channel->basic_publish($msg, $exchange, $routingKey);
+            foreach ($queues as $queueConfig) {
+                if ($queueConfig['name'] === $exchange) {
+                    $isDirectQueue = true;
+                    break;
+                }
+            }
+
+            if ($isDirectQueue) {
+                // Direct queue publishing
+                $this->channel->queue_declare(
+                    $exchange,
+                    false,
+                    true,
+                    false,
+                    false
+                );
+                $this->channel->basic_publish($msg, '', $exchange);
+            } else {
+                // Exchange-based publishing
+                $this->channel->exchange_declare(
+                    $exchange,
+                    'topic',
+                    false,
+                    true,
+                    false
+                );
+                $this->channel->basic_publish($msg, $exchange, $routingKey);
+            }
 
             Log::info('Message published to RabbitMQ', [
                 'exchange' => $exchange,
                 'routing_key' => $routingKey,
-                'message' => $message
+                'message' => $message,
+                'type' => $isDirectQueue ? 'direct_queue' : 'exchange'
             ]);
 
             return true;
@@ -215,6 +239,5 @@ class RabbitMQService
     {
         $this->close();
     }
-
 
 }

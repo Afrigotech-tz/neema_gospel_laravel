@@ -27,24 +27,34 @@ class NotificationPublisherService
             'timestamp' => now()->toISOString(),
         ];
 
-        $routingKey = 'user.registered.' . $user->verification_method;
-        $exchange = config('rabbitmq.exchanges.user_registration.name');
-
-        $success = $this->rabbitMQService->publish($exchange, $routingKey, $message);
+        // For SMS notifications, publish directly to sms.notifications queue
+        if ($user->verification_method === 'mobile') {
+            $success = $this->rabbitMQService->publish(
+                'sms.notifications',
+                'sms.notification',
+                $message
+            );
+        } else {
+            // For email notifications, use the email queue
+            $success = $this->rabbitMQService->publish(
+                'email.notifications',
+                'email.notification',
+                $message
+            );
+        }
 
         if (!$success) {
-            Log::error('Failed to publish registration notification', [
+            Log::error('Failed to publish notification', [
                 'user_id' => $user->id,
                 'verification_method' => $user->verification_method
             ]);
-
-            // Fallback to synchronous sending if RabbitMQ fails
             return false;
         }
 
-        Log::info('Registration notification published to RabbitMQ', [
+        Log::info('Notification published to RabbitMQ', [
             'user_id' => $user->id,
-            'verification_method' => $user->verification_method
+            'verification_method' => $user->verification_method,
+            'queue' => $user->verification_method === 'mobile' ? 'sms.notifications' : 'email.notifications'
         ]);
 
         return true;
