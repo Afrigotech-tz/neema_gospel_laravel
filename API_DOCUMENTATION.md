@@ -51,6 +51,7 @@ Register a new user with email or phone number verification.
       }
     }
   }
+  
 }
 ```
 
