@@ -7,7 +7,7 @@ use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
@@ -28,7 +28,7 @@ class ProfileController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'user' => $user->load('country'),
+                // 'user' => $user->load('country'),
                 'profile' => $profile
             ]
         ]);
@@ -128,8 +128,13 @@ class ProfileController extends Controller
         $filename = 'profile_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs('profile-pictures', $filename, 'public');
 
-        // Optimize the image for better performance
-        $this->optimizeImage($path);
+        // Optimize the image with high quality settings
+        $this->optimizeImage($path, [
+            'quality' => 95,
+            'resize' => false, // Don't resize profile pictures to maintain quality
+            'format' => 'webp', // Use WebP for better compression without quality loss
+            'backup_original' => true
+        ]);
 
         $profile->update(['profile_picture' => $path]);
 
@@ -221,22 +226,65 @@ class ProfileController extends Controller
     }
 
     /**
-     * Optimize uploaded image for better performance
+     * Optimize uploaded image with configurable quality settings
      */
-    private function optimizeImage($path)
+    private function optimizeImage($path, $options = [])
     {
+        $defaults = [
+            'quality' => 95, // Increased from 85% to 95% for better quality
+            'max_width' => 1200, // Increased from 800 to allow larger images
+            'max_height' => 1200, // Increased from 800 to allow larger images
+            'resize' => false, // Make resizing optional to preserve original dimensions
+            'format' => null, // Allow format conversion
+            'backup_original' => true // Keep original high-quality version
+        ];
+
+        $options = array_merge($defaults, $options);
+
         try {
-            // Use Intervention Image to optimize the image
-            $image = Image::make(Storage::disk('public')->path($path));
+            // Create image manager
+            $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
 
-            // Resize if too large (max 800x800 while maintaining aspect ratio)
-            $image->resize(800, 800, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
+            $fullPath = Storage::disk('public')->path($path);
+            $image = $manager->read($fullPath);
 
-            // Compress and save with 85% quality for good balance
-            $image->save(null, 85);
+            // Backup original if requested
+            if ($options['backup_original']) {
+                $originalPath = str_replace('.jpg', '_original.jpg', $fullPath);
+                $originalPath = str_replace('.jpeg', '_original.jpeg', $originalPath);
+                $originalPath = str_replace('.png', '_original.png', $originalPath);
+                $originalPath = str_replace('.gif', '_original.gif', $originalPath);
+                $originalPath = str_replace('.webp', '_original.webp', $originalPath);
+
+                if (!file_exists($originalPath)) {
+                    copy($fullPath, $originalPath);
+                }
+            }
+
+            // Only resize if explicitly requested and image is larger than limits
+            if ($options['resize']) {
+                $width = $image->width();
+                $height = $image->height();
+
+                if ($width > $options['max_width'] || $height > $options['max_height']) {
+                    $image->scaleDown($options['max_width'], $options['max_height']);
+                }
+            }
+
+            // Handle format conversion for better compression
+            if ($options['format'] === 'webp' && function_exists('imagewebp')) {
+                $webpPath = str_replace(['.jpg', '.jpeg', '.png'], '.webp', $fullPath);
+                $image->save($webpPath, $options['quality']);
+
+                // Update the path to use WebP version
+                if (file_exists($webpPath)) {
+                    unlink($fullPath);
+                    $path = str_replace(['.jpg', '.jpeg', '.png'], '.webp', $path);
+                }
+            } else {
+                // Save with high quality settings
+                $image->save($fullPath, $options['quality']);
+            }
 
         } catch (\Exception $e) {
             // Log error but don't fail the upload
