@@ -51,7 +51,7 @@ class MusicController extends Controller
             'release_date' => 'required|date|before_or_equal:today',
             'choir' => 'required|string|max:255',
             'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'audio_file' => 'required|file|mimes:mp3,wav,ogg,m4a,flac|max:50000', // 50MB max
+            'audio_file' => 'nullable|file|mimes:mp3,wav,ogg,m4a,flac|max:50000', // 50MB max
             'description' => 'nullable|string|max:1000',
             'genre' => 'nullable|string|max:100',
         ],

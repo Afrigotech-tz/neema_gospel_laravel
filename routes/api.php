@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductManagementController;
 use App\Http\Controllers\Api\ProfileController;
@@ -87,17 +88,20 @@ Route::prefix('events')->group(function () {
 
 // Public news routes
 Route::prefix('news')->group(function () {
-    Route::get('/', [App\Http\Controllers\Api\NewsController::class, 'index']);
-    Route::get('/featured', [App\Http\Controllers\Api\NewsController::class, 'featured']);
-    Route::get('/recent', [App\Http\Controllers\Api\NewsController::class, 'recent']);
-    Route::get('/{news}', [App\Http\Controllers\Api\NewsController::class, 'show']);
+    Route::get('/', [NewsController::class, 'index']);
+    Route::get('/featured', [NewsController::class, 'featured']);
+    Route::get('/recent', [NewsController::class, 'recent']);
+    Route::get('/{news}', [NewsController::class, 'show']);
 });
+
 
 // Public music routes
 Route::prefix('music')->group(function () {
     Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
+
+
 
 
 
