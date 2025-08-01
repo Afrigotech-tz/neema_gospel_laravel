@@ -234,6 +234,19 @@ class ProductManagementController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    public function getCategory(Request $request)
+    {
+        $query = ProductCategory::query();
+        $query->orderBy('sort_order', 'asc');
+
+        $categories = $query->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'Categories retrieved successfully',
+            'data' => $categories
+        ]);
+    }
+
     /**
      * Update product category.
      */
@@ -297,6 +310,20 @@ class ProductManagementController extends Controller
     /**
      * Create product variant.
      */
+    public function getVariant(Request $request)
+    {
+        $query = ProductVariant::query();
+        $query->orderBy('id', 'asc');
+
+        $variants = $query->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'Variants retrieved successfully',
+            'data' => $variants
+        ]);
+
+    }
+
     public function storeVariant(Request $request)
     {
         $request->validate([
@@ -456,4 +483,7 @@ class ProductManagementController extends Controller
             'data' => $attributeValue
         ], Response::HTTP_CREATED);
     }
+
+
+
 }

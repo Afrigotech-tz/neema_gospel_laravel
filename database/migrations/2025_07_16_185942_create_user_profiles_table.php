@@ -24,30 +24,18 @@ return new class extends Migration
                 $table->string('city')->nullable();
                 $table->string('state_province')->nullable();
                 $table->string('postal_code')->nullable();
-                $table->decimal('latitude', 10, 8)->nullable(); // GPS coordinates
-                $table->decimal('longitude', 11, 8)->nullable(); // GPS coordinates
-
                 // Additional Profile Info
                 $table->text('bio')->nullable(); // User biography/description
                 $table->date('date_of_birth')->nullable();
                 $table->string('occupation')->nullable();
-                $table->string('website')->nullable();
-
-                // Social Media Links
-                $table->string('facebook_url')->nullable();
-                $table->string('twitter_url')->nullable();
-                $table->string('instagram_url')->nullable();
-                $table->string('linkedin_url')->nullable();
-
                 // Privacy Settings
                 $table->boolean('location_public')->default(false); // Whether location is public
                 $table->boolean('profile_public')->default(true); // Whether profile is public
 
                 $table->timestamps();
-
                 // Indexes
                 $table->index(['user_id']);
-                $table->index(['latitude', 'longitude']); // For location-based queries
+
             });
         }
     }

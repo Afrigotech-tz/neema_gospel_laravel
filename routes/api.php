@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\AdvancedPaymentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\ProductManagementController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -89,6 +93,15 @@ Route::prefix('news')->group(function () {
     Route::get('/{news}', [App\Http\Controllers\Api\NewsController::class, 'show']);
 });
 
+// Public music routes
+Route::prefix('music')->group(function () {
+    Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
+    Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
+});
+
+
+
+
 // Protected routes with API key authentication
 Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Auth routes
@@ -122,20 +135,19 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::put('/', [ProfileController::class, 'update']);
         Route::post('/picture', [ProfileController::class, 'updateProfilePicture']);
         Route::delete('/picture', [ProfileController::class, 'deleteProfilePicture']);
-        Route::post('/location', [ProfileController::class, 'updateLocation']);
+        Route::put('/location', [ProfileController::class, 'updateLocation']);
     });
 
     // Donations routes
-    require __DIR__.'/api_donations.php';
+    require __DIR__ . '/api_donations.php';
 
-    // Music routes
+    // Protected music routes
     Route::prefix('music')->group(function () {
-        Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
         Route::post('/', [App\Http\Controllers\Api\MusicController::class, 'store']);
-        Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
         Route::put('/{music}', [App\Http\Controllers\Api\MusicController::class, 'update']);
         Route::delete('/{music}', [App\Http\Controllers\Api\MusicController::class, 'destroy']);
     });
+
 
     // Protected news routes
     Route::prefix('news')->group(function () {
@@ -157,16 +169,25 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::delete('/{role}/permissions', [App\Http\Controllers\Api\RoleController::class, 'removePermissions']);
     });
 
+
     // Permissions routes
     Route::prefix('permissions')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\RoleController::class, 'getAllPermissions']);
     });
 
     // Products & Payments Routes
-    require __DIR__.'/api_products_payments.php';
+    require __DIR__.'/api_products.php';
 
+
+    // Webhook routes for payment gateways
+    Route::prefix('webhooks')->group(function () {
+        Route::post('/stripe', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.stripe');
+        Route::post('/paystack', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.paystack');
+        Route::post('/flutterwave', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.flutterwave');
+    });
 
 });
+
 
 
 // Fallback route for API
@@ -177,8 +198,4 @@ Route::fallback(function () {
         'message' => 'API endpoint not found'
     ], 404);
 
-
 });
-
-
-

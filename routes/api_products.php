@@ -23,6 +23,7 @@ Route::prefix('products')->group(function () {
     Route::get('/{id}', [ProductController::class, 'show']);
     Route::get('/categories/all', [ProductController::class, 'categories']);
     Route::get('/category/{categoryId}', [ProductController::class, 'productsByCategory']);
+
 });
 
 // Protected routes
@@ -30,16 +31,19 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Product Management Routes (Admin)
     Route::prefix('admin/products')->group(function () {
+
         Route::post('/', [ProductManagementController::class, 'store']);
         Route::put('/{id}', [ProductManagementController::class, 'update']);
         Route::delete('/{id}', [ProductManagementController::class, 'destroy']);
 
         // Categories
+        Route::get('/categories', [ProductManagementController::class, 'getCategory']);
         Route::post('/categories', [ProductManagementController::class, 'storeCategory']);
         Route::put('/categories/{id}', [ProductManagementController::class, 'updateCategory']);
         Route::delete('/categories/{id}', [ProductManagementController::class, 'destroyCategory']);
 
         // Variants
+        Route::get('/variants', [ProductManagementController::class, 'getVariant']);
         Route::post('/variants', [ProductManagementController::class, 'storeVariant']);
         Route::put('/variants/{id}', [ProductManagementController::class, 'updateVariant']);
         Route::delete('/variants/{id}', [ProductManagementController::class, 'destroyVariant']);
@@ -47,9 +51,13 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         // Attributes
         Route::post('/attributes', [ProductManagementController::class, 'storeAttribute']);
         Route::post('/attribute-values', [ProductManagementController::class, 'storeAttributeValue']);
+
+
     });
 
-    // Cart Routes
+
+
+    // // Cart Routes
     Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'index']);
         Route::post('/', [CartController::class, 'store']);
@@ -58,7 +66,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::delete('/clear', [CartController::class, 'clear']);
     });
 
-    // Payment Routes
+    // // Payment Routes
     Route::prefix('payments')->group(function () {
         // Basic payment routes
         Route::get('/methods', [PaymentController::class, 'paymentMethods']);
@@ -78,7 +86,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::get('/refunds/{refundId}', [AdvancedPaymentController::class, 'refundDetails']);
     });
 
-    // Webhook routes for payment gateways
+    // // Webhook routes for payment gateways
     Route::prefix('webhooks')->group(function () {
         Route::post('/stripe', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.stripe');
         Route::post('/paystack', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.paystack');

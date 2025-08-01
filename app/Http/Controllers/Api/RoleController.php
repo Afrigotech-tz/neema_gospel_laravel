@@ -63,13 +63,21 @@ class RoleController extends Controller
     /**
      * Display the specified role
      */
-    public function show(Role $role)
+    public function show($id)
     {
+        $role = Role::find($id);
+
+        if (!$role) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Role not found'
+            ], 404);
+        }
+
         return response()->json([
             'success' => true,
             'data' => $role->load('permissions')
         ]);
-        
     }
 
     /**
@@ -79,6 +87,7 @@ class RoleController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+            'display_name' => 'nullable|string|max:255,',
             'description' => 'nullable|string|max:500',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,id',
@@ -94,6 +103,7 @@ class RoleController extends Controller
 
         $role->update([
             'name' => $request->name,
+            'display_name' => $request->display_name,
             'description' => $request->description,
         ]);
 
@@ -155,7 +165,9 @@ class RoleController extends Controller
             'message' => 'Permissions added to role successfully',
             'data' => $role->load('permissions')
         ]);
+
     }
+    
 
     /**
      * Remove permissions from role

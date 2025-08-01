@@ -54,7 +54,8 @@ class MusicController extends Controller
             'audio_file' => 'required|file|mimes:mp3,wav,ogg,m4a,flac|max:50000', // 50MB max
             'description' => 'nullable|string|max:1000',
             'genre' => 'nullable|string|max:100',
-        ], [
+        ],
+        [
             'name.required' => 'The music name is required.',
             'name.max' => 'The music name must not exceed 255 characters.',
             'release_date.required' => 'The release date is required.',
@@ -72,6 +73,8 @@ class MusicController extends Controller
             'description.max' => 'The description must not exceed 1000 characters.',
             'genre.max' => 'The genre must not exceed 100 characters.',
         ]);
+
+
 
         if ($validator->fails()) {
             return response()->json([

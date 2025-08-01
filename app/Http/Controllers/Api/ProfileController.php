@@ -47,16 +47,9 @@ class ProfileController extends Controller
             'city' => 'nullable|string|max:100',
             'state_province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
             'bio' => 'nullable|string|max:1000',
             'date_of_birth' => 'nullable|date|before:today',
             'occupation' => 'nullable|string|max:100',
-            'website' => 'nullable|url|max:255',
-            'facebook_url' => 'nullable|url|max:255',
-            'twitter_url' => 'nullable|url|max:255',
-            'instagram_url' => 'nullable|url|max:255',
-            'linkedin_url' => 'nullable|url|max:255',
             'location_public' => 'nullable|boolean',
             'profile_public' => 'nullable|boolean',
         ]);
@@ -130,10 +123,10 @@ class ProfileController extends Controller
 
         // Optimize the image with high quality settings
         $this->optimizeImage($path, [
-            'quality' => 95,
+            'quality' => 98,
             'resize' => false, // Don't resize profile pictures to maintain quality
             'format' => 'webp', // Use WebP for better compression without quality loss
-            'backup_original' => true
+            'backup_original' => false // Do not store original image
         ]);
 
         $profile->update(['profile_picture' => $path]);
@@ -153,8 +146,6 @@ class ProfileController extends Controller
     public function updateLocation(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'state_province' => 'nullable|string|max:100',
@@ -174,8 +165,6 @@ class ProfileController extends Controller
         $profile = $user->profile ?? UserProfile::create(['user_id' => $user->id]);
 
         $profile->update($request->only([
-            'latitude',
-            'longitude',
             'address',
             'city',
             'state_province',
@@ -188,8 +177,6 @@ class ProfileController extends Controller
             'message' => 'Location updated successfully',
             'data' => [
                 'location' => [
-                    'latitude' => $profile->latitude,
-                    'longitude' => $profile->longitude,
                     'address' => $profile->full_address,
                     'location_public' => $profile->location_public
                 ]
@@ -290,5 +277,7 @@ class ProfileController extends Controller
             // Log error but don't fail the upload
             Log::warning('Image optimization failed: ' . $e->getMessage());
         }
+
+
     }
 }
