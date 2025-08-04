@@ -32,6 +32,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Product Management Routes (Admin)
     Route::prefix('admin/products')->group(function () {
 
+
+        Route::get('/', [ProductManagementController::class, 'getProducts']);
         Route::post('/', [ProductManagementController::class, 'store']);
         Route::put('/{id}', [ProductManagementController::class, 'update']);
         Route::delete('/{id}', [ProductManagementController::class, 'destroy']);
@@ -50,7 +52,13 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
         // Attributes
         Route::post('/attributes', [ProductManagementController::class, 'storeAttribute']);
+
+        // Attribute Values
+        Route::get('/attribute-values', [ProductManagementController::class, 'getAttributeValues']);
         Route::post('/attribute-values', [ProductManagementController::class, 'storeAttributeValue']);
+        Route::put('/attribute-values/{id}', [ProductManagementController::class, 'updateAttributeValue']);
+        Route::delete('/attribute-values/{id}', [ProductManagementController::class, 'destroyAttributeValue']);
+
 
 
     });

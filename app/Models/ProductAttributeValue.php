@@ -12,7 +12,6 @@ class ProductAttributeValue extends Model
     protected $table = 'product_attribute_values';
 
     protected $fillable = [
-        'product_id',
         'attribute_id',
         'value',
         'price_adjustment',
@@ -25,10 +24,6 @@ class ProductAttributeValue extends Model
         'stock_quantity' => 'integer',
     ];
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
 
     public function attribute()
     {
@@ -40,5 +35,5 @@ class ProductAttributeValue extends Model
         return $this->belongsToMany(ProductVariant::class, 'attribute_value_product_variant', 'attribute_value_id', 'product_variant_id')
             ->withPivot('value');
     }
-    
+
 }
