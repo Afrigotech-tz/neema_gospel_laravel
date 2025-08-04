@@ -20,8 +20,11 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             NewsSeeder::class,
             RolesAndPermissionsSeeder::class,
-            ApiKeySeeder::class
+            ApiKeySeeder::class,
+            DonationCategorySeeder::class,
+            ProductCategorySeeder::class,
         ]);
+
     }
 
 }

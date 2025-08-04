@@ -55,4 +55,6 @@ class ProductCategory extends Model
     {
         return $this->hasMany(ProductCategory::class, 'parent_id');
     }
+
+
 }
