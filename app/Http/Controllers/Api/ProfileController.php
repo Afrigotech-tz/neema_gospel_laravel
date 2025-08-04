@@ -28,7 +28,7 @@ class ProfileController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                // 'user' => $user->load('country'),
+                'user' => $user->load('country'),
                 'profile' => $profile
             ]
         ]);
