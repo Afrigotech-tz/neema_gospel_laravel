@@ -323,7 +323,7 @@ class ProductManagementController extends Controller
             'product_id' => 'required|exists:products,id',
             'sku' => 'required|string|unique:product_variants,sku',
             'price' => 'required|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
+            'stock' => 'required|integer|min:0',
             'is_active' => 'boolean',
             'attribute_values' => 'required|array',
             'attribute_values.*' => 'exists:product_attribute_values,id'
@@ -335,7 +335,7 @@ class ProductManagementController extends Controller
                 'product_id' => $request->product_id,
                 'sku' => $request->sku,
                 'price' => $request->price,
-                'stock_quantity' => $request->stock_quantity,
+                'stock' => $request->stock,
                 'is_active' => $request->boolean('is_active', true)
             ]);
 
@@ -542,6 +542,7 @@ class ProductManagementController extends Controller
             'success' => true,
             'message' => 'Attribute value deleted successfully'
         ]);
+
     }
 
     /**
