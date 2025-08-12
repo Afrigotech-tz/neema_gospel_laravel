@@ -22,6 +22,7 @@ class ProductManagementController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:product_categories,id',
@@ -37,6 +38,7 @@ class ProductManagementController extends Controller
 
         DB::beginTransaction();
         try {
+
             $product = Product::create([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -56,7 +58,7 @@ class ProductManagementController extends Controller
                     $path = $image->store('products', 'public');
                     $images[] = $path;
                 }
-                $product->update(['images' => json_encode($images)]);
+                $product->update(['images' => $images]);
             }
 
             DB::commit();
@@ -66,6 +68,8 @@ class ProductManagementController extends Controller
                 'message' => 'Product created successfully',
                 'data' => $product->load('category')
             ], Response::HTTP_CREATED);
+
+
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
@@ -74,11 +78,14 @@ class ProductManagementController extends Controller
                 'error' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
+
     }
 
     /**
      * Update an existing product.
      */
+
     public function update(Request $request, $id)
     {
         $product = Product::find($id);
@@ -91,6 +98,7 @@ class ProductManagementController extends Controller
         }
 
         $request->validate([
+
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'sometimes|required|exists:product_categories,id',
@@ -100,6 +108,9 @@ class ProductManagementController extends Controller
             'is_active' => 'boolean',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images_action' => 'nullable|in:replace,add,remove,keep',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
             'weight' => 'nullable|numeric|min:0',
@@ -123,21 +134,72 @@ class ProductManagementController extends Controller
             $product->update($updateData);
 
             // Handle image updates
-            if ($request->hasFile('images')) {
-                // Delete old images
-                if ($product->images) {
-                    $oldImages = json_decode($product->images, true);
-                    foreach ($oldImages as $oldImage) {
-                        Storage::disk('public')->delete($oldImage);
-                    }
-                }
+            if ($request->has('images_action')) {
+                $action = $request->input('images_action');
 
-                $images = [];
+                switch ($action) {
+                    case 'replace':
+                        // Delete old images
+                        if ($product->images) {
+                            $oldImages = is_array($product->images) ? $product->images : json_decode($product->images, true);
+                            foreach ($oldImages as $oldImage) {
+                                Storage::disk('public')->delete($oldImage);
+                            }
+                        }
+
+                        $images = [];
+                        if ($request->hasFile('images')) {
+                            foreach ($request->file('images') as $image) {
+                                $path = $image->store('products', 'public');
+                                $images[] = $path;
+                            }
+                        }
+                        $product->update(['images' => $images]);
+                        break;
+
+                    case 'add':
+                        // Add new images to existing ones
+                        $existingImages = $product->images ? (is_array($product->images) ? $product->images : json_decode($product->images, true)) : [];
+
+                        if ($request->hasFile('images')) {
+                            foreach ($request->file('images') as $image) {
+                                $path = $image->store('products', 'public');
+                                $existingImages[] = $path;
+                            }
+                        }
+                        $product->update(['images' => $existingImages]);
+                        break;
+
+                    case 'remove':
+                        // Remove specific images
+                        $imagesToRemove = $request->input('remove_images', []);
+                        $existingImages = $product->images ? (is_array($product->images) ? $product->images : json_decode($product->images, true)) : [];
+
+                        foreach ($imagesToRemove as $imageToRemove) {
+                            Storage::disk('public')->delete($imageToRemove);
+                            $existingImages = array_filter($existingImages, function($img) use ($imageToRemove) {
+                                return $img !== $imageToRemove;
+                            });
+                        }
+
+                        $product->update(['images' => array_values($existingImages)]);
+                        break;
+
+                    case 'keep':
+                    default:
+                        // Keep existing images, no changes
+                        break;
+                }
+            } elseif ($request->hasFile('images')) {
+                // Backward compatibility: if no images_action specified but images provided
+                $existingImages = $product->images ? (is_array($product->images) ? $product->images : json_decode($product->images, true)) : [];
+
                 foreach ($request->file('images') as $image) {
                     $path = $image->store('products', 'public');
-                    $images[] = $path;
+                    $existingImages[] = $path;
                 }
-                $product->update(['images' => json_encode($images)]);
+
+                $product->update(['images' => $existingImages]);
             }
 
             DB::commit();
@@ -238,6 +300,7 @@ class ProductManagementController extends Controller
             'message' => 'Categories retrieved successfully',
             'data' => $categories
         ]);
+        
     }
 
     /**

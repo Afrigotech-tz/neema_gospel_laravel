@@ -16,6 +16,7 @@ class Product extends Model
         'base_price',
         'weight',
         'image_url',
+        'images',
         'is_active',
         'stock_quantity',
         'category_id'
@@ -25,6 +26,7 @@ class Product extends Model
         'base_price' => 'decimal:2',
         'weight' => 'decimal:2',
         'is_active' => 'boolean',
+        'images' => 'array',
     ];
 
     public function category()
@@ -48,6 +50,6 @@ class Product extends Model
     }
 
 
-    
+
 }
 

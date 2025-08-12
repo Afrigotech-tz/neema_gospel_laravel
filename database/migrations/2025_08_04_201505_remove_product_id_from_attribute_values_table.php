@@ -11,20 +11,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('product_attribute_values', function (Blueprint $table) {
-            $table->dropForeign(['product_id']); // If you have a foreign key
-            $table->dropColumn('product_id');
-        });
+        // Skip this migration as product_id column doesn't exist
+        // This migration was likely created for a column that was never added
     }
 
     /**
      * Reverse the migrations.
      */
-    
+
     public function down(): void
     {
-        Schema::table('product_attribute_values', function (Blueprint $table) {
-            //
-        });
+        // Skip this migration as product_id column doesn't exist
     }
 };
