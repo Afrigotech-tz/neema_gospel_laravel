@@ -62,6 +62,9 @@ class PaymentController extends Controller
             'user_id' => $user->id,
             'address_id' => $request->address_id,
             'order_number' => 'ORD-' . Str::upper(Str::random(8)),
+            'subtotal' => $total,
+            'tax' => 0,
+            'shipping' => 0,
             'total_amount' => $total,
             'status' => 'pending',
             'payment_method_id' => $request->payment_method_id,
@@ -75,6 +78,7 @@ class PaymentController extends Controller
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $item->product_id,
+                'product_name' => $item->product->name,
                 'product_variant_id' => $item->product_variant_id,
                 'quantity' => $item->quantity,
                 'price' => $price,

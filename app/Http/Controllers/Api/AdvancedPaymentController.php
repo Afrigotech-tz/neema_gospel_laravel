@@ -23,7 +23,7 @@ class AdvancedPaymentController extends Controller
         $request->validate([
             'order_id' => 'required|exists:orders,id',
             'payment_method' => 'required|string',
-            'gateway' => 'required|string|in:stripe,paystack,flutterwave'
+            //'gateway' => 'required|string|in:stripe,paystack,flutterwave'
         ]);
 
         $order = Order::with(['user', 'items'])->find($request->order_id);
@@ -41,8 +41,8 @@ class AdvancedPaymentController extends Controller
             'transaction_id' => 'TXN-' . Str::upper(Str::random(12)),
             'amount' => $order->total_amount,
             'status' => 'initialized',
-            'gateway' => $request->gateway,
-            'gateway_response' => []
+            //'gateway' => $request->gateway,
+           // 'gateway_response' => []
         ]);
 
         // Initialize payment based on gateway

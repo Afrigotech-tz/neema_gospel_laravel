@@ -68,8 +68,6 @@ class ProductManagementController extends Controller
                 'message' => 'Product created successfully',
                 'data' => $product->load('category')
             ], Response::HTTP_CREATED);
-
-
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
@@ -78,8 +76,6 @@ class ProductManagementController extends Controller
                 'error' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-
     }
 
     /**
@@ -177,7 +173,7 @@ class ProductManagementController extends Controller
 
                         foreach ($imagesToRemove as $imageToRemove) {
                             Storage::disk('public')->delete($imageToRemove);
-                            $existingImages = array_filter($existingImages, function($img) use ($imageToRemove) {
+                            $existingImages = array_filter($existingImages, function ($img) use ($imageToRemove) {
                                 return $img !== $imageToRemove;
                             });
                         }
@@ -300,7 +296,6 @@ class ProductManagementController extends Controller
             'message' => 'Categories retrieved successfully',
             'data' => $categories
         ]);
-        
     }
 
     /**
@@ -377,7 +372,6 @@ class ProductManagementController extends Controller
             'message' => 'Variants retrieved successfully',
             'data' => $variants
         ]);
-
     }
 
     public function storeVariant(Request $request)
@@ -412,8 +406,6 @@ class ProductManagementController extends Controller
                 'message' => 'Product variant created successfully',
                 'data' => $variant->load('attributeValues.attribute')
             ], Response::HTTP_CREATED);
-
-
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
@@ -605,7 +597,6 @@ class ProductManagementController extends Controller
             'success' => true,
             'message' => 'Attribute value deleted successfully'
         ]);
-
     }
 
     /**
@@ -643,7 +634,4 @@ class ProductManagementController extends Controller
             'data' => $products
         ]);
     }
-
-
-
 }

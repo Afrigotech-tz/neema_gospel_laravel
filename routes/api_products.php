@@ -63,15 +63,13 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     });
 
-
-
     // // Cart Routes
     Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'index']);
         Route::post('/', [CartController::class, 'store']);
+        Route::delete('/clear', [CartController::class, 'clear']);
         Route::put('/{id}', [CartController::class, 'update']);
         Route::delete('/{id}', [CartController::class, 'destroy']);
-        Route::delete('/clear', [CartController::class, 'clear']);
     });
 
     // // Payment Routes
@@ -92,6 +90,9 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::post('/refunds', [AdvancedPaymentController::class, 'processRefund']);
         Route::get('/refunds', [AdvancedPaymentController::class, 'refunds']);
         Route::get('/refunds/{refundId}', [AdvancedPaymentController::class, 'refundDetails']);
+
+
+        
     });
 
     // // Webhook routes for payment gateways
@@ -100,6 +101,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::post('/paystack', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.paystack');
         Route::post('/flutterwave', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.flutterwave');
     });
+
+
 
 
 });

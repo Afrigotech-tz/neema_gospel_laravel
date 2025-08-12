@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdvancedPaymentController;
+use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CountryController;
@@ -142,6 +143,21 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::put('/location', [ProfileController::class, 'updateLocation']);
     });
 
+    // Address routes
+    Route::prefix('addresses')->group(function () {
+        Route::get('/', [AddressController::class, 'index']);
+        Route::post('/', [AddressController::class, 'store']);
+        Route::get('/{address}', [AddressController::class, 'show']);
+        Route::put('/{address}', [AddressController::class, 'update']);
+        Route::delete('/{address}', [AddressController::class, 'destroy']);
+
+        // Additional address routes
+        Route::get('/user/{userId}', [AddressController::class, 'getUserAddresses']);
+        Route::post('/user/{userId}/default', [AddressController::class, 'setDefaultAddress']);
+        
+    });
+
+
     // Donations routes
     require __DIR__ . '/api_donations.php';
 
@@ -183,12 +199,6 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     require __DIR__.'/api_products.php';
 
 
-    // Webhook routes for payment gateways
-    Route::prefix('webhooks')->group(function () {
-        Route::post('/stripe', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.stripe');
-        Route::post('/paystack', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.paystack');
-        Route::post('/flutterwave', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.flutterwave');
-    });
 
 });
 

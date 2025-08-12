@@ -15,10 +15,27 @@ class OrderItem extends Model
         'order_id',
         'product_id',
         'product_variant_id',
+        'product_name',
         'quantity',
         'price',
         'total'
     ];
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($orderItem) {
+            $orderItem->total = $orderItem->price * $orderItem->quantity;
+        });
+
+        static::updating(function ($orderItem) {
+            $orderItem->total = $orderItem->price * $orderItem->quantity;
+        });
+    }
 
     protected $casts = [
         'quantity' => 'integer',
@@ -40,4 +57,8 @@ class OrderItem extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
+
+
+
 }
+
