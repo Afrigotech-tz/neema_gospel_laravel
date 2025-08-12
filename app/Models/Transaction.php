@@ -16,14 +16,24 @@ class Transaction extends Model
         'payment_method_id',
         'transaction_id',
         'amount',
+        'currency',
         'status',
         'gateway_response',
-        'notes'
+        'notes',
+        'payment_reference',
+        'phone_number',
+        'account_number',
+        'response_data',
+        'error_message',
+        'paid_at'
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'currency' => 'string',
         'gateway_response' => 'array',
+        'response_data' => 'array',
+        'paid_at' => 'datetime',
     ];
 
     public function order()
