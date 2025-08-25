@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\CustomResetPassword;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class User extends Authenticatable
@@ -125,7 +128,7 @@ class User extends Authenticatable
         }
 
         return $this->otp_code === $otp &&
-               Carbon::now()->lessThanOrEqualTo($this->otp_expires_at);
+            Carbon::now()->lessThanOrEqualTo($this->otp_expires_at);
     }
 
     /**
@@ -192,7 +195,7 @@ class User extends Authenticatable
      *
      */
 
-    
+
     public function hasAllRoles(...$roles)
     {
         foreach ($roles as $role) {
@@ -322,6 +325,28 @@ class User extends Authenticatable
         return true;
     }
 
+    /**
+     *  send the password reset notification to the user
+     */
+
+
+    // public function sendPasswordResetNotification($token)
+    // {
+    //     $url = config('app.frontend_url') . '/reset-password?token=' . $token . '&email=' . $this->email;
+
+    //     $this->notify(new CustomResetPassword($url));
+    // }
+
+    /**
+     *  send the password reset notification to the user use mailable function
+     */
+
+    public function sendPasswordResetNotification($token)
+    {
+        $url = config('app.frontend_url') . '/reset-password?token=' . $token . '&email=' . $this->email;
+
+        Mail::to($this->email)->send(new PasswordResetMail($url));
+    }
+
 
 };
-

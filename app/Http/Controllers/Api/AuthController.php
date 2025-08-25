@@ -219,15 +219,8 @@ class AuthController extends Controller
 
         $otp = $user->generateOtp();
 
-        // Use RabbitMQ for async notification
-        $notificationService = new \App\Services\NotificationPublisherService(new \App\Services\RabbitMQService());
-        $published = $notificationService->publishOtpResendNotification($user, $otp);
-
-        if ($published) {
-            $message = 'New OTP sent successfully to your ' . $user->verification_method . '.';
-        } else {
-            // Fallback to synchronous sending if RabbitMQ fails
-            if ($user->verification_method === 'mobile') {
+        //  synchoronous send notifications
+         if ($user->verification_method === 'mobile') {
                 $smsService = new SmService();
                 if ($smsService->isConfigured()) {
                     $smsService->sendOtp($user->phone_number, $otp);
@@ -239,7 +232,32 @@ class AuthController extends Controller
                 Mail::to($user->email)->send(new SendOtpMail($otp));
                 $message = 'New OTP sent successfully to your email.';
             }
-        }
+
+
+            //   DONT DELETE THE CODE
+
+
+        // Use RabbitMQ for async notification
+        // $notificationService = new \App\Services\NotificationPublisherService(new \App\Services\RabbitMQService());
+        // $published = $notificationService->publishOtpResendNotification($user, $otp);
+
+        // if ($published) {
+        //     $message = 'New OTP sent successfully to your ' . $user->verification_method . '.';
+        // } else {
+        //     // Fallback to synchronous sending if RabbitMQ fails
+        //     if ($user->verification_method === 'mobile') {
+        //         $smsService = new SmService();
+        //         if ($smsService->isConfigured()) {
+        //             $smsService->sendOtp($user->phone_number, $otp);
+        //             $message = 'New OTP sent successfully to your phone.';
+        //         } else {
+        //             return response()->json(['success' => false, 'message' => 'SMS Service is not configured.'], 500);
+        //         }
+        //     } else {
+        //         Mail::to($user->email)->send(new SendOtpMail($otp));
+        //         $message = 'New OTP sent successfully to your email.';
+        //     }
+        // }
 
         return response()->json([
             'success' => true,

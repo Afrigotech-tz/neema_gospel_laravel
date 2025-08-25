@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,11 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+
+
+Route::post('/password/forgot', [PasswordResetController::class, 'sendResetLink']);
+Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 
 
 // Public user routes
@@ -85,6 +91,7 @@ Route::prefix('events')->group(function () {
     Route::get('/featured', [EventController::class, 'featured']);
     Route::get('/search', [EventController::class, 'search']);
     Route::get('/{event}', [EventController::class, 'show']);
+
 });
 
 // Public news routes
@@ -154,7 +161,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         // Additional address routes
         Route::get('/user/{userId}', [AddressController::class, 'getUserAddresses']);
         Route::post('/user/{userId}/default', [AddressController::class, 'setDefaultAddress']);
-        
+
     });
 
 
@@ -197,6 +204,9 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Products & Payments Routes
     require __DIR__.'/api_products.php';
+
+    // Tracking Routes
+    require __DIR__.'/api_tracking.php';
 
 
 

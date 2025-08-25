@@ -3,23 +3,24 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendOtpMail extends Mailable
+class PasswordResetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $otp;
+    public $url; // The reset password link
 
     /**
      * Create a new message instance.
      */
-    public function __construct($otp)
+    public function __construct($url)
     {
-        $this->otp = $otp;
+        $this->url = $url;
     }
 
     /**
@@ -28,7 +29,7 @@ class SendOtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your NEEMA GOSPEL Verification Code',
+            subject: 'Reset Your Password - NEEMA GOSPEL',
         );
     }
 
@@ -38,8 +39,10 @@ class SendOtpMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.otp',
-            with: ['otp' => $this->otp],
+            view: 'emails.password-reset', // Your Blade template
+            with: [
+                'url' => $this->url, // Pass the reset URL to the template
+            ]
         );
     }
 
@@ -53,5 +56,7 @@ class SendOtpMail extends Mailable
         return [];
     }
 
+
     
 }
+

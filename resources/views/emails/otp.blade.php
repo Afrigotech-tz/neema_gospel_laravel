@@ -20,7 +20,7 @@
             overflow: hidden;
         }
         .header {
-            background-color: #c05e0e;
+            background-color: #f9ad7efd;
             color: white;
             padding: 30px;
             text-align: center;
@@ -30,7 +30,7 @@
         }
         .otp-code {
             background-color: #f8f9fa;
-            border: 2px dashed #eb7e25;
+            border: 2px dashed #f9ad7efd;
             border-radius: 8px;
             padding: 20px;
             text-align: center;
@@ -38,7 +38,7 @@
             font-size: 24px;
             font-weight: bold;
             letter-spacing: 4px;
-            color: #eb7125;
+            color: #f9ad7efd;
         }
         .warning {
             background-color: #fef3c7;
@@ -83,6 +83,7 @@
 
         <div class="footer">
             <p>This is an automated message. Please do not reply to this email.</p>
+            <p>&copy; {{ date('Y') }} Neema Gospel. All rights reserved.</p>
         </div>
     </div>
 </body>

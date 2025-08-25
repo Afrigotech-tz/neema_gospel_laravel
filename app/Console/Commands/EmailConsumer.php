@@ -36,4 +36,5 @@ class EmailConsumer extends Command
 
     }
 
+    
 }

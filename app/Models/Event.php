@@ -29,6 +29,7 @@ class Event extends Model
         'latitude',
         'longitude',
         'image_url',
+        'picture',
         'capacity',
         'attendees_count',
         'is_featured',
@@ -48,6 +49,7 @@ class Event extends Model
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'date' => 'datetime',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'ticket_price' => 'decimal:2',
@@ -57,7 +59,18 @@ class Event extends Model
         'is_public' => 'boolean',
     ];
 
-    // Image URL accessor removed to avoid naming conflict with database column
+    /**
+     * Get the full URL for the event picture.
+     *
+     * @return string|null
+     */
+    public function getPictureUrlAttribute()
+    {
+        if ($this->picture) {
+            return Storage::url($this->picture);
+        }
+        return null;
+    }
 
     /**
      * Scope a query to only include upcoming events.

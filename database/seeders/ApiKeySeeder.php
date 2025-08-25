@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class ApiKeySeeder extends Seeder
 {
     /**
-     * 
+     *
      * Run the database seeds.
      *
      */
@@ -59,4 +59,5 @@ class ApiKeySeeder extends Seeder
 
 
 
+    
 }

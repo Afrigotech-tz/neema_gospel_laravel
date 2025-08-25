@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Stmt\Catch_;
 
 class EventController extends Controller
 {
     /**
      * Display a listing of events
+     *
      */
+
     public function index(Request $request)
     {
         $query = Event::query();
@@ -32,61 +37,30 @@ class EventController extends Controller
         }
 
         // Sorting
-        $sortBy = $request->get('sort_by', 'date');
-        $sortOrder = $request->get('sort_order', 'asc');
-        $query->orderBy($sortBy, $sortOrder);
+          $sortBy = $request->get('sort_by', 'date','desc');
+        // $sortOrder = $request->get('sort_order', 'asc');
+        // $query->orderBy($sortBy, $sortOrder);
 
         // Pagination
         $perPage = $request->get('per_page', 15);
-        $events = $query->paginate($perPage);
+
+        $cacheKey = 'events_' . md5(json_encode($request->all()));
+
+        // Cache for 10 minutes
+        $events = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($query, $perPage) {
+            return $query->paginate($perPage);
+        });
 
         return response()->json([
             'success' => true,
             'data' => $events,
             'message' => 'Events retrieved successfully'
         ]);
+
+
     }
 
-    /**
-     * Store a newly created event
-     */
-    // public function store(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'title' => 'required|string|max:255',
-    //         'type' => 'required|in:concert,service,live_recording,conference,other',
-    //         'date' => 'required|date|after:now',
-    //         'location' => 'required|string|max:255',
-    //         'picture' => 'nullable|string|max:500',
-    //     ]);
 
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Validation errors',
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //    $data = $validator->validated();
-
-
-    //     // Handle picture upload if provided as file
-    //     if ($request->hasFile('picture')) {
-    //         $file = $request->file('picture');
-    //         $filename = 'event_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-    //         $path = $file->storeAs('events', $filename, 'public');
-    //         $data['picture'] = $path;
-    //     }
-
-    //     $event = Event::create($data);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Event created successfully',
-    //         'data' => $event
-    //     ], 201);
-    // }
 
 
     public function store(Request $request)
@@ -96,7 +70,22 @@ class EventController extends Controller
             'type' => 'required|in:concert,service,live_recording,conference,other',
             'date' => 'required|date|after:now',
             'location' => 'required|string|max:255',
-            'picture' => 'nullable|file|mimes:jpg,jpeg,png|max:2048', // if uploading image files
+            'picture' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'description' => 'nullable|string',
+            'venue' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'capacity' => 'nullable|integer|min:1',
+            'is_featured' => 'boolean',
+            'is_public' => 'boolean',
+            'status' => 'string|in:upcoming,ongoing,completed,cancelled',
+            'ticket_price' => 'nullable|numeric|min:0',
+            'ticket_url' => 'nullable|url',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
+            'metadata' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -120,11 +109,14 @@ class EventController extends Controller
 
         $event = Event::create($data);
 
+        //Cache::tags('events')->flush();
+        Cache::flush();
+
         return response()->json([
             'success' => true,
             'message' => 'Event created successfully',
             'data' => $event
-        ], 201);                                                                                        
+        ], 201);
     }
 
 
@@ -151,6 +143,21 @@ class EventController extends Controller
             'date' => 'sometimes|date|after:now',
             'location' => 'sometimes|string|max:255',
             'picture' => 'nullable|string|max:500',
+            'description' => 'nullable|string',
+            'venue' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'capacity' => 'nullable|integer|min:1',
+            'is_featured' => 'boolean',
+            'is_public' => 'boolean',
+            'status' => 'string|in:upcoming,ongoing,completed,cancelled',
+            'ticket_price' => 'nullable|numeric|min:0',
+            'ticket_url' => 'nullable|url',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
+            'metadata' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -177,6 +184,8 @@ class EventController extends Controller
         }
 
         $event->update($data);
+        //Cache::tags('events')->flush();
+        Cache::flush();
 
         return response()->json([
             'success' => true,
@@ -185,11 +194,23 @@ class EventController extends Controller
         ]);
     }
 
+
+
     /**
      * Remove the specified event
      */
-    public function destroy(Event $event)
+
+    public function destroy($id)
     {
+        $event = Event::find($id);
+
+        if (!$event) {
+            return response()->json([
+                'success' => false,
+                'message' => "Event not found"
+            ], 404);
+        }
+
         // Delete associated picture
         if ($event->picture && Storage::disk('public')->exists($event->picture)) {
             Storage::disk('public')->delete($event->picture);
@@ -197,11 +218,17 @@ class EventController extends Controller
 
         $event->delete();
 
+        //Cache::tags('events')->flush();
+        Cache::flush();
+
         return response()->json([
             'success' => true,
             'message' => 'Event deleted successfully'
         ]);
     }
+
+
+
 
     /**
      * Get upcoming events
@@ -222,7 +249,9 @@ class EventController extends Controller
 
     /**
      * Search events
+     *
      */
+
     public function search(Request $request)
     {
         $validator = Validator::make($request->all(), [
