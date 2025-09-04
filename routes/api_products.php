@@ -76,11 +76,11 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     Route::prefix('order')->group(function () {
         // Basic payment routes
-        Route::post('/create', [PaymentController::class, 'processPayment']);
+        Route::post('/process', [PaymentController::class, 'processPayment']);
         Route::get('/list', [PaymentController::class, 'orders']);
         Route::get('/{id}', [PaymentController::class, 'orderDetails']);
-        Route::put('/orders/{id}/status', [PaymentController::class, 'updateOrderStatus']);
-        
+        Route::put('/{id}/status', [PaymentController::class, 'updateOrderStatus']);
+
     });
 
 
