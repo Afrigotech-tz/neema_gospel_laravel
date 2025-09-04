@@ -129,10 +129,10 @@ class NotificationPublisherService
                 // Fallback to Laravel queue
                 return $this->sendViaLaravelQueue($user, $otp, $user->verification_method);
 
-                
             }
-        }
 
+        }
+        
         // For SMS notifications, publish directly to sms.notifications queue
         if ($user->verification_method === 'mobile') {
             $success = $this->rabbitMQService->publish(

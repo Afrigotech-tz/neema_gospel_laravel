@@ -72,6 +72,18 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::delete('/{id}', [CartController::class, 'destroy']);
     });
 
+
+
+    Route::prefix('order')->group(function () {
+        // Basic payment routes
+        Route::post('/create', [PaymentController::class, 'processPayment']);
+        Route::get('/list', [PaymentController::class, 'orders']);
+        Route::get('/{id}', [PaymentController::class, 'orderDetails']);
+        Route::put('/orders/{id}/status', [PaymentController::class, 'updateOrderStatus']);
+        
+    });
+
+
     // // Payment Routes
     Route::prefix('payments')->group(function () {
         // Basic payment routes
@@ -94,6 +106,9 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
         
     });
+
+
+
 
     // // Webhook routes for payment gateways
     Route::prefix('webhooks')->group(function () {

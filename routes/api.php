@@ -91,7 +91,6 @@ Route::prefix('events')->group(function () {
     Route::get('/featured', [EventController::class, 'featured']);
     Route::get('/search', [EventController::class, 'search']);
     Route::get('/{event}', [EventController::class, 'show']);
-
 });
 
 // Public news routes
@@ -108,7 +107,6 @@ Route::prefix('music')->group(function () {
     Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
-
 
 
 
@@ -161,7 +159,6 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         // Additional address routes
         Route::get('/user/{userId}', [AddressController::class, 'getUserAddresses']);
         Route::post('/user/{userId}/default', [AddressController::class, 'setDefaultAddress']);
-
     });
 
 
@@ -203,15 +200,11 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     });
 
     // Products & Payments Routes
-    require __DIR__.'/api_products.php';
+    require __DIR__ . '/api_products.php';
 
     // Tracking Routes
-    require __DIR__.'/api_tracking.php';
-
-
-
+    require __DIR__ . '/api_tracking.php';
 });
-
 
 
 // Fallback route for API
@@ -221,5 +214,4 @@ Route::fallback(function () {
         'success' => false,
         'message' => 'API endpoint not found'
     ], 404);
-
 });
