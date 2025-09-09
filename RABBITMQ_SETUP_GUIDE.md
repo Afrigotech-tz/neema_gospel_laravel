@@ -94,8 +94,38 @@ netstat -an | findstr 5672
 ```
 Setting up RabbitMQ infrastructure...
 RabbitMQ setup completed successfully!
+
+
 Exchanges: user.registration
 Queues: email.notifications, sms.notifications
 Bindings: email.notifications -> user.registered.email
 Bindings: sms.notifications -> user.registered.sms
+
+
+
+
+<!--  MESSAGE BLOCKER PUBLISHE   -->
+
+   //   DONT DELETE THE CODE
+   // Use RabbitMQ for async notification
+   // $notificationService = new \App\Services\NotificationPublisherService(new \App\Services\RabbitMQService());
+   // $published = $notificationService->publishOtpResendNotification($user, $otp);
+
+   // if ($published) {
+   //     $message = 'New OTP sent successfully to your ' . $user->verification_method . '.';
+   // } else {
+   //     // Fallback to synchronous sending if RabbitMQ fails
+   //     if ($user->verification_method === 'mobile') {
+   //         $smsService = new SmService();
+   //         if ($smsService->isConfigured()) {
+   //             $smsService->sendOtp($user->phone_number, $otp);
+   //             $message = 'New OTP sent successfully to your phone.';
+   //         } else {
+   //             return response()->json(['success' => false, 'message' => 'SMS Service is not configured.'], 500);
+   //         }
+   //     } else {
+   //         Mail::to($user->email)->send(new SendOtpMail($otp));
+   //         $message = 'New OTP sent successfully to your email.';
+   //     }
+   // }
 
