@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 // Public product routes
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index']);
@@ -31,7 +32,6 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Product Management Routes (Admin)
     Route::prefix('admin/products')->group(function () {
-
 
         Route::get('/', [ProductManagementController::class, 'getProducts']);
         Route::post('/', [ProductManagementController::class, 'store']);
@@ -103,11 +103,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::get('/refunds', [AdvancedPaymentController::class, 'refunds']);
         Route::get('/refunds/{refundId}', [AdvancedPaymentController::class, 'refundDetails']);
 
-
-        
     });
-
-
 
 
     // // Webhook routes for payment gateways

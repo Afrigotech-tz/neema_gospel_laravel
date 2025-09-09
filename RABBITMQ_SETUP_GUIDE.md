@@ -93,8 +93,9 @@ netstat -an | findstr 5672
 ## Expected Output After Fix
 ```
 Setting up RabbitMQ infrastructure...
-✅ RabbitMQ setup completed successfully!
+RabbitMQ setup completed successfully!
 Exchanges: user.registration
 Queues: email.notifications, sms.notifications
 Bindings: email.notifications -> user.registered.email
 Bindings: sms.notifications -> user.registered.sms
+
