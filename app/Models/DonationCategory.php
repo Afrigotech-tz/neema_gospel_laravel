@@ -26,4 +26,6 @@ class DonationCategory extends Model
         return $this->hasMany(DonationCampaign::class);
     }
     
+    
+
 }

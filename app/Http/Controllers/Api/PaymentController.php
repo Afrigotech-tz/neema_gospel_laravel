@@ -186,4 +186,84 @@ class PaymentController extends Controller
             'data' => $order
         ]);
     }
+
+    /**
+     * Process payment for ticket orders.
+     */
+    public function processTicketPayment(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:ticket_orders,id',
+            'payment_method_id' => 'required|exists:payment_methods,id',
+            'notes' => 'nullable|string|max:500'
+        ]);
+
+        $ticketOrder = \App\Models\TicketOrder::find($request->order_id);
+
+        if (!$ticketOrder) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket order not found'
+            ], 404);
+        }
+
+        if ($ticketOrder->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket order already processed'
+            ], 400);
+        }
+
+        // Simulate payment processing here or integrate with payment gateway
+        // For now, mark as paid
+        $ticketOrder->update([
+            'status' => 'paid',
+            'payment_method' => $request->payment_method_id,
+            'payment_ref' => 'TKT-' . strtoupper(\Illuminate\Support\Str::random(10)),
+        ]);
+
+        // Update sold count on ticket type
+        $ticketOrder->ticketType->increment('sold', $ticketOrder->quantity);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ticket payment processed successfully',
+            'data' => $ticketOrder->load(['event', 'ticketType'])
+        ]);
+    }
+
+    /**
+     * Confirm ticket payment (webhook or manual confirmation).
+     */
+    public function confirmTicketPayment(Request $request, $orderId)
+    {
+        $ticketOrder = \App\Models\TicketOrder::find($orderId);
+
+        if (!$ticketOrder) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket order not found'
+            ], 404);
+        }
+
+        if ($ticketOrder->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket order already processed'
+            ], 400);
+        }
+
+        $ticketOrder->update([
+            'status' => 'paid',
+            'payment_ref' => $request->payment_ref ?? $ticketOrder->payment_ref,
+        ]);
+
+        $ticketOrder->ticketType->increment('sold', $ticketOrder->quantity);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ticket payment confirmed successfully',
+            'data' => $ticketOrder->load(['event', 'ticketType'])
+        ]);
+    }
 }

@@ -8,10 +8,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * 
      */
+    
     public function up(): void
     {
         Schema::create('shipments', function (Blueprint $table) {
+
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->string('tracking_number')->unique();
@@ -29,14 +32,27 @@ return new class extends Migration
 
             $table->index(['order_id', 'tracking_number']);
             $table->index(['status', 'shipped_at']);
+
+            
         });
+
+
+
     }
+
 
     /**
      * Reverse the migrations.
+     * 
      */
+
     public function down(): void
     {
         Schema::dropIfExists('shipments');
     }
+
+    
+
 };
+
+

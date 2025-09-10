@@ -23,7 +23,9 @@ class UserRegistered
      *
      * @param User $user
      * @param string $otp
+     * 
      */
+
     public function __construct(User $user, $otp)
     {
         $this->user = $user;
@@ -31,5 +33,7 @@ class UserRegistered
     }
 
 
+    
 }
+
 

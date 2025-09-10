@@ -29,11 +29,13 @@ Route::prefix('tracking')->middleware(['auth:api'])->group(function () {
 
     // Customer-specific endpoints
     Route::get('/customers/{customerId}/orders', [OrderTrackingController::class, 'getCustomerOrders']);
-
     // Search functionality
     Route::get('/search', [OrderTrackingController::class, 'searchOrders']);
 
+
 });
+
+
 
 // Public tracking endpoint (no authentication required)
 Route::get('/track/{orderNumber}', [OrderTrackingController::class, 'trackByOrderNumber'])
@@ -51,5 +53,7 @@ Route::prefix('admin/tracking')->middleware(['auth:api', 'role:admin'])->group(f
     Route::get('/reports/shipping', [OrderTrackingController::class, 'getShippingReport']);
 
 });
+
+
 
 

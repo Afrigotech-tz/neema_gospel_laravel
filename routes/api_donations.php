@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Route;
 
 */
 
+
 Route::prefix('donations')->group(function () {
+
     // Donation Categories
     Route::prefix('categories')->group(function () {
         Route::get('/', [DonationCategoryController::class, 'index']);
@@ -23,6 +25,7 @@ Route::prefix('donations')->group(function () {
         Route::get('/active', [DonationCategoryController::class, 'active']);
         Route::post('/check-name', [DonationCategoryController::class, 'checkNameExists']);
     });
+
 
     // Donation Campaigns
     Route::prefix('campaigns')->group(function () {
@@ -45,5 +48,6 @@ Route::prefix('donations')->group(function () {
     Route::get('/statistics', [DonationController::class, 'statistics']);
     Route::get('/user/{user}', [DonationController::class, 'byUser']);
 
+    
 
 });

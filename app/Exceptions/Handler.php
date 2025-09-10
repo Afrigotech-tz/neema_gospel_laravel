@@ -1,78 +1,114 @@
 <?php
 
-
 namespace App\Exceptions;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\RouteNotFoundException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Exception\RouteNotFoundException as ExceptionRouteNotFoundException;
-use Throwable;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
-
     /**
      * The inputs that are never flashed for validation exceptions.
      *
      * @var array<int, string>
-     *
      */
     protected $dontFlash = [
         'current_password',
         'password',
         'password_confirmation',
-
     ];
 
-    public function render($request, Throwable $e): JsonResponse
+    /**
+     * Render an exception into an HTTP response.
+     */
+    public function render($request, Throwable $e)
     {
         if ($request->is('api/*')) {
-            return match (true) {
-                $e instanceof AuthenticationException => response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized Request.',
-                ], Response::HTTP_UNAUTHORIZED),
 
-                $e instanceof ValidationException => response()->json([
+            // 🔐 Unauthenticated
+            if ($e instanceof AuthenticationException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized request.',
+                ], 401);
+            }
+
+            // 🚫 Forbidden
+            if ($e instanceof AuthorizationException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Forbidden. You don\'t have permission to access this resource.',
+                ], 403);
+            }
+
+            // 📝 Validation errors
+            if ($e instanceof ValidationException) {
+                return response()->json([
                     'success' => false,
                     'message' => 'Validation failed.',
                     'errors' => $e->errors(),
-                ], Response::HTTP_UNPROCESSABLE_ENTITY),
+                ], 422);
+            }
 
-                $e instanceof NotFoundHttpException => response()->json([
+            // 📦 Resource not found
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json([
                     'success' => false,
                     'message' => 'Resource not found.',
-                ], Response::HTTP_NOT_FOUND),
+                ], 404);
+            }
 
-                $e instanceof HttpException => response()->json([
+            // 🔍 Route not found
+            if ($e instanceof NotFoundHttpException) {
+                return response()->json([
                     'success' => false,
-                    'message' => $e->getMessage(),
-                ], $e->getStatusCode()),
+                    'message' => 'API route not found.',
+                ], 404);
+            }
 
-                $e instanceof ExceptionRouteNotFoundException => response()->json([
+            // ❌ Wrong HTTP method
+            if ($e instanceof MethodNotAllowedHttpException) {
+                return response()->json([
                     'success' => false,
-                    'message' => 'Route not found.',
-                ], Response::HTTP_NOT_FOUND),
+                    'message' => 'The method is not allowed for this route.',
+                    'allowed_methods' => $e->getHeaders()['Allow'] ?? [],
+                ], 405);
+            }
 
-                default => response()->json([
+            // ⏳ Too many requests
+            if ($e instanceof ThrottleRequestsException) {
+                return response()->json([
                     'success' => false,
-                    'message' => 'An unexpected error occurred.',
-                    'details' => $e->getMessage(),
-                ], Response::HTTP_INTERNAL_SERVER_ERROR),
-            };
+                    'message' => 'Too many requests. Please slow down.',
+                ], 429);
+            }
+
+            // 🌐 Generic HTTP exceptions
+            if ($e instanceof HttpException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage() ?: 'HTTP error occurred.',
+                ], $e->getStatusCode());
+            }
+
+            // 💥 Catch-all (internal errors)
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred.',
+                'details' => config('app.debug') ? $e->getMessage() : null, // hide details in production
+            ], 500);
         }
 
+        // Non-API requests → fall back to default Laravel handling
         return parent::render($request, $e);
-
     }
 
     

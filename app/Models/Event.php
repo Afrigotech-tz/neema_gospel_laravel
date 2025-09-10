@@ -148,4 +148,36 @@ class Event extends Model
         }
         return $this->attendees_count . ' Going';
     }
+
+    /**
+     * Get ticket types for this event.
+     */
+    public function ticketTypes()
+    {
+        return $this->hasMany(TicketType::class);
+    }
+
+    /**
+     * Get ticket orders for this event.
+     */
+    public function ticketOrders()
+    {
+        return $this->hasMany(TicketOrder::class);
+    }
+
+    /**
+     * Get total tickets sold for this event.
+     */
+    public function getTotalTicketsSoldAttribute()
+    {
+        return $this->ticketOrders()->where('status', 'paid')->sum('quantity');
+    }
+
+    /**
+     * Get total revenue from ticket sales.
+     */
+    public function getTotalRevenueAttribute()
+    {
+        return $this->ticketOrders()->where('status', 'paid')->sum('total_price');
+    }
 }

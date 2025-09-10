@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('refunds', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
@@ -40,8 +41,12 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['refund_id', 'order_item_id']);
+
         });
+
+
     }
+
 
     /**
      * Reverse the migrations.
@@ -51,4 +56,11 @@ return new class extends Migration
         Schema::dropIfExists('refund_items');
         Schema::dropIfExists('refunds');
     }
+
+
+    
 };
+
+
+
+

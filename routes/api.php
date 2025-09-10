@@ -1,47 +1,44 @@
 <?php
 
-use App\Http\Controllers\Api\AdvancedPaymentController;
 use App\Http\Controllers\Api\AddressController;
+use App\Http\Controllers\Api\AdvancedPaymentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductManagementController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\PasswordResetController;
 
 /*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+ * |--------------------------------------------------------------------------
+ * | API Routes
+ * |--------------------------------------------------------------------------
+ * |
+ * | Here is where you can register API routes for your application. These
+ * | routes are loaded by the RouteServiceProvider and all of them will
+ * | be assigned to the "api" middleware group. Make something great!
+ * |
+ */
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
-
 Route::post('/password/forgot', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
-
 
 // Public user routes
 Route::get('test/users/', [UserController::class, 'get_users']);
 Route::get('test/users/{id}', [UserController::class, 'get_user']);
 Route::put('test/users/{id}', [UserController::class, 'update_user']);
 Route::delete('test/users/{id}', [UserController::class, 'delete_user']);
-
 
 // OTP verification routes
 Route::prefix('auth')->group(function () {
@@ -83,7 +80,6 @@ Route::get('/languages', function () {
     ]);
 });
 
-
 // Public event routes
 Route::prefix('events')->group(function () {
     Route::get('/', [EventController::class, 'index']);
@@ -91,6 +87,7 @@ Route::prefix('events')->group(function () {
     Route::get('/featured', [EventController::class, 'featured']);
     Route::get('/search', [EventController::class, 'search']);
     Route::get('/{event}', [EventController::class, 'show']);
+    Route::get('/{event}/ticket-types', [TicketController::class, 'getTicketTypes']);
 });
 
 // Public news routes
@@ -101,16 +98,11 @@ Route::prefix('news')->group(function () {
     Route::get('/{news}', [NewsController::class, 'show']);
 });
 
-
 // Public music routes
 Route::prefix('music')->group(function () {
     Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
-
-
-
-
 
 // Protected routes with API key authentication
 Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
@@ -161,17 +153,12 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::post('/user/{userId}/default', [AddressController::class, 'setDefaultAddress']);
     });
 
-
-    // Donations routes
-    require __DIR__ . '/api_donations.php';
-
     // Protected music routes
     Route::prefix('music')->group(function () {
         Route::post('/', [App\Http\Controllers\Api\MusicController::class, 'store']);
         Route::put('/{music}', [App\Http\Controllers\Api\MusicController::class, 'update']);
         Route::delete('/{music}', [App\Http\Controllers\Api\MusicController::class, 'destroy']);
     });
-
 
     // Protected news routes
     Route::prefix('news')->group(function () {
@@ -193,25 +180,30 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::delete('/{role}/permissions', [App\Http\Controllers\Api\RoleController::class, 'removePermissions']);
     });
 
-
     // Permissions routes
     Route::prefix('permissions')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\RoleController::class, 'getAllPermissions']);
     });
 
+    // Donations routes
+    require __DIR__ . '/api_donations.php';
     // Products & Payments Routes
     require __DIR__ . '/api_products.php';
-
     // Tracking Routes
     require __DIR__ . '/api_tracking.php';
+    // Tickets routes
+    require __DIR__ . '/api_tickets.php';
+
+
 });
 
 
 // Fallback route for API
 Route::fallback(function () {
-
     return response()->json([
         'success' => false,
         'message' => 'API endpoint not found'
     ], 404);
 });
+
+
