@@ -17,8 +17,39 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /** Register a new user with either email or phone number. */
+
     /**
-     * Register a new user with either email or phone number.
+     * @OA\Post(
+     *     path="/api/register",
+     *     operationId="registerUser",
+     *     summary="Register a new user",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"first_name","surname","password","country_id","verification_method"},
+     *             @OA\Property(property="first_name", type="string", example="John"),
+     *             @OA\Property(property="surname", type="string", example="Doe"),
+     *             @OA\Property(property="gender", type="string", enum={"male","female"}),
+     *             @OA\Property(property="phone_number", type="string", example="+255712345678"),
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="secret123"),
+     *             @OA\Property(property="country_id", type="integer", example=1),
+     *             @OA\Property(property="verification_method", type="string", enum={"email","mobile"}),
+     *             @OA\Property(property="role_id", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User registered successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function register(Request $request)
     {
@@ -113,14 +144,33 @@ class AuthController extends Controller
                 'verification_method' => $user->verification_method,
             ]
         ], 201);
-
-
     }
 
-    
+    /** Login user with email or phone number */
 
     /**
-     * Login user with email or phone number
+     * @OA\Post(
+     *     path="/api/login",
+     *     tags={"Authentication"},
+     *     summary="Login user",
+     *     description="Login using email or phone number",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"login","password"},
+     *             @OA\Property(property="login", type="string", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login successful"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid credentials"
+     *     )
+     * )
      */
     public function login(Request $request)
     {
@@ -165,8 +215,31 @@ class AuthController extends Controller
         ]);
     }
 
+    /** Verify OTP and activate account */
+
     /**
-     * Verify OTP and activate account
+     * @OA\Post(
+     *     path="/api/verify-otp",
+     *     tags={"Authentication"},
+     *     summary="Verify OTP",
+     *     description="Verify user OTP and activate account",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"login","otp_code"},
+     *             @OA\Property(property="login", type="string", example="john@example.com"),
+     *             @OA\Property(property="otp_code", type="string", example="123456")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Account verified successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid or expired OTP"
+     *     )
+     * )
      */
     public function verifyOtp(Request $request)
     {
@@ -206,8 +279,30 @@ class AuthController extends Controller
         ]);
     }
 
+    /** Resend OTP to user's email or phone */
+
     /**
-     * Resend OTP to user's email or phone
+     * @OA\Post(
+     *     path="/api/resend-otp",
+     *     tags={"Authentication"},
+     *     summary="Resend OTP",
+     *     description="Resend OTP to email or phone",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"login"},
+     *             @OA\Property(property="login", type="string", example="john@example.com")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OTP resent successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
      */
     public function resendOtp(Request $request)
     {
@@ -274,8 +369,19 @@ class AuthController extends Controller
         ]);
     }
 
+    /** Logout user */
+
     /**
-     * Logout user
+     * @OA\Post(
+     *     path="/api/logout",
+     *     tags={"Authentication"},
+     *     summary="Logout user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout successful"
+     *     )
+     * )
      */
     public function logout(Request $request)
     {
@@ -283,8 +389,19 @@ class AuthController extends Controller
         return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
 
+    /** Get authenticated user profile */
+
     /**
-     * Get authenticated user profile
+     * @OA\Get(
+     *     path="/api/profile",
+     *     tags={"Authentication"},
+     *     summary="Get user profile",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Authenticated user profile"
+     *     )
+     * )
      */
     public function profile(Request $request)
     {

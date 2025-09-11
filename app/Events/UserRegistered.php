@@ -33,7 +33,8 @@ class UserRegistered
     }
 
 
-    
+
 }
+
 
 

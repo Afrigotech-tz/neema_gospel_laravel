@@ -31,5 +31,6 @@ class CustomResetPassword extends Notification
             ->line('If you did not request this, you can safely ignore this email.');
     }
 
+
     
 }
