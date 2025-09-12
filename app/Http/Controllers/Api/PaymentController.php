@@ -15,7 +15,21 @@ use Illuminate\Support\Str;
 class PaymentController extends Controller
 {
     /**
-     * Get available payment methods.
+     * @OA\Get(
+     *     path="/api/payments/methods",
+     *     tags={"Payment"},
+     *     summary="Get available payment methods",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of active payment methods",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
      */
     public function paymentMethods()
     {
@@ -28,7 +42,43 @@ class PaymentController extends Controller
     }
 
     /**
-     * Process payment for cart items.
+     * @OA\Post(
+     *     path="/api/payments/process",
+     *     tags={"Payment"},
+     *     summary="Process payment for cart items",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"address_id","payment_method_id"},
+     *             @OA\Property(property="address_id", type="integer", example=1),
+     *             @OA\Property(property="payment_method_id", type="integer", example=1),
+     *             @OA\Property(property="notes", type="string", example="Please deliver between 9-12 PM")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="order", type="object"),
+     *                 @OA\Property(property="transaction", type="object")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Cart is empty or validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function processPayment(Request $request)
     {
@@ -118,7 +168,32 @@ class PaymentController extends Controller
     }
 
     /**
-     * Get user's orders.
+     * @OA\Get(
+     *     path="/api/payments/orders",
+     *     tags={"Payment"},
+     *     summary="Get user's orders",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's orders",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function orders(Request $request)
     {
@@ -136,7 +211,37 @@ class PaymentController extends Controller
     }
 
     /**
-     * Get specific order details.
+     * @OA\Get(
+     *     path="/api/payments/orders/{id}",
+     *     tags={"Payment"},
+     *     summary="Get specific order details",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Order ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Order not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function orderDetails($id)
     {
@@ -160,7 +265,45 @@ class PaymentController extends Controller
     }
 
     /**
-     * Update order status.
+     * @OA\Put(
+     *     path="/api/payments/orders/{id}/status",
+     *     tags={"Payment"},
+     *     summary="Update order status",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Order ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"pending","processing","shipped","delivered","cancelled"}, example="shipped")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order status updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Order not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function updateOrderStatus(Request $request, $id)
     {
@@ -188,7 +331,49 @@ class PaymentController extends Controller
     }
 
     /**
-     * Process payment for ticket orders.
+     * @OA\Post(
+     *     path="/api/payments/tickets/process",
+     *     tags={"Payment"},
+     *     summary="Process payment for ticket orders",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"order_id","payment_method_id"},
+     *             @OA\Property(property="order_id", type="integer", example=1),
+     *             @OA\Property(property="payment_method_id", type="integer", example=1),
+     *             @OA\Property(property="notes", type="string", example="Payment for concert tickets")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket payment processed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket order not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Ticket order already processed",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function processTicketPayment(Request $request)
     {
@@ -233,7 +418,54 @@ class PaymentController extends Controller
     }
 
     /**
-     * Confirm ticket payment (webhook or manual confirmation).
+     * @OA\Post(
+     *     path="/api/payments/tickets/{orderId}/confirm",
+     *     tags={"Payment"},
+     *     summary="Confirm ticket payment",
+     *     description="Confirm ticket payment (webhook or manual confirmation)",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="orderId",
+     *         in="path",
+     *         description="Ticket order ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="payment_ref", type="string", example="TKT-ABC123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket payment confirmed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket order not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Ticket order already processed",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function confirmTicketPayment(Request $request, $orderId)
     {

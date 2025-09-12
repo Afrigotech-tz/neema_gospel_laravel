@@ -13,7 +13,31 @@ use Illuminate\Support\Str;
 class TicketController extends Controller
 {
     /**
-     * Get ticket types for an event.
+     * @OA\Get(
+     *     path="/api/tickets/events/{eventId}/ticket-types",
+     *     tags={"Tickets"},
+     *     summary="Get ticket types for an event",
+     *     @OA\Parameter(
+     *         name="eventId",
+     *         in="path",
+     *         description="ID of the event",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of ticket types",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Event not found"
+     *     )
+     * )
      */
     public function getTicketTypes($eventId)
     {
@@ -35,7 +59,37 @@ class TicketController extends Controller
     }
 
     /**
-     * Purchase tickets.
+     * @OA\Post(
+     *     path="/api/tickets/purchase",
+     *     tags={"Tickets"},
+     *     summary="Purchase tickets",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"event_id","ticket_type_id","quantity","payment_method"},
+     *             @OA\Property(property="event_id", type="integer", example=1),
+     *             @OA\Property(property="ticket_type_id", type="integer", example=1),
+     *             @OA\Property(property="quantity", type="integer", example=2),
+     *             @OA\Property(property="guest_email", type="string", format="email", example="guest@example.com"),
+     *             @OA\Property(property="guest_phone", type="string", example="+255712345678"),
+     *             @OA\Property(property="payment_method", type="string", example="card")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket order created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation errors or insufficient tickets"
+     *     )
+     * )
      */
     public function purchaseTickets(Request $request)
     {
@@ -104,7 +158,42 @@ class TicketController extends Controller
     }
 
     /**
-     * Confirm payment (webhook or manual confirmation).
+     * @OA\Post(
+     *     path="/api/tickets/orders/{orderId}/confirm-payment",
+     *     tags={"Tickets"},
+     *     summary="Confirm ticket payment",
+     *     @OA\Parameter(
+     *         name="orderId",
+     *         in="path",
+     *         description="ID of the ticket order",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="payment_ref", type="string", example="TKT-ABC123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Payment confirmed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket order not found"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Order already processed"
+     *     )
+     * )
      */
     public function confirmPayment(Request $request, $orderId)
     {
@@ -144,7 +233,21 @@ class TicketController extends Controller
     }
 
     /**
-     * Get user's ticket orders.
+     * @OA\Get(
+     *     path="/api/tickets/my-orders",
+     *     tags={"Tickets"},
+     *     summary="Get user's ticket orders",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's ticket orders",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
      */
     public function getUserTickets(Request $request)
     {
@@ -162,7 +265,35 @@ class TicketController extends Controller
     }
 
     /**
-     * Get event sales summary.
+     * @OA\Get(
+     *     path="/api/tickets/events/{eventId}/sales",
+     *     tags={"Tickets"},
+     *     summary="Get event sales summary",
+     *     @OA\Parameter(
+     *         name="eventId",
+     *         in="path",
+     *         description="ID of the event",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Event sales summary",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="total_tickets_sold", type="integer"),
+     *                 @OA\Property(property="total_revenue", type="number"),
+     *                 @OA\Property(property="ticket_types", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Event not found"
+     *     )
+     * )
      */
     public function getEventSales($eventId)
     {
@@ -190,7 +321,32 @@ class TicketController extends Controller
     }
 
     /**
-     * Get specific ticket order details.
+     * @OA\Get(
+     *     path="/api/tickets/orders/{orderId}",
+     *     tags={"Tickets"},
+     *     summary="Get specific ticket order details",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="orderId",
+     *         in="path",
+     *         description="ID of the ticket order",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket order details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket order not found"
+     *     )
+     * )
      */
     public function getTicketOrder($orderId, Request $request)
     {
@@ -217,7 +373,37 @@ class TicketController extends Controller
     }
 
     /**
-     * Cancel ticket order.
+     * @OA\Delete(
+     *     path="/api/tickets/orders/{orderId}",
+     *     tags={"Tickets"},
+     *     summary="Cancel ticket order",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="orderId",
+     *         in="path",
+     *         description="ID of the ticket order",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket order cancelled successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket order not found"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Cannot cancel order that is already processed"
+     *     )
+     * )
      */
     public function cancelTicketOrder($orderId, Request $request)
     {
@@ -256,7 +442,32 @@ class TicketController extends Controller
     }
 
     /**
-     * Get ticket order by payment reference.
+     * @OA\Get(
+     *     path="/api/tickets/payment/{paymentRef}",
+     *     tags={"Tickets"},
+     *     summary="Get ticket order by payment reference",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="paymentRef",
+     *         in="path",
+     *         description="Payment reference of the ticket order",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket order details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket order not found"
+     *     )
+     * )
      */
     public function getTicketByPaymentRef($paymentRef, Request $request)
     {
@@ -283,7 +494,46 @@ class TicketController extends Controller
     }
 
     /**
-     * Create a new ticket type for an event.
+     * @OA\Post(
+     *     path="/api/tickets/events/{eventId}/ticket-types",
+     *     tags={"Tickets"},
+     *     summary="Create a new ticket type for an event",
+     *     @OA\Parameter(
+     *         name="eventId",
+     *         in="path",
+     *         description="ID of the event",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","price","quantity"},
+     *             @OA\Property(property="name", type="string", example="VIP Ticket"),
+     *             @OA\Property(property="description", type="string", example="VIP access with premium seating"),
+     *             @OA\Property(property="price", type="number", example=100.00),
+     *             @OA\Property(property="quantity", type="integer", example=50)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Ticket type created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Event not found"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function createTicketType(Request $request, $eventId)
     {
@@ -322,7 +572,45 @@ class TicketController extends Controller
     }
 
     /**
-     * Update a ticket type.
+     * @OA\Put(
+     *     path="/api/tickets/ticket-types/{ticketTypeId}",
+     *     tags={"Tickets"},
+     *     summary="Update a ticket type",
+     *     @OA\Parameter(
+     *         name="ticketTypeId",
+     *         in="path",
+     *         description="ID of the ticket type",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="Updated VIP Ticket"),
+     *             @OA\Property(property="description", type="string", example="Updated VIP access with premium seating"),
+     *             @OA\Property(property="price", type="number", example=120.00),
+     *             @OA\Property(property="quantity", type="integer", example=60)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket type updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket type not found"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation errors or cannot reduce quantity below sold tickets"
+     *     )
+     * )
      */
     public function updateTicketType(Request $request, $ticketTypeId)
     {
@@ -362,7 +650,35 @@ class TicketController extends Controller
     }
 
     /**
-     * Delete a ticket type.
+     * @OA\Delete(
+     *     path="/api/tickets/ticket-types/{ticketTypeId}",
+     *     tags={"Tickets"},
+     *     summary="Delete a ticket type",
+     *     @OA\Parameter(
+     *         name="ticketTypeId",
+     *         in="path",
+     *         description="ID of the ticket type",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket type deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ticket type not found"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Cannot delete ticket type with existing paid orders"
+     *     )
+     * )
      */
     public function deleteTicketType($ticketTypeId)
     {

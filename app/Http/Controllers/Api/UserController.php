@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     /**
-     * Display a listing of users
+     * Get list of users (not routed).
      */
     public function index(Request $request)
     {
@@ -26,7 +26,7 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created user
+     * Create a new user (not routed).
      */
     public function store(Request $request)
     {
@@ -72,7 +72,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified user
+     * Get user details (not routed).
      */
     public function show($id)
     {
@@ -92,7 +92,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified user
+     * Update user details (not routed).
      */
     public function update(Request $request, $id)
     {
@@ -148,8 +148,7 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified user
-     *
+     * Delete a user (not routed).
      */
     public function destroy($id)
     {
@@ -171,7 +170,38 @@ class UserController extends Controller
     }
 
     /**
-     * Search users
+     * @OA\Get(
+     *     path="/api/test/users/search",
+     *     tags={"Users"},
+     *     summary="Search users",
+     *     @OA\Parameter(
+     *         name="query",
+     *         in="query",
+     *         description="Search query for user name, email, or phone",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Search results",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function search(Request $request)
     {
@@ -194,7 +224,47 @@ class UserController extends Controller
     }
 
     /**
-     * Assign role to user
+     * @OA\Post(
+     *     path="/api/test/users/{user}/assign-role",
+     *     tags={"Users"},
+     *     summary="Assign role to user",
+     *     @OA\Parameter(
+     *         name="user",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"role_id"},
+     *             @OA\Property(property="role_id", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Role assigned successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Role not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors or user already has this role"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to assign role"
+     *     )
+     * )
      */
     public function assignRole(Request $request, User $user)
     {
@@ -247,7 +317,39 @@ class UserController extends Controller
     }
 
     /**
-     * Remove role from user
+     * @OA\Delete(
+     *     path="/api/test/users/{user}/remove-role/{role}",
+     *     tags={"Users"},
+     *     summary="Remove role from user",
+     *     @OA\Parameter(
+     *         name="user",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="role",
+     *         in="path",
+     *         description="Role ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Role removed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="User does not have this role"
+     *     )
+     * )
      */
     public function removeRole(Request $request, User $user, Role $role)
     {
@@ -269,7 +371,27 @@ class UserController extends Controller
     }
 
     /**
-     * Get user roles
+     * @OA\Get(
+     *     path="/api/test/users/{user}/roles",
+     *     tags={"Users"},
+     *     summary="Get user roles",
+     *     @OA\Parameter(
+     *         name="user",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User roles",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
      */
     public function getUserRoles(User $user)
     {
@@ -280,7 +402,26 @@ class UserController extends Controller
     }
 
 
-    //  temporary functions
+    /**
+     * @OA\Get(
+     *     path="/api/test/users/",
+     *     tags={"Users"},
+     *     summary="Get all users (temporary endpoint)",
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of all users",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No users found"
+     *     )
+     * )
+     */
     public function get_users()
     {
         $users = User::all();
@@ -298,6 +439,33 @@ class UserController extends Controller
     }
 
 
+    /**
+     * @OA\Get(
+     *     path="/api/test/users/{id}",
+     *     tags={"Users"},
+     *     summary="Get user by ID (temporary endpoint)",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
+     */
     public function get_user($id)
     {
         $user = User::find($id);
@@ -314,7 +482,34 @@ class UserController extends Controller
 
     }
 
-    public  function delete_user($id)
+    /**
+     * @OA\Delete(
+     *     path="/api/test/users/{id}",
+     *     tags={"Users"},
+     *     summary="Delete user by ID (temporary endpoint)",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
+     */
+    public function delete_user($id)
     {
         $user = User::find($id);
         if (!$user) {

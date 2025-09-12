@@ -14,10 +14,51 @@ use PhpParser\Node\Stmt\Catch_;
 class EventController extends Controller
 {
     /**
-     * Display a listing of events
-     *
+     * @OA\Get(
+     *     path="/api/events",
+     *     tags={"Events"},
+     *     summary="Get list of events",
+     *     @OA\Parameter(
+     *         name="type",
+     *         in="query",
+     *         description="Filter by event type",
+     *         @OA\Schema(type="string", enum={"concert","service","live_recording","conference","other"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_from",
+     *         in="query",
+     *         description="Filter events from date",
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_to",
+     *         in="query",
+     *         description="Filter events to date",
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of events",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             ),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
-
     public function index(Request $request)
     {
         $query = Event::query();
@@ -63,6 +104,48 @@ class EventController extends Controller
 
 
 
+    /**
+     * @OA\Post(
+     *     path="/api/events",
+     *     tags={"Events"},
+     *     summary="Create a new event",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"title","type","date","location"},
+     *             @OA\Property(property="title", type="string", example="Gospel Concert 2024"),
+     *             @OA\Property(property="type", type="string", enum={"concert","service","live_recording","conference","other"}, example="concert"),
+     *             @OA\Property(property="date", type="string", format="date", example="2024-12-25"),
+     *             @OA\Property(property="location", type="string", example="Dar es Salaam"),
+     *             @OA\Property(property="description", type="string", example="Annual gospel concert"),
+     *             @OA\Property(property="venue", type="string", example="National Stadium"),
+     *             @OA\Property(property="city", type="string", example="Dar es Salaam"),
+     *             @OA\Property(property="country", type="string", example="Tanzania"),
+     *             @OA\Property(property="capacity", type="integer", example=1000),
+     *             @OA\Property(property="ticket_price", type="number", example=50.00),
+     *             @OA\Property(property="ticket_url", type="string", format="url", example="https://tickets.example.com"),
+     *             @OA\Property(property="is_featured", type="boolean", example=true),
+     *             @OA\Property(property="is_public", type="boolean", example=true),
+     *             @OA\Property(property="status", type="string", enum={"upcoming","ongoing","completed","cancelled"}, example="upcoming")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Event created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -121,7 +204,32 @@ class EventController extends Controller
 
 
     /**
-     * Display the specified event
+     * @OA\Get(
+     *     path="/api/events/{event}",
+     *     tags={"Events"},
+     *     summary="Get event details",
+     *     @OA\Parameter(
+     *         name="event",
+     *         in="path",
+     *         description="Event ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Event details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Event not found"
+     *     )
+     * )
      */
     public function show(Event $event)
     {
@@ -133,7 +241,56 @@ class EventController extends Controller
     }
 
     /**
-     * Update the specified event
+     * @OA\Put(
+     *     path="/api/events/{event}",
+     *     tags={"Events"},
+     *     summary="Update event details",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="event",
+     *         in="path",
+     *         description="Event ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", example="Updated Gospel Concert"),
+     *             @OA\Property(property="type", type="string", enum={"concert","service","live_recording","conference","other"}, example="concert"),
+     *             @OA\Property(property="date", type="string", format="date", example="2024-12-26"),
+     *             @OA\Property(property="location", type="string", example="Updated Location"),
+     *             @OA\Property(property="description", type="string", example="Updated description"),
+     *             @OA\Property(property="venue", type="string", example="Updated Venue"),
+     *             @OA\Property(property="city", type="string", example="Updated City"),
+     *             @OA\Property(property="country", type="string", example="Updated Country"),
+     *             @OA\Property(property="capacity", type="integer", example=1500),
+     *             @OA\Property(property="ticket_price", type="number", example=60.00),
+     *             @OA\Property(property="ticket_url", type="string", format="url", example="https://tickets.updated.com"),
+     *             @OA\Property(property="is_featured", type="boolean", example=false),
+     *             @OA\Property(property="is_public", type="boolean", example=true),
+     *             @OA\Property(property="status", type="string", enum={"upcoming","ongoing","completed","cancelled"}, example="upcoming")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Event updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Event not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function update(Request $request, Event $event)
     {
@@ -197,9 +354,33 @@ class EventController extends Controller
 
 
     /**
-     * Remove the specified event
+     * @OA\Delete(
+     *     path="/api/events/{id}",
+     *     tags={"Events"},
+     *     summary="Delete an event",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Event ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Event deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Event not found"
+     *     )
+     * )
      */
-
     public function destroy($id)
     {
         $event = Event::find($id);
@@ -231,7 +412,21 @@ class EventController extends Controller
 
 
     /**
-     * Get upcoming events
+     * @OA\Get(
+     *     path="/api/events/upcoming",
+     *     tags={"Events"},
+     *     summary="Get upcoming events",
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of upcoming events",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function upcoming()
     {
@@ -248,10 +443,33 @@ class EventController extends Controller
     }
 
     /**
-     * Search events
-     *
+     * @OA\Get(
+     *     path="/api/events/search",
+     *     tags={"Events"},
+     *     summary="Search events",
+     *     @OA\Parameter(
+     *         name="query",
+     *         in="query",
+     *         description="Search query for event title or location",
+     *         required=true,
+     *         @OA\Schema(type="string", minLength=2)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Search results",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
-
     public function search(Request $request)
     {
         $validator = Validator::make($request->all(), [

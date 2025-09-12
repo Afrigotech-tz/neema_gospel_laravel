@@ -24,7 +24,7 @@ class AuthController extends Controller
      *     path="/api/register",
      *     operationId="registerUser",
      *     summary="Register a new user",
-     *     tags={"Auth"},
+     *     tags={"Authentication"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -43,11 +43,30 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="User registered successfully"
+     *         description="User registered successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", type="object"),
+     *                 @OA\Property(property="verification_method", type="string", enum={"email","mobile"})
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Validation errors"
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="SMS service not configured"
      *     )
      * )
      */
@@ -164,11 +183,46 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Login successful"
+     *         description="Login successful",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", type="object"),
+     *                 @OA\Property(property="token", type="string"),
+     *                 @OA\Property(property="token_type", type="string", example="Bearer"),
+     *                 @OA\Property(property="permissions", type="array", @OA\Items(type="string"))
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=401,
-     *         description="Invalid credentials"
+     *         description="Invalid credentials",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Account not verified",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
      *     )
      * )
      */
@@ -233,14 +287,39 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Account verified successfully"
+     *         description="Account verified successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", type="object"),
+     *                 @OA\Property(property="token", type="string"),
+     *                 @OA\Property(property="token_type", type="string", example="Bearer")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Invalid or expired OTP"
+     *         description="Invalid or expired OTP",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
      *     )
      * )
      */
+    
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -296,11 +375,40 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="OTP resent successfully"
+     *         description="OTP resent successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="User not found"
+     *         description="User not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="SMS service not configured",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
      *     )
      * )
      */
@@ -379,7 +487,12 @@ class AuthController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Logout successful"
+     *         description="Logout successful",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
      *     )
      * )
      */
@@ -399,7 +512,12 @@ class AuthController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Authenticated user profile"
+     *         description="Authenticated user profile",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
      *     )
      * )
      */

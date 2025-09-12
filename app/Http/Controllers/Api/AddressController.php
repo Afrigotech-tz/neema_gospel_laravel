@@ -11,7 +11,44 @@ use Illuminate\Support\Facades\Validator;
 class AddressController extends Controller
 {
     /**
-     * Add a new address for the authenticated user
+     * @OA\Post(
+     *     path="/api/addresses",
+     *     tags={"Addresses"},
+     *     summary="Create a new address",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"type","first_name","last_name","phone","email","address_line_1","city","state","postal_code","country"},
+     *             @OA\Property(property="type", type="string", enum={"billing","shipping"}, example="billing"),
+     *             @OA\Property(property="first_name", type="string", example="John"),
+     *             @OA\Property(property="last_name", type="string", example="Doe"),
+     *             @OA\Property(property="phone", type="string", example="+255712345678"),
+     *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
+     *             @OA\Property(property="address_line_1", type="string", example="123 Main Street"),
+     *             @OA\Property(property="address_line_2", type="string", example="Apt 4B"),
+     *             @OA\Property(property="city", type="string", example="Dar es Salaam"),
+     *             @OA\Property(property="state", type="string", example="Dar es Salaam"),
+     *             @OA\Property(property="postal_code", type="string", example="12345"),
+     *             @OA\Property(property="country", type="string", example="Tanzania"),
+     *             @OA\Property(property="is_default", type="boolean", example=false)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Address created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -69,7 +106,54 @@ class AddressController extends Controller
     }
 
     /**
-     * Update an existing address
+     * @OA\Put(
+     *     path="/api/addresses/{id}",
+     *     tags={"Addresses"},
+     *     summary="Update an address",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Address ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="type", type="string", enum={"billing","shipping"}, example="billing"),
+     *             @OA\Property(property="first_name", type="string", example="Updated John"),
+     *             @OA\Property(property="last_name", type="string", example="Updated Doe"),
+     *             @OA\Property(property="phone", type="string", example="+255712345678"),
+     *             @OA\Property(property="email", type="string", format="email", example="updated.john.doe@example.com"),
+     *             @OA\Property(property="address_line_1", type="string", example="456 Updated Street"),
+     *             @OA\Property(property="address_line_2", type="string", example="Suite 5C"),
+     *             @OA\Property(property="city", type="string", example="Updated City"),
+     *             @OA\Property(property="state", type="string", example="Updated State"),
+     *             @OA\Property(property="postal_code", type="string", example="67890"),
+     *             @OA\Property(property="country", type="string", example="Updated Country"),
+     *             @OA\Property(property="is_default", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Address updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Address not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function update(Request $request, $id)
     {
@@ -123,7 +207,36 @@ class AddressController extends Controller
     }
 
     /**
-     * Delete an address
+     * @OA\Delete(
+     *     path="/api/addresses/{id}",
+     *     tags={"Addresses"},
+     *     summary="Delete an address",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Address ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Address deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Cannot delete default address"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Address not found"
+     *     )
+     * )
      */
     public function destroy($id)
     {
@@ -153,7 +266,21 @@ class AddressController extends Controller
     }
 
     /**
-     * Get all addresses for the authenticated user
+     * @OA\Get(
+     *     path="/api/addresses",
+     *     tags={"Addresses"},
+     *     summary="Get all addresses for authenticated user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of addresses",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
      */
     public function index()
     {
@@ -169,7 +296,32 @@ class AddressController extends Controller
     }
 
     /**
-     * Get a specific address
+     * @OA\Get(
+     *     path="/api/addresses/{id}",
+     *     tags={"Addresses"},
+     *     summary="Get a specific address",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Address ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Address details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Address not found"
+     *     )
+     * )
      */
     public function show($id)
     {
@@ -189,7 +341,32 @@ class AddressController extends Controller
     }
 
     /**
-     * Get addresses for a specific user
+     * @OA\Get(
+     *     path="/api/addresses/user/{userId}",
+     *     tags={"Addresses"},
+     *     summary="Get addresses for a specific user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of addresses",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized to view addresses for this user"
+     *     )
+     * )
      */
     public function getUserAddresses($userId)
     {
@@ -213,7 +390,49 @@ class AddressController extends Controller
     }
 
     /**
-     * Set a default address for a user
+     * @OA\Post(
+     *     path="/api/addresses/user/{userId}/default",
+     *     tags={"Addresses"},
+     *     summary="Set a default address for a user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"address_id","type"},
+     *             @OA\Property(property="address_id", type="integer", example=1),
+     *             @OA\Property(property="type", type="string", enum={"billing","shipping"}, example="billing")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Default address updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized to modify addresses for this user"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Address not found for this user"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function setDefaultAddress(Request $request, $userId)
     {

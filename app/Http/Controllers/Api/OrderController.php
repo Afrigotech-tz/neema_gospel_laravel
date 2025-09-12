@@ -17,7 +17,32 @@ use Illuminate\Support\Facades\Validator;
 class OrderController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/orders",
+     *     tags={"Orders"},
+     *     summary="Get list of orders",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of orders",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function index()
     {
@@ -32,7 +57,53 @@ class OrderController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/orders",
+     *     tags={"Orders"},
+     *     summary="Create a new order",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"address_id","items","payment_method_id"},
+     *             @OA\Property(property="address_id", type="integer", example=1),
+     *             @OA\Property(
+     *                 property="items",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     required={"product_id","quantity"},
+     *                     @OA\Property(property="product_id", type="integer", example=1),
+     *                     @OA\Property(property="quantity", type="integer", example=2)
+     *                 )
+     *             ),
+     *             @OA\Property(property="payment_method_id", type="integer", example=1),
+     *             @OA\Property(property="notes", type="string", example="Please deliver between 9am-5pm")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Insufficient stock"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to create order"
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -140,7 +211,32 @@ class OrderController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/orders/{id}",
+     *     tags={"Orders"},
+     *     summary="Get order details",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Order ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Order not found"
+     *     )
+     * )
      */
     public function show($id)
     {
@@ -161,7 +257,45 @@ class OrderController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/orders/{id}",
+     *     tags={"Orders"},
+     *     summary="Update order status",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Order ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"pending","processing","shipped","delivered","cancelled"}, example="processing"),
+     *             @OA\Property(property="notes", type="string", example="Order is being processed")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Order not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function update(Request $request, $id)
     {
@@ -200,7 +334,32 @@ class OrderController extends Controller
     }
 
     /**
-     * Get orders for authenticated user
+     * @OA\Get(
+     *     path="/api/orders/user",
+     *     tags={"Orders"},
+     *     summary="Get orders for authenticated user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user orders",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function userOrders()
     {

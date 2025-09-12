@@ -12,7 +12,46 @@ use Illuminate\Support\Facades\Validator;
 class MusicController extends Controller
 {
     /**
-     * Display a listing of the music.
+     * @OA\Get(
+     *     path="/api/music",
+     *     tags={"Music"},
+     *     summary="Get list of music",
+     *     @OA\Parameter(
+     *         name="choir",
+     *         in="query",
+     *         description="Filter by choir/artist",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="genre",
+     *         in="query",
+     *         description="Filter by genre",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Search by music name",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of music",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="current_page", type="integer"),
+     *             @OA\Property(property="total", type="integer"),
+     *             @OA\Property(property="per_page", type="integer")
+     *         )
+     *     )
+     * )
      */
     public function index(Request $request)
     {
@@ -42,7 +81,46 @@ class MusicController extends Controller
     }
 
     /**
-     * Store a newly created music.
+     * @OA\Post(
+     *     path="/api/music",
+     *     tags={"Music"},
+     *     summary="Upload new music",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"name","release_date","choir"},
+     *                 @OA\Property(property="name", type="string", example="Amazing Grace"),
+     *                 @OA\Property(property="release_date", type="string", format="date", example="2024-01-15"),
+     *                 @OA\Property(property="choir", type="string", example="Neema Gospel Choir"),
+     *                 @OA\Property(property="description", type="string", example="A beautiful gospel hymn"),
+     *                 @OA\Property(property="genre", type="string", example="Gospel"),
+     *                 @OA\Property(property="picture", type="string", format="binary", description="Music cover image (JPEG, PNG, JPG, GIF, max 2MB)"),
+     *                 @OA\Property(property="audio_file", type="string", format="binary", description="Audio file (MP3, WAV, OGG, M4A, FLAC, max 50MB)")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Music uploaded successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to upload music"
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -124,7 +202,31 @@ class MusicController extends Controller
     }
 
     /**
-     * Display the specified music.
+     * @OA\Get(
+     *     path="/api/music/{music}",
+     *     tags={"Music"},
+     *     summary="Get music details",
+     *     @OA\Parameter(
+     *         name="music",
+     *         in="path",
+     *         description="Music ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Music details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Music not found"
+     *     )
+     * )
      */
     public function show(Music $music)
     {
@@ -135,7 +237,56 @@ class MusicController extends Controller
     }
 
     /**
-     * Update the specified music.
+     * @OA\Put(
+     *     path="/api/music/{music}",
+     *     tags={"Music"},
+     *     summary="Update music details",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="music",
+     *         in="path",
+     *         description="Music ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="name", type="string", example="Updated Amazing Grace"),
+     *                 @OA\Property(property="release_date", type="string", format="date", example="2024-01-16"),
+     *                 @OA\Property(property="choir", type="string", example="Updated Choir"),
+     *                 @OA\Property(property="description", type="string", example="Updated description"),
+     *                 @OA\Property(property="genre", type="string", example="Updated Genre"),
+     *                 @OA\Property(property="picture", type="string", format="binary", description="New cover image"),
+     *                 @OA\Property(property="audio_file", type="string", format="binary", description="New audio file")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Music updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Music not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to update music"
+     *     )
+     * )
      */
     public function update(Request $request, Music $music)
     {
@@ -204,7 +355,36 @@ class MusicController extends Controller
     }
 
     /**
-     * Remove the specified music.
+     * @OA\Delete(
+     *     path="/api/music/{music}",
+     *     tags={"Music"},
+     *     summary="Delete music",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="music",
+     *         in="path",
+     *         description="Music ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Music deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Music not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to delete music"
+     *     )
+     * )
      */
     public function destroy(Music $music)
     {

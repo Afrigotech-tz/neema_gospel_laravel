@@ -10,7 +10,31 @@ use Illuminate\Support\Facades\Validator;
 class CountryController extends Controller
 {
     /**
-     * Display a listing of countries
+     * @OA\Get(
+     *     path="/api/countries",
+     *     tags={"Countries"},
+     *     summary="Get list of countries",
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", default=50)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of countries",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function index(Request $request)
     {
@@ -24,7 +48,34 @@ class CountryController extends Controller
     }
 
     /**
-     * Store a newly created country
+     * @OA\Post(
+     *     path="/api/countries",
+     *     tags={"Countries"},
+     *     summary="Create a new country",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","code","dial_code"},
+     *             @OA\Property(property="name", type="string", example="Tanzania"),
+     *             @OA\Property(property="code", type="string", example="TZ"),
+     *             @OA\Property(property="dial_code", type="string", example="+255")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Country created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -56,7 +107,36 @@ class CountryController extends Controller
     }
 
     /**
-     * Display the specified country
+     * @OA\Get(
+     *     path="/api/countries/{id}",
+     *     tags={"Countries"},
+     *     summary="Get country details",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Country ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Country details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Country not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function show($id)
     {
@@ -76,7 +156,44 @@ class CountryController extends Controller
     }
 
     /**
-     * Update the specified country
+     * @OA\Put(
+     *     path="/api/countries/{id}",
+     *     tags={"Countries"},
+     *     summary="Update country details",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Country ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="Updated Tanzania"),
+     *             @OA\Property(property="code", type="string", example="TZ"),
+     *             @OA\Property(property="dial_code", type="string", example="+255")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Country updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Country not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors"
+     *     )
+     * )
      */
     public function update(Request $request, $id)
     {
@@ -119,7 +236,35 @@ class CountryController extends Controller
     }
 
     /**
-     * Remove the specified country
+     * @OA\Delete(
+     *     path="/api/countries/{id}",
+     *     tags={"Countries"},
+     *     summary="Delete a country",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Country ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Country deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Country not found"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Cannot delete country with associated users"
+     *     )
+     * )
      */
     public function destroy($id)
     {
@@ -149,7 +294,38 @@ class CountryController extends Controller
     }
 
     /**
-     * Search countries
+     * @OA\Get(
+     *     path="/api/countries/search",
+     *     tags={"Countries"},
+     *     summary="Search countries",
+     *     @OA\Parameter(
+     *         name="query",
+     *         in="query",
+     *         description="Search query for country name, code, or dial code",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", default=50)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Search results",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function search(Request $request)
     {
@@ -171,7 +347,25 @@ class CountryController extends Controller
     }
 
     /**
-     * Get all countries (simple list for dropdowns)
+     * @OA\Get(
+     *     path="/api/countries/list",
+     *     tags={"Countries"},
+     *     summary="Get simple list of countries for dropdowns",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Simple list of countries",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="code", type="string"),
+     *                 @OA\Property(property="dial_code", type="string")
+     *             ))
+     *         )
+     *     )
+     * )
      */
     public function list()
     {
@@ -186,7 +380,45 @@ class CountryController extends Controller
     }
 
     /**
-     * Get users by country
+     * @OA\Get(
+     *     path="/api/countries/{id}/users",
+     *     tags={"Countries"},
+     *     summary="Get users from a specific country",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Country ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Users from the country",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="country", type="object"),
+     *                 @OA\Property(property="users", type="object",
+     *                     @OA\Property(property="current_page", type="integer"),
+     *                     @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                     @OA\Property(property="total", type="integer"),
+     *                     @OA\Property(property="per_page", type="integer")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Country not found"
+     *     )
+     * )
      */
     public function users($id, Request $request)
     {
