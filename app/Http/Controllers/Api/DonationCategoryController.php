@@ -10,6 +10,28 @@ use Illuminate\Http\Response;
 class DonationCategoryController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/donations/categories",
+     *     tags={"Donation Categories"},
+     *     summary="List all donation categories",
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of donation categories",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             ))
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Display a listing of donation categories.
      */
     public function index()
@@ -21,7 +43,49 @@ class DonationCategoryController extends Controller
         ], Response::HTTP_OK);
     }
 
-
+    /**
+     * @OA\Post(
+     *     path="/api/donations/categories",
+     *     tags={"Donation Categories"},
+     *     summary="Create a new donation category",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Education")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Category created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="Category already exists",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         // Step 1: Trim the name
@@ -57,6 +121,28 @@ class DonationCategoryController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/donations/categories/{category}",
+     *     tags={"Donation Categories"},
+     *     summary="Get a specific donation category",
+     *     @OA\Parameter(
+     *         name="category",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Display the specified donation category.
      *
      */
@@ -68,6 +154,46 @@ class DonationCategoryController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/donations/categories/{category}",
+     *     tags={"Donation Categories"},
+     *     summary="Update a donation category",
+     *     @OA\Parameter(
+     *         name="category",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Updated Education")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Update the specified donation category.
      */
@@ -89,6 +215,28 @@ class DonationCategoryController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/donations/categories/{category}",
+     *     tags={"Donation Categories"},
+     *     summary="Delete a donation category",
+     *     @OA\Parameter(
+     *         name="category",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Remove the specified donation category.
      */
     public function destroy(DonationCategory $category)
@@ -101,6 +249,41 @@ class DonationCategoryController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/donations/categories/check-name",
+     *     tags={"Donation Categories"},
+     *     summary="Check if a donation category name exists",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Education")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Check result",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="exists", type="boolean"),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object", nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Check if a donation category name exists.
      */

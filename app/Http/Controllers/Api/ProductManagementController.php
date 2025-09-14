@@ -17,6 +17,62 @@ use Illuminate\Support\Str;
 class ProductManagementController extends Controller
 {
     /**
+     * @OA\Post(
+     *     path="/api/admin/products",
+     *     tags={"Product Management"},
+     *     summary="Create a new product",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"name","category_id","base_price","sku","stock_quantity"},
+     *                 @OA\Property(property="name", type="string", example="Sample Product"),
+     *                 @OA\Property(property="description", type="string", example="Product description"),
+     *                 @OA\Property(property="category_id", type="integer", example=1),
+     *                 @OA\Property(property="base_price", type="number", format="float", example=99.99),
+     *                 @OA\Property(property="sku", type="string", example="PROD-001"),
+     *                 @OA\Property(property="stock_quantity", type="integer", example=100),
+     *                 @OA\Property(property="is_active", type="boolean", example=true),
+     *                 @OA\Property(property="weight", type="number", format="float", example=1.5),
+     *                 @OA\Property(property="images", type="array", @OA\Items(type="string", format="binary"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Product created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Create a new product.
      */
     public function store(Request $request)
@@ -78,6 +134,82 @@ class ProductManagementController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/admin/products/{id}",
+     *     tags={"Product Management"},
+     *     summary="Update an existing product",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="name", type="string", example="Updated Product"),
+     *                 @OA\Property(property="description", type="string", example="Updated description"),
+     *                 @OA\Property(property="category_id", type="integer", example=1),
+     *                 @OA\Property(property="base_price", type="number", format="float", example=149.99),
+     *                 @OA\Property(property="sku", type="string", example="PROD-001-UPD"),
+     *                 @OA\Property(property="stock_quantity", type="integer", example=150),
+     *                 @OA\Property(property="is_active", type="boolean", example=true),
+     *                 @OA\Property(property="weight", type="number", format="float", example=2.0),
+     *                 @OA\Property(property="images", type="array", @OA\Items(type="string", format="binary")),
+     *                 @OA\Property(property="images_action", type="string", enum={"replace","add","remove","keep"}, example="add"),
+     *                 @OA\Property(property="remove_images", type="array", @OA\Items(type="string"), example={"products/image1.jpg"}),
+     *                 @OA\Property(property="meta_title", type="string", example="Meta Title"),
+     *                 @OA\Property(property="meta_description", type="string", example="Meta Description"),
+     *                 @OA\Property(property="dimensions", type="array", @OA\Items(type="string"), example={"length":"10","width":"5"}),
+     *                 @OA\Property(property="tags", type="array", @OA\Items(type="string"), example={"tag1","tag2"})
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Update an existing product.
      */
@@ -216,6 +348,48 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/admin/products/{id}",
+     *     tags={"Product Management"},
+     *     summary="Delete a product",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Delete a product.
      */
     public function destroy($id)
@@ -258,6 +432,45 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/admin/products/categories",
+     *     tags={"Product Management"},
+     *     summary="Create a product category",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Electronics"),
+     *             @OA\Property(property="description", type="string", example="Electronic products"),
+     *             @OA\Property(property="parent_id", type="integer", nullable=true, example=null),
+     *             @OA\Property(property="is_active", type="boolean", example=true),
+     *             @OA\Property(property="sort_order", type="integer", example=0)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Category created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Create product category.
      */
     public function storeCategory(Request $request)
@@ -285,6 +498,24 @@ class ProductManagementController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/products/categories",
+     *     tags={"Product Management"},
+     *     summary="Get all product categories",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categories retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
     public function getCategory(Request $request)
     {
         $query = ProductCategory::query();
@@ -298,6 +529,59 @@ class ProductManagementController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/admin/products/categories/{id}",
+     *     tags={"Product Management"},
+     *     summary="Update product category",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="Updated Electronics"),
+     *             @OA\Property(property="description", type="string", example="Updated description"),
+     *             @OA\Property(property="parent_id", type="integer", nullable=true, example=null),
+     *             @OA\Property(property="is_active", type="boolean", example=true),
+     *             @OA\Property(property="sort_order", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Update product category.
      */
@@ -330,6 +614,47 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/admin/products/categories/{id}",
+     *     tags={"Product Management"},
+     *     summary="Delete product category",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Cannot delete category with products",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Delete product category.
      */
     public function destroyCategory($id)
@@ -359,6 +684,24 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/products/variants",
+     *     tags={"Product Management"},
+     *     summary="Get all product variants",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Variants retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Create product variant.
      */
     public function getVariant(Request $request)
@@ -374,6 +717,56 @@ class ProductManagementController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/admin/products/variants",
+     *     tags={"Product Management"},
+     *     summary="Create a product variant",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"product_id","sku","price","stock","attribute_values"},
+     *             @OA\Property(property="product_id", type="integer", example=1),
+     *             @OA\Property(property="sku", type="string", example="PROD-001-S"),
+     *             @OA\Property(property="price", type="number", format="float", example=99.99),
+     *             @OA\Property(property="stock", type="integer", example=50),
+     *             @OA\Property(property="is_active", type="boolean", example=true),
+     *             @OA\Property(property="attribute_values", type="array", @OA\Items(type="integer"), example={1,2})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Variant created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     public function storeVariant(Request $request)
     {
         $request->validate([
@@ -416,6 +809,69 @@ class ProductManagementController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/admin/products/variants/{id}",
+     *     tags={"Product Management"},
+     *     summary="Update product variant",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="sku", type="string", example="PROD-001-M"),
+     *             @OA\Property(property="price", type="number", format="float", example=109.99),
+     *             @OA\Property(property="stock_quantity", type="integer", example=75),
+     *             @OA\Property(property="is_active", type="boolean", example=true),
+     *             @OA\Property(property="attribute_values", type="array", @OA\Items(type="integer"), example={1,3})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Variant updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Variant not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Update product variant.
      */
@@ -465,6 +921,38 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/admin/products/variants/{id}",
+     *     tags={"Product Management"},
+     *     summary="Delete product variant",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Variant deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Variant not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Delete product variant.
      */
     public function destroyVariant($id)
@@ -486,6 +974,43 @@ class ProductManagementController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/admin/products/attributes",
+     *     tags={"Product Management"},
+     *     summary="Create a product attribute",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","type"},
+     *             @OA\Property(property="name", type="string", example="Color"),
+     *             @OA\Property(property="type", type="string", enum={"text","number","color","select"}, example="select"),
+     *             @OA\Property(property="is_required", type="boolean", example=false)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Attribute created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Create product attribute.
      */
@@ -510,6 +1035,45 @@ class ProductManagementController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/admin/products/attribute-values",
+     *     tags={"Product Management"},
+     *     summary="Create a product attribute value",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"attribute_id","value"},
+     *             @OA\Property(property="attribute_id", type="integer", example=1),
+     *             @OA\Property(property="value", type="string", example="Red"),
+     *             @OA\Property(property="price_adjustment", type="number", format="float", example=0.00),
+     *             @OA\Property(property="stock_quantity", type="integer", example=100),
+     *             @OA\Property(property="sku", type="string", example="RED-001")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Attribute value created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Create product attribute value.
      */
@@ -538,6 +1102,59 @@ class ProductManagementController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/admin/products/attribute-values/{id}",
+     *     tags={"Product Management"},
+     *     summary="Update a product attribute value",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="attribute_id", type="integer", example=1),
+     *             @OA\Property(property="value", type="string", example="Blue"),
+     *             @OA\Property(property="price_adjustment", type="number", format="float", example=5.00),
+     *             @OA\Property(property="stock_quantity", type="integer", example=150),
+     *             @OA\Property(property="sku", type="string", example="BLUE-001")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Attribute value updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Attribute value not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Update product attribute value.
      */
@@ -570,6 +1187,47 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/admin/products/attribute-values/{id}",
+     *     tags={"Product Management"},
+     *     summary="Delete a product attribute value",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Attribute value deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Cannot delete attribute value in use",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Attribute value not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Delete product attribute value.
      */
     public function destroyAttributeValue($id)
@@ -600,6 +1258,31 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/admin/products/attribute-values",
+     *     tags={"Product Management"},
+     *     summary="Get all product attribute values",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="attribute_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by attribute ID"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Attribute values retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Get all attribute values.
      */
     public function getAttributeValues(Request $request)
@@ -619,6 +1302,31 @@ class ProductManagementController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/admin/products",
+     *     tags={"Product Management"},
+     *     summary="Get all products (admin view)",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Page number for pagination"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Products retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Get all products (admin view)
      */

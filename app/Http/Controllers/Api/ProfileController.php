@@ -13,6 +13,26 @@ use Illuminate\Support\Facades\Log;
 class ProfileController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/profile",
+     *     tags={"Profile"},
+     *     summary="Get authenticated user's profile",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", type="object"),
+     *                 @OA\Property(property="profile", type="object")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Get the authenticated user's profile
      */
     public function show(Request $request)
@@ -34,6 +54,52 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/profile",
+     *     tags={"Profile"},
+     *     summary="Update authenticated user's profile",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="profile_picture", type="string", format="binary"),
+     *                 @OA\Property(property="address", type="string", example="123 Main St"),
+     *                 @OA\Property(property="city", type="string", example="New York"),
+     *                 @OA\Property(property="state_province", type="string", example="NY"),
+     *                 @OA\Property(property="postal_code", type="string", example="10001"),
+     *                 @OA\Property(property="bio", type="string", example="About me"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
+     *                 @OA\Property(property="occupation", type="string", example="Developer"),
+     *                 @OA\Property(property="location_public", type="boolean", example=true),
+     *                 @OA\Property(property="profile_public", type="boolean", example=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Update the authenticated user's profile
      */
@@ -92,6 +158,46 @@ class ProfileController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/profile/picture",
+     *     tags={"Profile"},
+     *     summary="Update profile picture",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"profile_picture"},
+     *                 @OA\Property(property="profile_picture", type="string", format="binary", description="Image file (jpeg, png, jpg, gif, webp, max 5MB)")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile picture updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="profile_picture_url", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Update profile picture only
      */
     public function updateProfilePicture(Request $request)
@@ -141,6 +247,49 @@ class ProfileController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *     path="/api/profile/location",
+     *     tags={"Profile"},
+     *     summary="Update profile location",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="address", type="string", example="123 Main St"),
+     *             @OA\Property(property="city", type="string", example="New York"),
+     *             @OA\Property(property="state_province", type="string", example="NY"),
+     *             @OA\Property(property="postal_code", type="string", example="10001"),
+     *             @OA\Property(property="location_public", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Location updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="location", type="object",
+     *                     @OA\Property(property="address", type="string"),
+     *                     @OA\Property(property="location_public", type="boolean")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    /**
      * Update location coordinates
      */
     public function updateLocation(Request $request)
@@ -184,6 +333,32 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/profile/picture",
+     *     tags={"Profile"},
+     *     summary="Delete profile picture",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile picture deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No profile picture to delete",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
     /**
      * Delete profile picture
      */
