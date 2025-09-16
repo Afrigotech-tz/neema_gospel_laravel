@@ -4,8 +4,16 @@ namespace App\Http\Controllers;
 
 /**
  * @OA\Info(
- *     title="APIs For Neema Gospel Choir",
- *     version="1.0.0"
+ *     title="Neema Gospel Choir APIs",
+ *     description="This is the API documentation for the Neema Gospel Choir system. 
+ *         It provides access to user authentication, donations, donation categories, 
+ *         profiles, and other resources.",
+ *     version="1.0.0",
+ *     @OA\Contact(
+ *         email="bennycive@gmail.com",
+ *         name="API Support"
+ *     ),
+ *     
  * )
  *
  * @OA\SecurityScheme(
@@ -13,10 +21,11 @@ namespace App\Http\Controllers;
  *     type="http",
  *     scheme="bearer",
  *     bearerFormat="JWT",
- *     in="header",
- *     name="bearerAuth"
+ *     description="Use the JWT token obtained from the login endpoint. 
+ *         Example: 'Bearer {token}'"
  * )
  */
+
 abstract class Controller
 {
     //

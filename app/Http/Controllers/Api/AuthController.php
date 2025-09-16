@@ -502,30 +502,5 @@ class AuthController extends Controller
         return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
 
-    /** Get authenticated user profile */
-
-    /**
-     * @OA\Get(
-     *     path="/api/profile",
-     *     tags={"Authentication"},
-     *     summary="Get user profile",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Authenticated user profile",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     )
-     * )
-     */
-    public function profile(Request $request)
-    {
-        return response()->json([
-            'success' => true,
-            'data' => $request->user()->load('country')
-        ]);
-    }
+ 
 }

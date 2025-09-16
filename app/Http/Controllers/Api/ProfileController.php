@@ -31,9 +31,8 @@ class ProfileController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
-     * Get the authenticated user's profile
+     * 
+     * show the profile of  authenticated user's
      */
     public function show(Request $request)
     {
@@ -99,8 +98,7 @@ class ProfileController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Update the authenticated user's profile
      */
     public function update(Request $request)
@@ -196,8 +194,7 @@ class ProfileController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Update profile picture only
      */
     public function updateProfilePicture(Request $request)
@@ -288,8 +285,7 @@ class ProfileController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Update location coordinates
      */
     public function updateLocation(Request $request)
@@ -358,8 +354,7 @@ class ProfileController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Delete profile picture
      */
     public function deleteProfilePicture(Request $request)

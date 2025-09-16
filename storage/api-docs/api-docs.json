@@ -1,7 +1,12 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "APIs For Neema Gospel Choir",
+        "title": "Neema Gospel Choir APIs",
+        "description": "This is the API documentation for the Neema Gospel Choir system. \n *         It provides access to user authentication, donations, donation categories, \n *         profiles, and other resources.",
+        "contact": {
+            "name": "API Support",
+            "email": "bennycive@gmail.com"
+        },
         "version": "1.0.0"
     },
     "paths": {
@@ -1026,41 +1031,6 @@
                                         },
                                         "message": {
                                             "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/profile": {
-            "get": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Get user profile",
-                "operationId": "94a5f4c5f5e5755cf43698cf9bc49e9d",
-                "responses": {
-                    "200": {
-                        "description": "Authenticated user profile",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -7092,6 +7062,402 @@
                 ]
             }
         },
+        "/api/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get authenticated user's profile",
+                "operationId": "f1784685f8270527da017b3616288443",
+                "responses": {
+                    "200": {
+                        "description": "Profile retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "type": "object"
+                                                },
+                                                "profile": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update authenticated user's profile",
+                "operationId": "875e8801180287e4193f1aced9023960",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "profile_picture": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Main St"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "New York"
+                                    },
+                                    "state_province": {
+                                        "type": "string",
+                                        "example": "NY"
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "example": "10001"
+                                    },
+                                    "bio": {
+                                        "type": "string",
+                                        "example": "About me"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "occupation": {
+                                        "type": "string",
+                                        "example": "Developer"
+                                    },
+                                    "location_public": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "profile_public": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/profile/picture": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update profile picture",
+                "operationId": "b4ae03f5485de68caecf31b18fdcf838",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "profile_picture"
+                                ],
+                                "properties": {
+                                    "profile_picture": {
+                                        "description": "Image file (jpeg, png, jpg, gif, webp, max 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile picture updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "profile_picture_url": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Delete profile picture",
+                "operationId": "94fe5ba281d0697f9a307aa237cf4306",
+                "responses": {
+                    "200": {
+                        "description": "Profile picture deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No profile picture to delete",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/profile/location": {
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update profile location",
+                "operationId": "7b2b66cb011689b8b4574cc6298daeae",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Main St"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "New York"
+                                    },
+                                    "state_province": {
+                                        "type": "string",
+                                        "example": "NY"
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "example": "10001"
+                                    },
+                                    "location_public": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Location updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "location": {
+                                                    "properties": {
+                                                        "address": {
+                                                            "type": "string"
+                                                        },
+                                                        "location_public": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/roles": {
             "get": {
                 "tags": [
@@ -8512,8 +8878,7 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "name": "bearerAuth",
-                "in": "header",
+                "description": "Use the JWT token obtained from the login endpoint. \n *         Example: 'Bearer {token}'",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
             }
@@ -8571,6 +8936,10 @@
         {
             "name": "Products",
             "description": "Products"
+        },
+        {
+            "name": "Profile",
+            "description": "Profile"
         },
         {
             "name": "Roles",
