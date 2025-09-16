@@ -77,8 +77,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Create a new product.
      */
     public function store(Request $request)
@@ -215,8 +214,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Update an existing product.
      */
 
@@ -394,8 +392,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Delete a product.
      */
     public function destroy($id)
@@ -475,8 +472,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Create product category.
      */
     public function storeCategory(Request $request)
@@ -587,8 +583,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Update product category.
      */
     public function updateCategory(Request $request, $id)
@@ -659,8 +654,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Delete product category.
      */
     public function destroyCategory($id)
@@ -706,8 +700,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Get product variants.
      */
     public function getVariant(Request $request)
@@ -877,8 +870,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Update product variant.
      */
     public function updateVariant(Request $request, $id)
@@ -957,8 +949,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Delete product variant.
      */
     public function destroyVariant($id)
@@ -1016,8 +1007,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Create product attribute.
      */
     public function storeAttribute(Request $request)
@@ -1079,8 +1069,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Create product attribute value.
      */
     public function storeAttributeValue(Request $request)
@@ -1160,8 +1149,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Update product attribute value.
      */
     public function updateAttributeValue(Request $request, $id)
@@ -1232,8 +1220,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Delete product attribute value.
      */
     public function destroyAttributeValue($id)
@@ -1287,8 +1274,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Get all attribute values.
      */
     public function getAttributeValues(Request $request)
@@ -1332,8 +1318,7 @@ class ProductManagementController extends Controller
      *         )
      *     )
      * )
-     */
-    /**
+     * 
      * Get all products (admin view)
      */
     public function getProducts(Request $request)

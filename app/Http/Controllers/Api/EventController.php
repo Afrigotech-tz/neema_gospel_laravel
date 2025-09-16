@@ -58,6 +58,8 @@ class EventController extends Controller
      *         )
      *     )
      * )
+     * 
+     * list all events
      */
     public function index(Request $request)
     {
@@ -102,8 +104,6 @@ class EventController extends Controller
     }
 
 
-
-
     /**
      * @OA\Post(
      *     path="/api/events",
@@ -124,7 +124,7 @@ class EventController extends Controller
      *             @OA\Property(property="country", type="string", example="Tanzania"),
      *             @OA\Property(property="capacity", type="integer", example=1000),
      *             @OA\Property(property="ticket_price", type="number", example=50.00),
-     *             @OA\Property(property="ticket_url", type="string", format="url", example="https://tickets.example.com"),
+     *             @OA\Property(property="ticket_url", type="string", format="url", example=""),
      *             @OA\Property(property="is_featured", type="boolean", example=true),
      *             @OA\Property(property="is_public", type="boolean", example=true),
      *             @OA\Property(property="status", type="string", enum={"upcoming","ongoing","completed","cancelled"}, example="upcoming")
@@ -145,10 +145,14 @@ class EventController extends Controller
      *         description="Validation errors"
      *     )
      * )
+     * 
+     * create tickets 
+     * 
      */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+
             'title' => 'required|string|max:255',
             'type' => 'required|in:concert,service,live_recording,conference,other',
             'date' => 'required|date|after:now',
@@ -169,6 +173,7 @@ class EventController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'string',
             'metadata' => 'nullable|array',
+
         ]);
 
         if ($validator->fails()) {
@@ -230,6 +235,9 @@ class EventController extends Controller
      *         description="Event not found"
      *     )
      * )
+     * 
+     * list all events
+     * 
      */
     public function show(Event $event)
     {
@@ -238,6 +246,7 @@ class EventController extends Controller
             'data' => $event,
             'message' => 'Event retrieved successfully'
         ]);
+
     }
 
     /**
@@ -266,7 +275,7 @@ class EventController extends Controller
      *             @OA\Property(property="country", type="string", example="Updated Country"),
      *             @OA\Property(property="capacity", type="integer", example=1500),
      *             @OA\Property(property="ticket_price", type="number", example=60.00),
-     *             @OA\Property(property="ticket_url", type="string", format="url", example="https://tickets.updated.com"),
+     *             @OA\Property(property="ticket_url", type="string", format="url", example="updated tickets "),
      *             @OA\Property(property="is_featured", type="boolean", example=false),
      *             @OA\Property(property="is_public", type="boolean", example=true),
      *             @OA\Property(property="status", type="string", enum={"upcoming","ongoing","completed","cancelled"}, example="upcoming")
@@ -291,6 +300,7 @@ class EventController extends Controller
      *         description="Validation errors"
      *     )
      * )
+     * update tickets
      */
     public function update(Request $request, Event $event)
     {
@@ -410,7 +420,6 @@ class EventController extends Controller
 
 
 
-
     /**
      * @OA\Get(
      *     path="/api/events/upcoming",
@@ -427,6 +436,7 @@ class EventController extends Controller
      *         )
      *     )
      * )
+     * 
      */
     public function upcoming()
     {
@@ -440,8 +450,9 @@ class EventController extends Controller
             'data' => $events,
             'message' => 'Upcoming events retrieved successfully'
         ]);
-    }
 
+    }
+    
     /**
      * @OA\Get(
      *     path="/api/events/search",
@@ -469,6 +480,8 @@ class EventController extends Controller
      *         description="Validation errors"
      *     )
      * )
+     * 
+     *  serach event from the list 
      */
     public function search(Request $request)
     {
@@ -496,4 +509,7 @@ class EventController extends Controller
             'message' => 'Events search results'
         ]);
     }
+
+
 }
+

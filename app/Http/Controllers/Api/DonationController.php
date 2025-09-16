@@ -32,12 +32,9 @@ class DonationController extends Controller
      *         )
      *     )
      * )
-     */
-
-    /**
+     * 
      * Display a listing of donation categories.
      */
-
     public function donationCategoryList()
     {
         $categories = DonationCategory::all();
@@ -89,6 +86,8 @@ class DonationController extends Controller
      *         )
      *     )
      * )
+     * 
+     * * create donation categories.
      */
 
     public function donationCategoryCreate(Request $request)
@@ -146,10 +145,8 @@ class DonationController extends Controller
      *         )
      *     )
      * )
-     */
-
-    /**
      * Display the specified donation category.
+     * 
      */
 
     public function findCategoryById(DonationCategory $category)
@@ -199,9 +196,7 @@ class DonationController extends Controller
      *         )
      *     )
      * )
-     */
-
-    /**
+     * 
      * Update the specified donation category.
      */
     public function donationCategoryUpdate(Request $request, DonationCategory $category)
@@ -242,9 +237,7 @@ class DonationController extends Controller
      *         )
      *     )
      * )
-     */
-
-    /**
+     * 
      * Remove the specified donation category.
      */
     public function donationCategoryDelete(DonationCategory $category)
@@ -284,7 +277,7 @@ class DonationController extends Controller
      *         )
      *     )
      * )
-     * 
+     * list the donations with users
      */
     public function index()
     {
@@ -331,6 +324,8 @@ class DonationController extends Controller
      *         description="Validation errors"
      *     )
      * )
+     * 
+     * create the donation plan
      */
     public function store(Request $request)
     {
@@ -359,7 +354,10 @@ class DonationController extends Controller
             'message' => 'Donation created successfully',
             'data' => $donation->load(['user', 'campaign'])
         ], Response::HTTP_CREATED);
+
+
     }
+
 
     /**
      * @OA\Get(
@@ -388,6 +386,8 @@ class DonationController extends Controller
      *         description="Donation not found"
      *     )
      * )
+     * 
+     * Find donation plan by Id
      */
     public function show(Donation $donation)
     {
@@ -437,6 +437,9 @@ class DonationController extends Controller
      *         description="Validation errors"
      *     )
      * )
+     * 
+     * Update donation plans
+     * 
      */
     public function update(Request $request, Donation $donation)
     {
@@ -490,6 +493,9 @@ class DonationController extends Controller
      *         description="Campaign not found"
      *     )
      * )
+     * 
+     * find donation by Fundraising
+     * 
      */
     public function byCampaign(DonationCampaign $campaign)
     {
@@ -522,6 +528,8 @@ class DonationController extends Controller
      *         )
      *     )
      * )
+     * 
+     * Statistics for analytic donation
      */
     public function statistics()
     {
@@ -541,6 +549,7 @@ class DonationController extends Controller
                 'monthly_donations' => $monthlyDonations
             ]
         ], Response::HTTP_OK);
+
     }
 
     /**
@@ -577,6 +586,10 @@ class DonationController extends Controller
      *         )
      *     )
      * )
+     * 
+     * 
+     * find the Fundraising for specific user
+     * 
      */
     public function byUser($user)
     {
@@ -589,6 +602,8 @@ class DonationController extends Controller
             'success' => true,
             'data' => $donations
         ], Response::HTTP_OK);
+
+
     }
 
     /**
@@ -618,6 +633,7 @@ class DonationController extends Controller
      *         description="Donation not found"
      *     )
      * )
+     * 
      */
     public function destroy(Donation $donation)
     {
@@ -633,4 +649,7 @@ class DonationController extends Controller
             'message' => 'Donation deleted successfully'
         ], Response::HTTP_OK);
     }
+
+
 }
+

@@ -498,4 +498,6 @@ class PaymentController extends Controller
             'data' => $ticketOrder->load(['event', 'ticketType'])
         ]);
     }
+ 
+    
 }

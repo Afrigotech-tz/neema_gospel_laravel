@@ -59,8 +59,9 @@ class PasswordResetController extends Controller
      *         )
      *     )
      * )
+     * send reset password link
      */
-    // Send reset link
+
     public function sendResetLink(Request $request)
     {
         $request->validate([
@@ -85,8 +86,6 @@ class PasswordResetController extends Controller
             : response()->json(['message' => __($status)], 400);
     }
 
-
-    // Reset password
     /**
      * @OA\Post(
      *     path="/api/password/reset",
@@ -128,6 +127,8 @@ class PasswordResetController extends Controller
      *         )
      *     )
      * )
+     * 
+     * new password 
      */
     public function resetPassword(Request $request)
     {
@@ -157,4 +158,5 @@ class PasswordResetController extends Controller
             ], 400);
         }
     }
+    
 }
