@@ -73,7 +73,6 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     });
 
 
-
     Route::prefix('order')->group(function () {
         // Basic payment routes
         Route::post('/process', [PaymentController::class, 'processPayment']);

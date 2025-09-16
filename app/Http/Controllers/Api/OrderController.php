@@ -127,8 +127,8 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            // Get the authenticated user
-            $user = auth()->user();
+             /** @var \App\Models\User $user */
+             $user = auth()->user();
 
             // Get the address
             $address = Address::findOrFail($request->address_id);

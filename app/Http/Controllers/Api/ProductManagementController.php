@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * @OA\Tag(
+ *     name="Product Management",
+ *     description="APIs for managing products, categories, variants, and attributes"
+ * )
+ */
 class ProductManagementController extends Controller
 {
     /**
@@ -702,7 +708,7 @@ class ProductManagementController extends Controller
      * )
      */
     /**
-     * Create product variant.
+     * Get product variants.
      */
     public function getVariant(Request $request)
     {
@@ -826,7 +832,7 @@ class ProductManagementController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="sku", type="string", example="PROD-001-M"),
      *             @OA\Property(property="price", type="number", format="float", example=109.99),
-     *             @OA\Property(property="stock_quantity", type="integer", example=75),
+     *             @OA\Property(property="stock", type="integer", example=75),
      *             @OA\Property(property="is_active", type="boolean", example=true),
      *             @OA\Property(property="attribute_values", type="array", @OA\Items(type="integer"), example={1,3})
      *         )
@@ -889,7 +895,7 @@ class ProductManagementController extends Controller
         $request->validate([
             'sku' => 'sometimes|required|string|unique:product_variants,sku,' . $id,
             'price' => 'sometimes|required|numeric|min:0',
-            'stock_quantity' => 'sometimes|required|integer|min:0',
+            'stock' => 'sometimes|required|integer|min:0',
             'is_active' => 'boolean',
             'attribute_values' => 'sometimes|required|array',
             'attribute_values.*' => 'exists:product_attribute_values,id'
@@ -1342,4 +1348,6 @@ class ProductManagementController extends Controller
             'data' => $products
         ]);
     }
+
+    
 }

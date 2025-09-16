@@ -185,6 +185,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::get('/', [App\Http\Controllers\Api\RoleController::class, 'getAllPermissions']);
     });
 
+
     // Donations routes
     require __DIR__ . '/api_donations.php';
     // Products & Payments Routes
@@ -194,7 +195,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Tickets routes
     require __DIR__ . '/api_tickets.php';
 
-
+    
 });
 
 

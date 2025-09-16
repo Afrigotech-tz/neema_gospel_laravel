@@ -1847,7 +1847,7 @@
                     "Donation Categories"
                 ],
                 "summary": "Create a new donation category",
-                "operationId": "b95ccd12a3df7c185cb7a48b444ad74f",
+                "operationId": "0bfa4c3197111e76f4c10a6734504dd7",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -6838,6 +6838,10 @@
     },
     "tags": [
         {
+            "name": "Product Management",
+            "description": "APIs for managing products, categories, variants, and attributes"
+        },
+        {
             "name": "Addresses",
             "description": "Addresses"
         },
@@ -6888,10 +6892,6 @@
         {
             "name": "Products",
             "description": "Products"
-        },
-        {
-            "name": "Product Management",
-            "description": "Product Management"
         },
         {
             "name": "Roles",

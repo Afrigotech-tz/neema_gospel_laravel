@@ -51,7 +51,10 @@ class CartController extends Controller
                 'total' => $total,
                 'count' => $cartItems->count()
             ]
+
         ]);
+        
+
     }
 
     /**
@@ -85,6 +88,7 @@ class CartController extends Controller
      *     )
      * )
      */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -304,4 +308,6 @@ class CartController extends Controller
             'message' => 'Cart cleared'
         ]);
     }
+    
+
 }
