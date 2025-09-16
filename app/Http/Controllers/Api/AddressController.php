@@ -53,7 +53,7 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|string|in:billing,shipping',
+            // 'type' => 'required|string|in:billing,shipping',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -84,7 +84,7 @@ class AddressController extends Controller
 
         $address = Address::create([
             'user_id' => Auth::id(),
-            'type' => $request->type,
+            // 'type' => $request->type,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone' => $request->phone,
@@ -121,7 +121,7 @@ class AddressController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="type", type="string", enum={"billing","shipping"}, example="billing"),
+    //  *             @OA\Property(property="type", type="string", enum={"billing","shipping"}, example="billing"),
      *             @OA\Property(property="first_name", type="string", example="Updated John"),
      *             @OA\Property(property="last_name", type="string", example="Updated Doe"),
      *             @OA\Property(property="phone", type="string", example="+255712345678"),
@@ -167,7 +167,7 @@ class AddressController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'type' => 'sometimes|string|in:billing,shipping',
+            // 'type' => 'sometimes|string|in:billing,shipping',
             'first_name' => 'sometimes|string|max:255',
             'last_name' => 'sometimes|string|max:255',
             'phone' => 'sometimes|string|max:20',
