@@ -121,7 +121,6 @@ class AddressController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-    //  *             @OA\Property(property="type", type="string", enum={"billing","shipping"}, example="billing"),
      *             @OA\Property(property="first_name", type="string", example="Updated John"),
      *             @OA\Property(property="last_name", type="string", example="Updated Doe"),
      *             @OA\Property(property="phone", type="string", example="+255712345678"),

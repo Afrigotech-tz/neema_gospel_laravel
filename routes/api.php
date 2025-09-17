@@ -34,11 +34,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/password/forgot', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 
-// Public user routes
-Route::get('test/users/', [UserController::class, 'get_users']);
-Route::get('test/users/{id}', [UserController::class, 'get_user']);
-Route::put('test/users/{id}', [UserController::class, 'update_user']);
-Route::delete('test/users/{id}', [UserController::class, 'delete_user']);
+
+require __DIR__ . '/api_products_public.php';
 
 // OTP verification routes
 Route::prefix('auth')->group(function () {
@@ -185,17 +182,18 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::get('/', [App\Http\Controllers\Api\RoleController::class, 'getAllPermissions']);
     });
 
-
-    // Donations routes
-    require __DIR__ . '/api_donations.php';
     // Products & Payments Routes
     require __DIR__ . '/api_products.php';
     // Tracking Routes
     require __DIR__ . '/api_tracking.php';
+
     // Tickets routes
     require __DIR__ . '/api_tickets.php';
 
-    
+    // Public donation routes
+    require __DIR__ . '/api_donations.php';
+
+
 });
 
 
@@ -206,5 +204,3 @@ Route::fallback(function () {
         'message' => 'API endpoint not found'
     ], 404);
 });
-
-

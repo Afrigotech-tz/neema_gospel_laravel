@@ -235,14 +235,6 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "billing",
-                                            "shipping"
-                                        ],
-                                        "example": "billing"
-                                    },
                                     "first_name": {
                                         "type": "string",
                                         "example": "Updated John"

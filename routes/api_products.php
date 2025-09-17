@@ -18,14 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-// Public product routes
-Route::prefix('products')->group(function () {
-    Route::get('/', [ProductController::class, 'index']);
-    Route::get('/{id}', [ProductController::class, 'show']);
-    Route::get('/categories/all', [ProductController::class, 'categories']);
-    Route::get('/category/{categoryId}', [ProductController::class, 'productsByCategory']);
 
-});
 
 // Protected routes
 Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
