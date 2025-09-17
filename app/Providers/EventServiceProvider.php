@@ -13,18 +13,23 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         // Register your event and listener here
+        
         \App\Events\UserRegistered::class => [
             \App\Listeners\SendOtpNotification::class,
         ],
+
+        \App\Events\PasswordResetRequested::class => [
+            \App\Listeners\SendPasswordResetLink::class,
+        ],
+
+
     ];
 
     /**
      * Register any events for your application.
      */
-
     public function boot(): void
     {
         parent::boot();
     }
-    
 }

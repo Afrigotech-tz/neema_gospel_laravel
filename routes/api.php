@@ -74,8 +74,12 @@ Route::get('/languages', function () {
             ],
         ],
         'message' => 'Languages retrieved successfully'
+
     ]);
+
+
 });
+
 
 // Public event routes
 Route::prefix('events')->group(function () {

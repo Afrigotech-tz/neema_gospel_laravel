@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\PasswordResetRequested;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class PasswordResetController extends Controller
 {
@@ -61,7 +60,25 @@ class PasswordResetController extends Controller
      * )
      * send reset password link
      */
-
+    // public function sendResetLink(Request $request)
+    // {
+    //     $request->validate([
+    //         'login' => 'required|string',
+    //     ]);
+    //     $login = $request->input('login');
+    //     $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_number';
+    //     $user = User::where($fieldType, $login)->first();
+    //     if (!$user) {
+    //         return response()->json([
+    //             'message' => 'User not found'
+    //         ], 404);
+    //     }
+    //     $status = Password::sendResetLink(['email' => $user->email]);
+    //     return $status === Password::RESET_LINK_SENT
+    //         ? response()->json(['message' => __($status)], 200)
+    //         : response()->json(['message' => __($status)], 400);
+    // }
+    
     public function sendResetLink(Request $request)
     {
         $request->validate([
@@ -79,12 +96,15 @@ class PasswordResetController extends Controller
             ], 404);
         }
 
-        $status = Password::sendResetLink(['email' => $user->email]);
+        // Dispatch the event (decouples sending logic)
+        event(new PasswordResetRequested($user));
 
-        return $status === Password::RESET_LINK_SENT
-            ? response()->json(['message' => __($status)], 200)
-            : response()->json(['message' => __($status)], 400);
+        return response()->json([
+            'message' => 'Password reset link will be sent if the user exists.'
+        ], 200);
+
     }
+
 
     /**
      * @OA\Post(
@@ -127,8 +147,8 @@ class PasswordResetController extends Controller
      *         )
      *     )
      * )
-     * 
-     * new password 
+     *
+     * new password
      */
     public function resetPassword(Request $request)
     {
@@ -158,5 +178,4 @@ class PasswordResetController extends Controller
             ], 400);
         }
     }
-    
 }
