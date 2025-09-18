@@ -80,12 +80,14 @@ class PaymentController extends Controller
      *     )
      * )
      */
-    public function processPayment(Request $request)
+    public function processOrder(Request $request)
     {
         $request->validate([
+
             'address_id' => 'required|exists:addresses,id',
             'payment_method_id' => 'required|exists:payment_methods,id',
             'notes' => 'nullable|string|max:500'
+            
         ]);
 
         $user = $request->user();
@@ -137,7 +139,7 @@ class PaymentController extends Controller
 
             // Update stock
             if ($item->product_variant_id) {
-                $item->variant->decrement('stock_quantity', $item->quantity);
+                $item->variant->decrement('stock', $item->quantity);
             } else {
                 $item->product->decrement('stock_quantity', $item->quantity);
             }
@@ -156,6 +158,14 @@ class PaymentController extends Controller
             'gateway_response' => [],
             'notes' => $request->notes
         ]);
+
+        // Send confirmation email
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OrderConfirmationMail($order));
+        } catch (\Exception $e) {
+            // Log email sending error but don't fail the order
+            \Illuminate\Support\Facades\Log::error('Failed to send order confirmation email: ' . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

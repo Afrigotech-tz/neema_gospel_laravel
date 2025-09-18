@@ -128,13 +128,13 @@
             <div class="shipping-address">
                 <h4>Shipping Address</h4>
                 <p>
-                    {{ $order->shippingAddress->full_name ?? $order->user->name }}<br>
-                    {{ $order->shippingAddress->address_line1 ?? 'N/A' }}<br>
-                    @if($order->shippingAddress && $order->shippingAddress->address_line2)
-                        {{ $order->shippingAddress->address_line2 }}<br>
+                    {{ $order->address ? ($order->address->first_name . ' ' . $order->address->last_name) : $order->user->name }}<br>
+                    {{ $order->address->address_line_1 ?? 'N/A' }}<br>
+                    @if($order->address && $order->address->address_line_2)
+                        {{ $order->address->address_line_2 }}<br>
                     @endif
-                    {{ $order->shippingAddress->city ?? 'N/A' }}, {{ $order->shippingAddress->state ?? 'N/A' }} {{ $order->shippingAddress->postal_code ?? 'N/A' }}<br>
-                    {{ $order->shippingAddress->country->name ?? 'N/A' }}
+                    {{ $order->address->city ?? 'N/A' }}, {{ $order->address->state ?? 'N/A' }} {{ $order->address->postal_code ?? 'N/A' }}<br>
+                    {{ $order->address->country ?? 'N/A' }}
                 </p>
             </div>
 
@@ -197,3 +197,4 @@
     </div>
 </body>
 </html>
+
