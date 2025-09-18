@@ -14,6 +14,7 @@ class ProductVariant extends Model
     protected $fillable = [
         'product_id',
         'sku',
+        'stock',
         'price',
         'weight',
         'image_url',
@@ -24,27 +25,41 @@ class ProductVariant extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'weight' => 'decimal:2',
-        'stock_quantity' => 'integer',
+        'stock' => 'integer',
         'is_active' => 'boolean',
     ];
+
 
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
+
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
     }
+
 
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
 
+
     public function attributeValues()
     {
         return $this->belongsToMany(ProductAttributeValue::class, 'attribute_value_product_variant', 'product_variant_id', 'attribute_value_id');
     }
+
+     
+
 }
+
+
+
+
+
+
+

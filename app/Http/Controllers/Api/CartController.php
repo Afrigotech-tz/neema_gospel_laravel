@@ -93,7 +93,7 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'product_variant_id' => 'nullable|exists:product_attributes,id',
+            'product_variant_id' => 'nullable|exists:product_variants,id',
             'quantity' => 'required|integer|min:1'
         ]);
 
@@ -108,9 +108,20 @@ class CartController extends Controller
             ], Response::HTTP_BAD_REQUEST);
         }
 
+        // Check if variant belongs to the product
+        if ($request->product_variant_id) {
+            $variant = ProductVariant::find($request->product_variant_id);
+            if (!$variant || $variant->product_id != $request->product_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The selected product variant does not belong to this product'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
         // Check stock availability
         $availableStock = $request->product_variant_id
-            ? ProductVariant::find($request->product_variant_id)->stock_quantity
+            ? ProductVariant::find($request->product_variant_id)->stock
             : $product->stock_quantity;
 
         if ($availableStock < $request->quantity) {
@@ -215,7 +226,7 @@ class CartController extends Controller
 
         $product = $cartItem->product;
         $availableStock = $cartItem->product_variant_id
-            ? $cartItem->variant->stock_quantity
+            ? $cartItem->variant->stock
             : $product->stock_quantity;
 
         if ($availableStock < $request->quantity) {
