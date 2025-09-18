@@ -17,7 +17,9 @@ class Role extends Model
     ];
 
     protected $casts = [
+
         'is_active' => 'boolean',
+
     ];
 
     public function users()
@@ -91,4 +93,7 @@ class Role extends Model
 
         $this->permissions()->sync($permissions);
     }
+
+    
 }
+

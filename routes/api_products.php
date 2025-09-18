@@ -58,14 +58,16 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // // Cart Routes
     Route::prefix('cart')->group(function () {
+
         Route::get('/', [CartController::class, 'index']);
         Route::post('/', [CartController::class, 'store']);
         Route::delete('/clear', [CartController::class, 'clear']);
         Route::put('/{id}', [CartController::class, 'update']);
         Route::delete('/{id}', [CartController::class, 'destroy']);
+
     });
 
-
+    
     Route::prefix('order')->group(function () {
         // Basic payment routes
         Route::post('/process', [PaymentController::class, 'processPayment']);

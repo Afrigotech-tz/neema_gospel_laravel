@@ -773,7 +773,6 @@ class ProductManagementController extends Controller
             'sku' => 'required|string|unique:product_variants,sku',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'is_active' => 'boolean',
             'attribute_values' => 'required|array',
             'attribute_values.*' => 'exists:product_attribute_values,id'
         ]);
@@ -784,8 +783,7 @@ class ProductManagementController extends Controller
                 'product_id' => $request->product_id,
                 'sku' => $request->sku,
                 'price' => $request->price,
-                'stock' => $request->stock,
-                'is_active' => $request->boolean('is_active', true)
+                'stock' => $request->stock
             ]);
 
             // Attach attribute values

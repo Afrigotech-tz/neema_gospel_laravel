@@ -20,8 +20,11 @@ class SendPasswordResetLink implements ShouldQueue
 
         // Always trigger reset using the user's email
         Password::sendResetLink(['email' => $user->email]);
-        
+
     }
 
+
+    
 }
+
 

@@ -18,7 +18,6 @@ class SendOtpNotification implements ShouldQueue
      * Handle the event.
      */
 
-
     public function handle(UserRegistered $event): void
     {
         $user = $event->user;
@@ -39,5 +38,6 @@ class SendOtpNotification implements ShouldQueue
     }
 
 
+    
 }
 

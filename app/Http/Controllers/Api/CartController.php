@@ -88,12 +88,12 @@ class CartController extends Controller
      *     )
      * )
      */
-    
+
     public function store(Request $request)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'product_variant_id' => 'nullable|exists:product_variants,id',
+            'product_variant_id' => 'nullable|exists:product_attributes,id',
             'quantity' => 'required|integer|min:1'
         ]);
 
@@ -153,8 +153,10 @@ class CartController extends Controller
             'message' => 'Item added to cart',
             'data' => $cartItem->load(['product', 'variant'])
         ]);
-    }
 
+
+    }
+    
     /**
      * @OA\Put(
      *     path="/api/cart/{id}",
@@ -278,6 +280,7 @@ class CartController extends Controller
             'success' => true,
             'message' => 'Item removed from cart'
         ]);
+        
     }
 
     /**

@@ -29,19 +29,20 @@ class SetupRabbitMQ extends Command
             $rabbitMQService = new RabbitMQService();
             $rabbitMQService->setupExchangesAndQueues();
 
-            $this->info('✅ RabbitMQ setup completed successfully!');
+            $this->info('RabbitMQ setup completed successfully!');
             $this->info('Exchanges: user.registration');
             $this->info('Queues: email.notifications, sms.notifications');
             $this->info('Bindings: email.notifications -> user.registered.email');
             $this->info('Bindings: sms.notifications -> user.registered.sms');
 
         } catch (\Exception $e) {
-            $this->error('❌ Failed to setup RabbitMQ: ' . $e->getMessage());
+            $this->error('Failed to setup RabbitMQ: ' . $e->getMessage());
             return 1;
         }
 
         return 0;
     }
+    
 
 }
 
