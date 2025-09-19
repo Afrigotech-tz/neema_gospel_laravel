@@ -4,13 +4,12 @@ namespace App\Http\Controllers\Api\Reports;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportsController extends Controller
 {
-
     /**
      * @OA\Get(
      *     path="/api/reports/orders",
@@ -48,6 +47,57 @@ class ReportsController extends Controller
      *     )
      * )
      */
+    // public function ordersReport(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'status' => 'nullable|in:pending,processing,shipped,delivered,cancelled,refunded',
+    //         'start_date' => 'nullable|date|before_or_equal:end_date',
+    //         'end_date' => 'nullable|date|after_or_equal:start_date',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validation errors',
+    //             'errors' => $validator->errors()
+    //         ], 422);
+    //     }
+    //     // Build query
+    //     $query = Order::with(['user', 'address', 'items.product', 'paymentMethod']);
+    //     // Filter by status if provided
+    //     if ($request->has('status') && $request->status) {
+    //         $query->where('status', $request->status);
+    //     }
+    //     // Filter by date range if provided
+    //     if ($request->has('start_date') && $request->start_date) {
+    //         $query->whereDate('created_at', '>=', $request->start_date);
+    //     }
+    //     if ($request->has('end_date') && $request->end_date) {
+    //         $query->whereDate('created_at', '<=', $request->end_date);
+    //     }
+    //     // Order by creation date
+    //     $orders = $query->orderBy('created_at', 'desc')->get();
+    //     // Calculate summary statistics
+    //     $summary = [
+    //         'total_orders' => $orders->count(),
+    //         'total_amount' => $orders->sum('total_amount'),
+    //         'status_breakdown' => $orders->groupBy('status')->map->count(),
+    //         'date_range' => [
+    //             'start' => $request->start_date ?? null,
+    //             'end' => $request->end_date ?? null,
+    //         ],
+    //         'status_filter' => $request->status ?? 'All',
+    //     ];
+    //     // Generate PDF
+    //     $pdf = Pdf::loadView('reports.orders', [
+    //         'orders' => $orders,
+    //         'summary' => $summary,
+    //         'generated_at' => now(),
+    //     ]);
+    //     // Set paper size and orientation
+    //     $pdf->setPaper('a4', 'landscape');
+    //     // Return PDF as download
+    //     return $pdf->stream('orders_report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
+    // }
     public function ordersReport(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -96,11 +146,16 @@ class ReportsController extends Controller
             'status_filter' => $request->status ?? 'All',
         ];
 
+        // Generate the static logo path
+        $logoPath = public_path('assets/logo/logo.png');  // absolute path for dompdf
+        // Or for URL access: $logoUrl = asset('assets/logo/logo.png');
+
         // Generate PDF
         $pdf = Pdf::loadView('reports.orders', [
             'orders' => $orders,
             'summary' => $summary,
             'generated_at' => now(),
+            'logoPath' => $logoPath, 
         ]);
 
         // Set paper size and orientation
@@ -110,6 +165,8 @@ class ReportsController extends Controller
         return $pdf->stream('orders_report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
     }
 
+
+    
     /**
      * @OA\Get(
      *     path="/api/reports/orders/status-summary",
@@ -167,13 +224,15 @@ class ReportsController extends Controller
         }
 
         // Get status breakdown
-        $statusBreakdown = $query->selectRaw('status, COUNT(*) as count, SUM(total_amount) as total_amount')
+        $statusBreakdown = $query
+            ->selectRaw('status, COUNT(*) as count, SUM(total_amount) as total_amount')
             ->groupBy('status')
             ->get()
             ->keyBy('status');
 
         // Get total statistics
-        $totalStats = $query->selectRaw('COUNT(*) as total_orders, SUM(total_amount) as total_amount')
+        $totalStats = $query
+            ->selectRaw('COUNT(*) as total_orders, SUM(total_amount) as total_amount')
             ->first();
 
         $data = [

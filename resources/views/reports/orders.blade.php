@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Orders Report</title>
@@ -110,10 +111,11 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Header -->
     <div class="header">
-        <img src="{{ asset('assets/logo/logo.png') }}" alt="NGC-Logo" class="logo">
+        <img src="{{ $logoPath }}" alt="Logo" class="logo">
         <div class="company-name">NEEMA GOSPEL</div>
     </div>
 
@@ -122,17 +124,17 @@
     <!-- Summary -->
     <div class="summary">
         <p><strong>Generated:</strong> {{ $generated_at->format('Y-m-d H:i:s') }}</p>
-        <p><strong>Date Range:</strong> 
-            @if($summary['date_range']['start']) 
-                {{ $summary['date_range']['start'] }} 
-            @else 
-                All time 
+        <p><strong>Date Range:</strong>
+            @if ($summary['date_range']['start'])
+                {{ $summary['date_range']['start'] }}
+            @else
+                All time
             @endif
             to
-            @if($summary['date_range']['end']) 
-                {{ $summary['date_range']['end'] }} 
-            @else 
-                Present 
+            @if ($summary['date_range']['end'])
+                {{ $summary['date_range']['end'] }}
+            @else
+                Present
             @endif
         </p>
         <p><strong>Status Filter:</strong> {{ $summary['status_filter'] }}</p>
@@ -153,22 +155,24 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($orders as $order)
-            <tr>
-                <td>{{ $order->order_number }}</td>
-                <td>{{ $order->user->name ?? 'N/A' }}</td>
-                <td>{{ ucfirst($order->status) }}</td>
-                <td>{{ ucfirst($order->payment_status) }}</td>
-                <td class="amount"> {{ number_format($order->total_amount, 2) }} TZS</td>
-                <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
-            </tr>
+            @foreach ($orders as $order)
+                <tr>
+                    <td>{{ $order->order_number }}</td>
+                    <td>{{ $order->user->name ?? 'N/A' }}</td>
+                    <td>{{ ucfirst($order->status) }}</td>
+                    <td>{{ ucfirst($order->payment_status) }}</td>
+                    <td class="amount"> {{ number_format($order->total_amount, 2) }} TZS</td>
+                    <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
+                </tr>
             @endforeach
         </tbody>
     </table>
 
     <!-- Footer with page number -->
     <div class="footer">
-        Page <span style="font-size: 18px" class="pagenum"></span><br> Generated at | {{ $generated_at->format('Y-m-d H:i:s') }}
+        Page <span class="pagenum"></span><br> Generated at |
+         {{ $generated_at->format('Y-m-d H:i:s') }}
     </div>
 </body>
+
 </html>
