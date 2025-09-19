@@ -165,7 +165,7 @@
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->sku ?: 'N/A' }}</td>
                     <td>{{ $product->category->name ?? 'No Category' }}</td>
-                    <td>${{ number_format($product->base_price, 2) }}</td>
+                    <td>{{ number_format($product->base_price, 2) }} TZS</td>
                     <td>{{ $product->stock_quantity }}</td>
                     <td>{{ $product->variants->count() }}</td>
                     <td>
