@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Orders Report</title>
+    <title>Users Report</title>
     <style>
         @page {
             margin: 20mm;
@@ -17,16 +17,12 @@
             padding: 0;
         }
 
-        /* Header with logo on the left */
-
-
         .header {
             position: relative;
             padding: 10px 0;
             margin-bottom: 30px;
             height: 60px;
             border-bottom: 1px dotted #FF5600;
-            /* dotted line instead of solid */
         }
 
         .logo {
@@ -47,9 +43,7 @@
             text-align: center;
             white-space: nowrap;
             padding-bottom: 30px;
-            /* add some space from the dotted line */
         }
-
 
         h1 {
             color: #FF5600;
@@ -100,11 +94,6 @@
             background-color: #f9f9f9;
         }
 
-        .amount {
-            text-align: right;
-            font-weight: bold;
-        }
-
         /* Footer with page number */
         .footer {
             position: fixed;
@@ -131,7 +120,7 @@
         <div class="company-name">NEEMA GOSPEL CHOIR</div>
     </div>
 
-    <h1>Orders Report</h1>
+    <h1>Users Report</h1>
 
     <!-- Summary -->
     <div class="summary">
@@ -149,32 +138,32 @@
                 Present
             @endif
         </p>
-        <p><strong>Status Filter:</strong> {{ $summary['status_filter'] }}</p>
-        <p><strong>Total Orders:</strong> {{ $summary['total_orders'] }}</p>
-        <p><strong>Total Amount:</strong> {{ number_format($summary['total_amount'], 2) }} TZS </p>
+        <p><strong>Total Users:</strong> {{ $summary['total_users'] }}</p>
     </div>
 
-    <!-- Orders Table -->
+    <!-- Users Table -->
     <table>
         <thead>
             <tr>
-                <th>Order ID#</th>
-                <th>Customer</th>
+                <th>User ID#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Roles</th>
                 <th>Status</th>
-                <th>Payment</th>
-                <th>Amount</th>
-                <th>Date</th>
+                <th>Registered Date</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($orders as $order)
+            @foreach ($users as $user)
                 <tr>
-                    <td>{{ $order->order_number }}</td>
-                    <td>{{ $order->user->name ?? 'N/A' }}</td>
-                    <td>{{ ucfirst($order->status) }}</td>
-                    <td>{{ ucfirst($order->payment_status) }}</td>
-                    <td class="amount"> {{ number_format($order->total_amount, 2) }} TZS</td>
-                    <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $user->first_name }} {{ $user->surname }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->phone_number }}</td>
+                    <td>{{ $user->roles->pluck('name')->join(', ') ?: 'No Role' }}</td>
+                    <td>{{ ucfirst($user->status) }}</td>
+                    <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
                 </tr>
             @endforeach
         </tbody>

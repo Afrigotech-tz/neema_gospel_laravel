@@ -39,13 +39,16 @@ Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']
 Route::prefix('reports')->group(function () {
     Route::get('/orders', [ReportsController::class, 'ordersReport']);
     Route::get('/orders/status-summary', [ReportsController::class, 'ordersStatusSummary']);
+    Route::get('/users', [ReportsController::class, 'usersReport']);
+    Route::get('/products', [ReportsController::class, 'productsReport']);
+    Route::get('/stock', [ReportsController::class, 'stockReport']);
 });
 
 require __DIR__ . '/api_products_public.php';
 
 // OTP verification routes
 Route::prefix('auth')->group(function () {
-    // Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+    Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
 });

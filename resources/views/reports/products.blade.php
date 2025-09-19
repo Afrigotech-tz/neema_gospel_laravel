@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Orders Report</title>
+    <title>Products Report</title>
     <style>
         @page {
             margin: 20mm;
@@ -17,16 +17,12 @@
             padding: 0;
         }
 
-        /* Header with logo on the left */
-
-
         .header {
             position: relative;
             padding: 10px 0;
             margin-bottom: 30px;
             height: 60px;
             border-bottom: 1px dotted #FF5600;
-            /* dotted line instead of solid */
         }
 
         .logo {
@@ -47,9 +43,7 @@
             text-align: center;
             white-space: nowrap;
             padding-bottom: 30px;
-            /* add some space from the dotted line */
         }
-
 
         h1 {
             color: #FF5600;
@@ -100,8 +94,13 @@
             background-color: #f9f9f9;
         }
 
-        .amount {
-            text-align: right;
+        .status-active {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: #dc3545;
             font-weight: bold;
         }
 
@@ -131,50 +130,50 @@
         <div class="company-name">NEEMA GOSPEL CHOIR</div>
     </div>
 
-    <h1>Orders Report</h1>
+    <h1>Products Report</h1>
 
     <!-- Summary -->
     <div class="summary">
         <p><strong>Generated:</strong> {{ $generated_at->format('Y-m-d H:i:s') }}</p>
-        <p><strong>Date Range:</strong>
-            @if ($summary['date_range']['start'])
-                {{ $summary['date_range']['start'] }}
-            @else
-                All time
-            @endif
-            to
-            @if ($summary['date_range']['end'])
-                {{ $summary['date_range']['end'] }}
-            @else
-                Present
-            @endif
-        </p>
+        <p><strong>Total Products:</strong> {{ $summary['total_products'] }}</p>
+        <p><strong>Active Products:</strong> {{ $summary['active_products'] }}</p>
+        <p><strong>Inactive Products:</strong> {{ $summary['inactive_products'] }}</p>
+        <p><strong>Total Stock:</strong> {{ $summary['total_stock'] }}</p>
+        <p><strong>Category Filter:</strong> {{ $summary['category_filter'] }}</p>
         <p><strong>Status Filter:</strong> {{ $summary['status_filter'] }}</p>
-        <p><strong>Total Orders:</strong> {{ $summary['total_orders'] }}</p>
-        <p><strong>Total Amount:</strong> {{ number_format($summary['total_amount'], 2) }} TZS </p>
     </div>
 
-    <!-- Orders Table -->
+    <!-- Products Table -->
     <table>
         <thead>
             <tr>
-                <th>Order ID#</th>
-                <th>Customer</th>
+                <th>S.No</th>
+                <th>Product Name</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Base Price</th>
+                <th>Stock Qty</th>
+                <th>Variants</th>
                 <th>Status</th>
-                <th>Payment</th>
-                <th>Amount</th>
-                <th>Date</th>
+                <th>Created Date</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($orders as $order)
+            @foreach ($products as $product)
                 <tr>
-                    <td>{{ $order->order_number }}</td>
-                    <td>{{ $order->user->name ?? 'N/A' }}</td>
-                    <td>{{ ucfirst($order->status) }}</td>
-                    <td>{{ ucfirst($order->payment_status) }}</td>
-                    <td class="amount"> {{ number_format($order->total_amount, 2) }} TZS</td>
-                    <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $product->name }}</td>
+                    <td>{{ $product->sku ?: 'N/A' }}</td>
+                    <td>{{ $product->category->name ?? 'No Category' }}</td>
+                    <td>${{ number_format($product->base_price, 2) }}</td>
+                    <td>{{ $product->stock_quantity }}</td>
+                    <td>{{ $product->variants->count() }}</td>
+                    <td>
+                        <span class="status-{{ $product->is_active ? 'active' : 'inactive' }}">
+                            {{ $product->is_active ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td>{{ $product->created_at->format('Y-m-d H:i') }}</td>
                 </tr>
             @endforeach
         </tbody>
