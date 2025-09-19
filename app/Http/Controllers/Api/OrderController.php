@@ -58,17 +58,16 @@ class OrderController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/orders",
+     *     path="/api/orders/process",
      *     tags={"Orders"},
      *     summary="Create a new order",
      *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"address_id","items","payment_method_id"},
+     *             required={"address_id","payment_method_id"},
      *             @OA\Property(property="address_id", type="integer", example=1),
      *             @OA\Property(
-     *                 property="items",
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",

@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\PasswordResetRequested;
+use App\Events\ResendOTPcode;
+use App\Events\UserRegistered;
+use App\Listeners\SendOtpNotification;
+use App\Listeners\SendPasswordResetLink;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -13,16 +18,21 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         // Register your event and listener here
-        
+        // UserRegistered::class => [
+        //     SendOtpNotification::class,
+        // ],
+        // ResendOTPcode::class => [
+        //     SendOtpNotification::class,
+        // ],
         \App\Events\UserRegistered::class => [
             \App\Listeners\SendOtpNotification::class,
         ],
-
-        \App\Events\PasswordResetRequested::class => [
-            \App\Listeners\SendPasswordResetLink::class,
+        \App\Events\ResendOTPcode::class => [
+            \App\Listeners\SendOtpNotification::class,
         ],
-
-
+        PasswordResetRequested::class => [
+            SendPasswordResetLink::class,
+        ],
     ];
 
     /**

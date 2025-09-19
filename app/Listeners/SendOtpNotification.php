@@ -3,6 +3,7 @@
 
 namespace App\Listeners;
 
+use App\Events\ResendOTPcode;
 use App\Events\UserRegistered;
 use App\Services\SmService;
 use App\Mail\SendOtpMail;
@@ -18,7 +19,7 @@ class SendOtpNotification implements ShouldQueue
      * Handle the event.
      */
 
-    public function handle(UserRegistered $event): void
+    public function handle(ResendOTPcode|UserRegistered $event): void
     {
         $user = $event->user;
         $otp = $event->otp;
@@ -34,9 +35,7 @@ class SendOtpNotification implements ShouldQueue
         }
 
 
-
     }
-
 
     
 }

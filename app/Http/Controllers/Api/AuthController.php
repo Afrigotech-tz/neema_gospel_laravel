@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ResendOTPcode;
 use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
 use App\Mail\SendOtpMail;
@@ -147,8 +148,8 @@ class AuthController extends Controller
         //     ]
         // ], 201);
 
-        //  Use event driven to send notifications
 
+        //  Use event driven to send notifications
         event(new UserRegistered($user, $otp));
 
         $message = $user->verification_method === 'mobile'
@@ -273,7 +274,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/verify-otp",
+     *     path="/api/auth/verify-otp",
      *     tags={"Authentication"},
      *     summary="Verify OTP",
      *     description="Verify user OTP and activate account",
@@ -359,10 +360,9 @@ class AuthController extends Controller
     }
 
     /** Resend OTP to user's email or phone */
-
     /**
      * @OA\Post(
-     *     path="/api/resend-otp",
+     *     path="/api/auth/resend-otp",
      *     tags={"Authentication"},
      *     summary="Resend OTP",
      *     description="Resend OTP to email or phone",
@@ -411,6 +411,7 @@ class AuthController extends Controller
      *         )
      *     )
      * )
+     * 
      */
     public function resendOtp(Request $request)
     {
@@ -433,19 +434,22 @@ class AuthController extends Controller
 
         $otp = $user->generateOtp();
 
-        //  synchoronous send notifications
-        if ($user->verification_method === 'mobile') {
-            $smsService = new SmService();
-            if ($smsService->isConfigured()) {
-                $smsService->sendOtp($user->phone_number, $otp);
-                $message = 'New OTP sent successfully to your phone.';
-            } else {
-                return response()->json(['success' => false, 'message' => 'SMS Service is not configured.'], 500);
-            }
-        } else {
-            Mail::to($user->email)->send(new SendOtpMail($otp));
-            $message = 'New OTP sent successfully to your email.';
-        }
+        
+        event(new ResendOTPcode($user, $otp));
+
+        // //  synchoronous send notifications
+        // if ($user->verification_method === 'mobile') {
+        //     $smsService = new SmService();
+        //     if ($smsService->isConfigured()) {
+        //         $smsService->sendOtp($user->phone_number, $otp);
+        //         $message = 'New OTP sent successfully to your phone.';
+        //     } else {
+        //         return response()->json(['success' => false, 'message' => 'SMS Service is not configured.'], 500);
+        //     }
+        // } else {
+        //     Mail::to($user->email)->send(new SendOtpMail($otp));
+        //     $message = 'New OTP sent successfully to your email.';
+        // }
 
         //   DONT DELETE THE CODE
 
@@ -473,8 +477,9 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => $message
+            'message' => "sms sent"
         ]);
+
     }
 
     /** Logout user */

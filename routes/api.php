@@ -105,6 +105,9 @@ Route::prefix('music')->group(function () {
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
 
+// Public donation routes
+require __DIR__ . '/api_donations.php';
+
 // Protected routes with API key authentication
 Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Auth routes
@@ -191,11 +194,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Tracking Routes
     require __DIR__ . '/api_tracking.php';
 
-    // Tickets routes
-    require __DIR__ . '/api_tickets.php';
-
-    // Public donation routes
-    require __DIR__ . '/api_donations.php';
+     // Tickets routes
+     require __DIR__ . '/api_tickets.php';
 
 
 });
@@ -208,3 +208,6 @@ Route::fallback(function () {
         'message' => 'API endpoint not found'
     ], 404);
 });
+
+
+

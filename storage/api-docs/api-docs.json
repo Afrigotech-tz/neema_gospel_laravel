@@ -785,14 +785,14 @@
                 }
             }
         },
-        "/api/verify-otp": {
+        "/api/auth/verify-otp": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Verify OTP",
                 "description": "Verify user OTP and activate account",
-                "operationId": "c4e4be2444463a153f1ca5669741bc89",
+                "operationId": "abcb5741589707b15c7ecac7a67c13aa",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -893,14 +893,14 @@
                 }
             }
         },
-        "/api/resend-otp": {
+        "/api/auth/resend-otp": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Resend OTP",
                 "description": "Resend OTP to email or phone",
-                "operationId": "5034e3809df3c665692b179099da36f3",
+                "operationId": "97c388571700f6d6d5ad133cd096195b",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -4076,13 +4076,15 @@
                         "bearerAuth": []
                     }
                 ]
-            },
+            }
+        },
+        "/api/orders/process": {
             "post": {
                 "tags": [
                     "Orders"
                 ],
                 "summary": "Create a new order",
-                "operationId": "2123ba58dadb22bd6f2c8081af562230",
+                "operationId": "e27c5e3d78a92015c64ab79055709d78",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -4090,7 +4092,6 @@
                             "schema": {
                                 "required": [
                                     "address_id",
-                                    "items",
                                     "payment_method_id"
                                 ],
                                 "properties": {
@@ -4098,7 +4099,7 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "items": {
+                                    "": {
                                         "type": "array",
                                         "items": {
                                             "required": [
@@ -4600,7 +4601,7 @@
                     "Payment"
                 ],
                 "summary": "Process payment for cart items",
-                "operationId": "692755efb24e4c9531a5a02743ba1e35",
+                "operationId": "6c7b112cea2a3ce0b869b0f86c2be347",
                 "requestBody": {
                     "required": true,
                     "content": {

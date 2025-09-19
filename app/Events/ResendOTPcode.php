@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserRegistered
+class ResendOTPcode
 {
     use Dispatchable, SerializesModels;
 
@@ -26,15 +26,11 @@ class UserRegistered
      * 
      */
 
-    public function __construct(User $user,  string $otp)
+    public function __construct(User $user, string $otp)
     {
         $this->user = $user;
         $this->otp = $otp;
     }
 
 
-
 }
-
-
-
