@@ -20,8 +20,8 @@
             overflow: hidden;
         }
         .header {
-            background-color: #f9ad7efd;
-            color: white;
+            background-color: #FF5600;
+            color: #FFFFFF;
             padding: 30px;
             text-align: center;
         }
@@ -35,7 +35,7 @@
             margin: 20px 0;
         }
         .order-details h3 {
-            color: #f9ad7efd;
+            color: #FF5600;
             margin-top: 0;
         }
         .order-info {
@@ -57,7 +57,7 @@
             margin: 20px 0;
         }
         .shipping-address h4 {
-            color: #f9ad7efd;
+            color: #FF5600;
             margin-top: 0;
         }
         .items-table {
@@ -66,8 +66,8 @@
             margin: 20px 0;
         }
         .items-table th {
-            background-color: #f9ad7efd;
-            color: white;
+            background-color: #FF5600;
+            color: #FFFFFF;
             padding: 12px;
             text-align: left;
             font-weight: bold;
@@ -88,7 +88,7 @@
             font-size: 16px;
         }
         .total-row td {
-            border-top: 2px solid #f9ad7efd;
+            border-top: 2px solid #FF5600;
             padding: 15px;
         }
         .footer {

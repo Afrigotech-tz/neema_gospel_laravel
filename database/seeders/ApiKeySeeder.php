@@ -22,7 +22,7 @@ class ApiKeySeeder extends Seeder
             'key' => 'mh8bUvdGP2xD9P4J3BZPYvr6noPBwEwZ',
             'client_type' => 'flutter',
             'is_active' => true,
-            'rate_limit' => 1000, // 1000 requests per day
+            'rate_limit' => 100000, // 1000 requests per day
             'expires_at' => now()->addYear(),
         ]);
 
@@ -32,7 +32,7 @@ class ApiKeySeeder extends Seeder
             'key' => 'h67vhksEYwSV1OTrqK6TTNs36uU5DxOT',
             'client_type' => 'react',
             'is_active' => true,
-            'rate_limit' => 2000, // 2000 requests per day
+            'rate_limit' => 20000, // 2000 requests per day
             'expires_at' => now()->addYear(),
         ]);
 
@@ -42,7 +42,7 @@ class ApiKeySeeder extends Seeder
             'key' => 'dev_flutter_key_2024_dev_mode_11111',
             'client_type' => 'flutter',
             'is_active' => true,
-            'rate_limit' => 5000, // Higher limit for development
+            'rate_limit' => 50000, // Higher limit for development
             'expires_at' => now()->addMonths(6),
         ]);
 
@@ -59,5 +59,6 @@ class ApiKeySeeder extends Seeder
 
 
 
-    
+
 }
+

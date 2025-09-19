@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductManagementController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\Reports\ReportsController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -34,6 +35,11 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/password/forgot', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 
+// Reports routes
+Route::prefix('reports')->group(function () {
+    Route::get('/orders', [ReportsController::class, 'ordersReport']);
+    Route::get('/orders/status-summary', [ReportsController::class, 'ordersStatusSummary']);
+});
 
 require __DIR__ . '/api_products_public.php';
 
@@ -74,12 +80,8 @@ Route::get('/languages', function () {
             ],
         ],
         'message' => 'Languages retrieved successfully'
-
     ]);
-
-
 });
-
 
 // Public event routes
 Route::prefix('events')->group(function () {
@@ -105,7 +107,6 @@ Route::prefix('music')->group(function () {
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
 
-// Public donation routes
 require __DIR__ . '/api_donations.php';
 
 // Protected routes with API key authentication
@@ -194,12 +195,9 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Tracking Routes
     require __DIR__ . '/api_tracking.php';
 
-     // Tickets routes
-     require __DIR__ . '/api_tickets.php';
-
-
+    // Tickets routes
+    require __DIR__ . '/api_tickets.php';
 });
-
 
 // Fallback route for API
 Route::fallback(function () {
@@ -208,6 +206,3 @@ Route::fallback(function () {
         'message' => 'API endpoint not found'
     ], 404);
 });
-
-
-
