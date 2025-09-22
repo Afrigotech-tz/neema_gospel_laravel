@@ -99,7 +99,7 @@
             color: #6b7280;
         }
         .highlight {
-            color: #f9ad7efd;
+            color: #FF5600;
             font-weight: bold;
         }
     </style>

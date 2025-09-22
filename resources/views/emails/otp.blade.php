@@ -20,7 +20,7 @@
             overflow: hidden;
         }
         .header {
-            background-color: #f9ad7efd;
+            background-color: #FF5600;
             color: white;
             padding: 30px;
             text-align: center;
@@ -30,7 +30,7 @@
         }
         .otp-code {
             background-color: #f8f9fa;
-            border: 2px dashed #f9ad7efd;
+            border: 2px dashed #FF5600;
             border-radius: 8px;
             padding: 20px;
             text-align: center;
@@ -38,7 +38,7 @@
             font-size: 24px;
             font-weight: bold;
             letter-spacing: 4px;
-            color: #f9ad7efd;
+            color: #FF5600;
         }
         .warning {
             background-color: #fef3c7;
@@ -87,4 +87,6 @@
         </div>
     </div>
 </body>
+
 </html>
+

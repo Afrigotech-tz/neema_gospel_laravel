@@ -36,8 +36,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 404);
             }
 
-            return response()->view('errors.404', [], 404);
-
         });
 
         $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {
@@ -50,6 +48,8 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
         });
-        
+
+
     })
+    
     ->create();

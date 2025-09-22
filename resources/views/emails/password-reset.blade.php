@@ -30,7 +30,7 @@
         }
         /* Header */
         .header {
-            background-color: #f9ad7efd;
+            background-color: #FF5600;
             color: #ffffff;
             padding: 30px;
             text-align: center;
@@ -46,7 +46,7 @@
         }
         .reset-button {
             display: inline-block;
-            background-color: #f9ad7e;
+            background-color: #FF5600;
             color: #ffffff !important;
             padding: 15px 25px;
             border-radius: 8px;
