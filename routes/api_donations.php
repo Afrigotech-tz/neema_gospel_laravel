@@ -59,5 +59,6 @@ Route::middleware(['api.key', 'auth:sanctum'])->prefix('donations')->group(funct
     Route::get('/campaign/{campaign}', [DonationController::class, 'byCampaign']);
     Route::get('/statistics', [DonationController::class, 'statistics']);
     Route::get('/user/{user}', [DonationController::class, 'byUser']);
+    
 
 });

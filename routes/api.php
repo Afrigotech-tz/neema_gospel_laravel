@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Reports\ReportsController;
 use App\Http\Controllers\Api\AboutUsController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AdvancedPaymentController;
@@ -15,7 +16,6 @@ use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductManagementController;
 use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\Reports\ReportsController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserMessageController;
@@ -50,6 +50,9 @@ Route::prefix('reports')->group(function () {
 });
 
 require __DIR__ . '/api_products_public.php';
+
+// Public user message route (for sending messages)
+Route::post('/user-messages', [UserMessageController::class, 'store']);
 
 // OTP verification routes
 Route::prefix('auth')->group(function () {
@@ -89,7 +92,6 @@ Route::get('/languages', function () {
         ],
         'message' => 'Languages retrieved successfully'
     ]);
-    
 });
 
 // Public event routes
@@ -254,12 +256,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 });
 
-
-
 Route::fallback(function () {
     return response()->json([
         'success' => false,
         'message' => 'API endpoint not found'
     ], 404);
 });
-

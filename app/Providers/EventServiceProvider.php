@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Events\PasswordResetRequested;
 use App\Events\ResendOTPcode;
+use App\Events\UserMessageCreated;
 use App\Events\UserRegistered;
+use App\Listeners\ProcessUserMessage;
 use App\Listeners\SendOtpNotification;
 use App\Listeners\SendPasswordResetLink;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -32,6 +34,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         PasswordResetRequested::class => [
             SendPasswordResetLink::class,
+        ],
+        UserMessageCreated::class => [
+            ProcessUserMessage::class,
         ],
     ];
 

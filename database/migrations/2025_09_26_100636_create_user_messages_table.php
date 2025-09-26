@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('subject');
             $table->text('message');
-            $table->enum('status', ['read', 'replied', 'completed'])->default('read');
+            $table->enum('status', ['pending', 'read', 'replied', 'closed'])->default('pending');
             $table->timestamps();
         });
     }

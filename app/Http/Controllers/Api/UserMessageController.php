@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\UserMessageCreated;
 use App\Http\Controllers\Controller;
 use App\Models\UserMessage;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class UserMessageController extends Controller
      */
     public function index()
     {
-        $messages = UserMessage::orderBy('created_at', 'desc')->get();
+        $messages = UserMessage::orderBy('created_at', 'desc')->paginate(20);
         return response()->json(['success' => true, 'data' => $messages]);
     }
 
@@ -77,10 +78,20 @@ class UserMessageController extends Controller
         }
 
         $data = $request->only(['first_name', 'last_name', 'email', 'phone', 'subject', 'message']);
-        $data['status'] = 'pending'; // Default status
 
-        $message = UserMessage::create($data);
-        return response()->json(['success' => true, 'data' => $message], 201);
+        // Dispatch the event for asynchronous processing
+        UserMessageCreated::dispatch($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Your message has been received and will be processed shortly.',
+            'data' => [
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'subject' => $data['subject']
+            ]
+        ], 202); // 202 Accepted - request has been received but not yet acted upon
     }
 
     /**

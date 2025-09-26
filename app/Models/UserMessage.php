@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  *     @OA\Property(property="phone", type="string", nullable=true, example="+1234567890"),
  *     @OA\Property(property="subject", type="string", example="Subject"),
  *     @OA\Property(property="message", type="string", example="Message content"),
- *     @OA\Property(property="status", type="string", enum={"read","replied","completed"}, example="read"),
+ *      @OA\Property(property="status", type="string", enum={"pending","read","replied","closed"}, example="pending"),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time")
  * )

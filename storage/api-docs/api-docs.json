@@ -10852,11 +10852,12 @@
                     "status": {
                         "type": "string",
                         "enum": [
+                            "pending",
                             "read",
                             "replied",
-                            "completed"
+                            "closed"
                         ],
-                        "example": "read"
+                        "example": "pending"
                     },
                     "created_at": {
                         "type": "string",
