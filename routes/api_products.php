@@ -1,31 +1,27 @@
 <?php
 
+use App\Http\Controllers\Api\AdvancedPaymentController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductManagementController;
-use App\Http\Controllers\Api\CartController;
-use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\Api\AdvancedPaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
-|--------------------------------------------------------------------------
-| Products & Payments API Routes
-|--------------------------------------------------------------------------
-|
-| All routes related to products, cart, and payments
-|
-*/
-
-
-
+ * |--------------------------------------------------------------------------
+ * | Products & Payments API Routes
+ * |--------------------------------------------------------------------------
+ * |
+ * | All routes related to products, cart, and payments
+ * |
+ */
 
 // Protected routes
 Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
-
     // Product Management Routes (Admin)
     Route::prefix('admin/products')->group(function () {
-
         Route::get('/', [ProductManagementController::class, 'getProducts']);
         Route::post('/', [ProductManagementController::class, 'store']);
         Route::put('/{id}', [ProductManagementController::class, 'update']);
@@ -51,41 +47,32 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         Route::post('/attribute-values', [ProductManagementController::class, 'storeAttributeValue']);
         Route::put('/attribute-values/{id}', [ProductManagementController::class, 'updateAttributeValue']);
         Route::delete('/attribute-values/{id}', [ProductManagementController::class, 'destroyAttributeValue']);
-
-
-
     });
 
     // // Cart Routes
     Route::prefix('cart')->group(function () {
-
         Route::get('/', [CartController::class, 'index']);
         Route::post('/', [CartController::class, 'store']);
         Route::delete('/clear', [CartController::class, 'clear']);
         Route::put('/{id}', [CartController::class, 'update']);
         Route::delete('/{id}', [CartController::class, 'destroy']);
-
     });
-
 
     Route::prefix('orders')->group(function () {
-        // Basic payment routes
-        Route::post('/process', [PaymentController::class, 'processOrder']);
-        Route::get('/', [PaymentController::class, 'orders']);
-        Route::get('/{id}', [PaymentController::class, 'orderDetails']);
-        Route::put('/{id}/status', [PaymentController::class, 'updateOrderStatus']);
+        // Basic order routes
+        Route::post('/process', [OrderController::class, 'processOrder']);
+        Route::get('/', [OrderController::class, 'orders']);
+        Route::get('/user',[OrderController::class, 'userOrders']);
+        Route::get('/{id}', [OrderController::class, 'orderDetails']);
+        Route::put('/{id}/status', [OrderController::class, 'updateOrderStatus']);
 
     });
-
 
     // // Payment Routes
     Route::prefix('payments')->group(function () {
         // Basic payment routes
         Route::get('/methods', [PaymentController::class, 'paymentMethods']);
         Route::post('/process', [PaymentController::class, 'processPayment']);
-        Route::get('/orders', [PaymentController::class, 'orders']);
-        Route::get('/orders/{id}', [PaymentController::class, 'orderDetails']);
-        Route::put('/orders/{id}/status', [PaymentController::class, 'updateOrderStatus']);
 
         // Advanced payment routes
         Route::post('/initialize', [AdvancedPaymentController::class, 'initializePayment']);
@@ -99,16 +86,10 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     });
 
-
     // // Webhook routes for payment gateways
     Route::prefix('webhooks')->group(function () {
         Route::post('/stripe', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.stripe');
         Route::post('/paystack', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.paystack');
         Route::post('/flutterwave', [AdvancedPaymentController::class, 'handleWebhook'])->name('webhook.flutterwave');
     });
-
-
-
-
 });
-

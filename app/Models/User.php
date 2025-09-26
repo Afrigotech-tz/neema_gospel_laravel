@@ -3,14 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Mail\PasswordResetMail;
+use App\Notifications\CustomResetPassword;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use App\Notifications\CustomResetPassword;
-use App\Mail\PasswordResetMail;
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -20,7 +20,6 @@ class User extends Authenticatable
     // User status constants
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
-
     // Verification method constants
     const VERIFICATION_EMAIL = 'email';
     const VERIFICATION_MOBILE = 'mobile';
@@ -59,9 +58,7 @@ class User extends Authenticatable
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
-     *
      */
-
     protected function casts(): array
     {
         return [
@@ -134,8 +131,6 @@ class User extends Authenticatable
     /**
      * Clear OTP after verification
      */
-
-
     public function clearOtp(): void
     {
         $this->update([
@@ -192,10 +187,7 @@ class User extends Authenticatable
 
     /**
      * Check if user has all of the given roles
-     *
      */
-
-
     public function hasAllRoles(...$roles)
     {
         foreach ($roles as $role) {
@@ -325,10 +317,7 @@ class User extends Authenticatable
         return true;
     }
 
-    /**
-     *  send the password reset notification to the user
-     */
-
+    /** send the password reset notification to the user */
 
     // public function sendPasswordResetNotification($token)
     // {
@@ -338,9 +327,8 @@ class User extends Authenticatable
     // }
 
     /**
-     *  send the password reset notification to the user use mailable function
+     * send the password reset notification to the user use mailable function
      */
-
     public function sendPasswordResetNotification($token)
     {
         $url = config('app.frontend_url') . '/reset-password?token=' . $token . '&email=' . $this->email;
@@ -348,5 +336,10 @@ class User extends Authenticatable
         Mail::to($this->email)->send(new PasswordResetMail($url));
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
+    
 };

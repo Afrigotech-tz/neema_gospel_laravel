@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\Api\AboutUsController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AdvancedPaymentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\ContactUsController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\HomeSliderController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PaymentController;
@@ -14,6 +18,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\Reports\ReportsController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserMessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +89,7 @@ Route::get('/languages', function () {
         ],
         'message' => 'Languages retrieved successfully'
     ]);
+    
 });
 
 // Public event routes
@@ -110,10 +116,24 @@ Route::prefix('music')->group(function () {
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
 
+// Public website content routes
+Route::prefix('about-us')->group(function () {
+    Route::get('/', [AboutUsController::class, 'index']);
+});
+
+Route::prefix('contact-us')->group(function () {
+    Route::get('/', [ContactUsController::class, 'index']);
+});
+
+Route::prefix('blogs')->group(function () {
+    Route::get('/', [BlogController::class, 'index']);
+    Route::get('/{blog}', [BlogController::class, 'show']);
+});
+
 require __DIR__ . '/api_donations.php';
 
 // Protected routes with API key authentication
-Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -200,12 +220,46 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Tickets routes
     require __DIR__ . '/api_tickets.php';
+
+    // Website content management routes
+    Route::prefix('home-sliders')->group(function () {
+        Route::get('/', [HomeSliderController::class, 'index']);
+        Route::post('/', [HomeSliderController::class, 'store']);
+        Route::get('/{homeSlider}', [HomeSliderController::class, 'show']);
+        Route::post('/{homeSlider}', [HomeSliderController::class, 'update']);
+        Route::delete('/{homeSlider}', [HomeSliderController::class, 'destroy']);
+    });
+
+    Route::prefix('about-us')->group(function () {
+        Route::post('/', [AboutUsController::class, 'store']);
+        Route::post('/update', [AboutUsController::class, 'update']);
+    });
+
+    Route::prefix('contact-us')->group(function () {
+        Route::post('/', [ContactUsController::class, 'store']);
+        Route::post('/update', [ContactUsController::class, 'update']);
+    });
+
+    Route::prefix('user-messages')->group(function () {
+        Route::get('/', [UserMessageController::class, 'index']);
+        Route::get('/{userMessage}', [UserMessageController::class, 'show']);
+        Route::put('/{userMessage}', [UserMessageController::class, 'update']);
+        Route::delete('/{userMessage}', [UserMessageController::class, 'destroy']);
+    });
+
+    Route::prefix('blogs')->group(function () {
+        Route::post('/', [BlogController::class, 'store']);
+        Route::post('/{blog}', [BlogController::class, 'update']);
+        Route::delete('/{blog}', [BlogController::class, 'destroy']);
+    });
 });
 
-// Fallback route for API
+
+
 Route::fallback(function () {
     return response()->json([
         'success' => false,
         'message' => 'API endpoint not found'
     ], 404);
 });
+

@@ -106,6 +106,7 @@ class ProductController extends Controller
             'success' => true,
             'data' => $products
         ]);
+
     }
 
     /**
@@ -245,10 +246,11 @@ class ProductController extends Controller
             'success' => true,
             'data' => $products
         ]);
-
-        
+ 
     }
 
-
 }
+
+
+
 

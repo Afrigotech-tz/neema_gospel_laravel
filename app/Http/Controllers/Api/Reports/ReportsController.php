@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+
 class ReportsController extends Controller
 {
     /**
@@ -50,57 +51,7 @@ class ReportsController extends Controller
      *     )
      * )
      */
-    // public function ordersReport(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'status' => 'nullable|in:pending,processing,shipped,delivered,cancelled,refunded',
-    //         'start_date' => 'nullable|date|before_or_equal:end_date',
-    //         'end_date' => 'nullable|date|after_or_equal:start_date',
-    //     ]);
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Validation errors',
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-    //     // Build query
-    //     $query = Order::with(['user', 'address', 'items.product', 'paymentMethod']);
-    //     // Filter by status if provided
-    //     if ($request->has('status') && $request->status) {
-    //         $query->where('status', $request->status);
-    //     }
-    //     // Filter by date range if provided
-    //     if ($request->has('start_date') && $request->start_date) {
-    //         $query->whereDate('created_at', '>=', $request->start_date);
-    //     }
-    //     if ($request->has('end_date') && $request->end_date) {
-    //         $query->whereDate('created_at', '<=', $request->end_date);
-    //     }
-    //     // Order by creation date
-    //     $orders = $query->orderBy('created_at', 'desc')->get();
-    //     // Calculate summary statistics
-    //     $summary = [
-    //         'total_orders' => $orders->count(),
-    //         'total_amount' => $orders->sum('total_amount'),
-    //         'status_breakdown' => $orders->groupBy('status')->map->count(),
-    //         'date_range' => [
-    //             'start' => $request->start_date ?? null,
-    //             'end' => $request->end_date ?? null,
-    //         ],
-    //         'status_filter' => $request->status ?? 'All',
-    //     ];
-    //     // Generate PDF
-    //     $pdf = Pdf::loadView('reports.orders', [
-    //         'orders' => $orders,
-    //         'summary' => $summary,
-    //         'generated_at' => now(),
-    //     ]);
-    //     // Set paper size and orientation
-    //     $pdf->setPaper('a4', 'landscape');
-    //     // Return PDF as download
-    //     return $pdf->stream('orders_report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
-    // }
+    
     public function ordersReport(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -150,7 +101,7 @@ class ReportsController extends Controller
         ];
 
         // Generate the static logo path
-        $logoPath = public_path('assets/logo/logo.png');  // absolute path for dompdf
+        $logoPath = public_path('assets/logo/logo.png');  
         // Or for URL access: $logoUrl = asset('assets/logo/logo.png');
 
         // Generate PDF
@@ -165,7 +116,7 @@ class ReportsController extends Controller
         $pdf->setPaper('a4', 'landscape');
 
         // Return PDF as download
-        return $pdf->stream('orders_report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
+        return $pdf->stream('ORDERS_REPORT_' . now()->format('Y-m-d_H-i-s') . '.pdf');
     }
 
 
@@ -374,10 +325,10 @@ class ReportsController extends Controller
         ]);
 
         // Set paper size and orientation
-        $pdf->setPaper('a4', 'potrait');
+        $pdf->setPaper('a4', 'landscape');
 
         // Return PDF as download
-        return $pdf->stream('users_report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
+        return $pdf->stream('USERS_REPORT_' . now()->format('Y-m-d_H-i-s') . '.pdf');
     }
 
     /**
@@ -467,7 +418,7 @@ class ReportsController extends Controller
         $pdf->setPaper('a4', 'landscape');
 
         // Return PDF as download
-        return $pdf->stream('products_report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
+        return $pdf->stream('PRODUCTS_REPORT_' . now()->format('Y-m-d_H-i-s') . '.pdf');
     }
 
     /**
@@ -570,6 +521,9 @@ class ReportsController extends Controller
         $pdf->setPaper('a4', 'landscape');
 
         // Return PDF as download
-        return $pdf->stream('stock_report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
+        return $pdf->stream('STOCK_REPORT' . now()->format('Y-m-d_H-i-s') . '.pdf');
+
     }
+
+
 }

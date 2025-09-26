@@ -9,10 +9,16 @@ use App\Models\Product;
 use App\Models\Address;
 use App\Models\PaymentMethod;
 use App\Mail\OrderConfirmationMail;
+use App\Models\CartItem;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+
+
 
 class OrderController extends Controller
 {
@@ -50,10 +56,12 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+
         return response()->json([
             'success' => true,
             'data' => $orders
         ]);
+
     }
 
     /**
@@ -62,10 +70,10 @@ class OrderController extends Controller
      *     tags={"Orders"},
      *     summary="Create a new order",
      *     security={{"bearerAuth":{}}},
-     *     @OA\RequestBody(
+     * @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"address_id","payment_method_id"},
+     *             required={"address_id"},
      *             @OA\Property(property="address_id", type="integer", example=1),
      *             @OA\Property(
      *                 type="array",
@@ -111,7 +119,7 @@ class OrderController extends Controller
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'payment_method_id' => 'required|exists:payment_methods,id',
+            'payment_method_id' => 'nullable|exists:payment_methods,id',
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -207,8 +215,10 @@ class OrderController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+
     }
 
+    
     /**
      * @OA\Get(
      *     path="/api/orders/{id}",
@@ -363,7 +373,7 @@ class OrderController extends Controller
     public function userOrders()
     {
         $orders = auth()->user()->orders()
-            ->with(['address', 'items'])
+            ->with(['address', 'items.product','paymentMethod', 'transaction'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -373,5 +383,247 @@ class OrderController extends Controller
         ]);
         
     }
+
+
+
+
+     /**
+     * @OA\Post(
+     *     path="/api/payments/process",
+     *     tags={"Payment"},
+     *     summary="Process payment for cart items",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"address_id","payment_method_id"},
+     *             @OA\Property(property="address_id", type="integer", example=1),
+     *             @OA\Property(property="payment_method_id", type="integer", example=1),
+     *             @OA\Property(property="notes", type="string", example="Please deliver between 9-12 PM")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="order", type="object"),
+     *                 @OA\Property(property="transaction", type="object")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Cart is empty or validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
+    public function processOrder(Request $request)
+    {
+        $request->validate([
+
+            'address_id' => 'required|exists:addresses,id',
+            'payment_method_id' => 'nullable|exists:payment_methods,id',
+            'notes' => 'nullable|string|max:500'
+            
+        ]);
+
+        $user = $request->user();
+
+        // Get cart items
+        $cartItems = CartItem::with(['product', 'variant'])
+            ->where('user_id', $user->id)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart is empty'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Calculate total
+        $total = $cartItems->sum(function ($item) {
+            return $item->quantity * ($item->variant ? $item->variant->price : $item->product->base_price);
+        });
+
+        // Create order
+        $order = Order::create([
+            'user_id' => $user->id,
+            'address_id' => $request->address_id,
+            'order_number' => 'ORD-' . Str::upper(Str::random(8)),
+            'subtotal' => $total,
+            'tax' => 0,
+            'shipping' => 0,
+            'total_amount' => $total,
+            'status' => 'pending',
+            'payment_method_id' => $request->payment_method_id,
+            'notes' => $request->notes
+        ]);
+
+        // Create order items
+        foreach ($cartItems as $item) {
+            $price = $item->variant ? $item->variant->price : $item->product->base_price;
+
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item->product_id,
+                'product_name' => $item->product->name,
+                'product_variant_id' => $item->product_variant_id,
+                'quantity' => $item->quantity,
+                'price' => $price,
+                'total' => $item->quantity * $price
+            ]);
+
+            // Update stock
+            if ($item->product_variant_id) {
+                $item->variant->decrement('stock', $item->quantity);
+            } else {
+                $item->product->decrement('stock_quantity', $item->quantity);
+            }
+        }
+
+        // Clear cart
+        CartItem::where('user_id', $user->id)->delete();
+
+        // Create transaction record
+        $transaction = Transaction::create([
+            'order_id' => $order->id,
+            'payment_method_id' => $request->payment_method_id,
+            'transaction_id' => 'TXN-' . Str::upper(Str::random(10)),
+            'amount' => $total,
+            'status' => 'pending',
+            'gateway_response' => [],
+            'notes' => $request->notes
+        ]);
+
+        // Send confirmation email
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OrderConfirmationMail($order));
+        } catch (\Exception $e) {
+            // Log email sending error but don't fail the order
+            \Illuminate\Support\Facades\Log::error('Failed to send order confirmation email: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order created successfully',
+            'data' => [
+                'order' => $order->load(['items.product', 'items.variant']),
+                'transaction' => $transaction
+            ]
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/payments/orders",
+     *     tags={"Payment"},
+     *     summary="Get user's orders",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's orders",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function orders(Request $request)
+    {
+        $user = $request->user();
+
+        $orders = Order::with(['items.product', 'items.variant', 'paymentMethod', 'transaction'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
+        ]);
+
+
+        
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/payments/orders/{id}",
+     *     tags={"Payment"},
+     *     summary="Get specific order details",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Order ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Order not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
+    public function orderDetails($id)
+    {
+        $user = request()->user();
+
+        $order = Order::with(['items.product', 'items.variant', 'paymentMethod', 'transaction'])
+            ->where('user_id', $user->id)
+            ->find($id);
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $order
+        ]);
+    }
+    
+
 }
+
 

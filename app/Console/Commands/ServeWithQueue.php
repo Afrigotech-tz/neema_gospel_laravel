@@ -28,8 +28,9 @@ class ServeWithQueue extends Command
 
         // Keep the queue process running alongside the server
         $queueProcess->wait();
+
     }
 
-
 }
+
 

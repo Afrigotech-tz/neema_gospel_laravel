@@ -21,7 +21,7 @@ class PasswordResetController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"login"},
-     *             @OA\Property(property="login", type="string", example="user@example.com")
+     *             @OA\Property(property="login", type="string", example="user@example.com||255684571155")
      *         )
      *     ),
      *     @OA\Response(

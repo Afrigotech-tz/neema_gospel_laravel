@@ -119,11 +119,14 @@ class OrderTrackingController extends Controller
             'message' => 'Shipment status updated successfully',
             'shipment' => $updatedShipment,
         ]);
+
+
     }
 
     /**
      * Get order analytics
      */
+
     public function getAnalytics(Request $request)
     {
         $request->validate([
@@ -198,4 +201,7 @@ class OrderTrackingController extends Controller
             'orders' => $orders,
         ]);
     }
+
+
 }
+
