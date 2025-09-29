@@ -40,6 +40,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/password/forgot', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 
+
 // Reports routes
 Route::prefix('reports')->group(function () {
     Route::get('/orders', [ReportsController::class, 'ordersReport']);
@@ -49,10 +50,16 @@ Route::prefix('reports')->group(function () {
     Route::get('/stock', [ReportsController::class, 'stockReport']);
 });
 
+
+
 require __DIR__ . '/api_products_public.php';
 
 // Public user message route (for sending messages)
 Route::post('/user-messages', [UserMessageController::class, 'store']);
+
+// public home sliders
+Route::get('/home-sliders', [HomeSliderController::class, 'index']);
+
 
 // OTP verification routes
 Route::prefix('auth')->group(function () {
@@ -60,6 +67,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
 });
+
 
 // Countries public routes (for dropdowns, etc.)
 Route::get('/countries', [CountryController::class, 'index']);
@@ -92,6 +100,7 @@ Route::get('/languages', function () {
         ],
         'message' => 'Languages retrieved successfully'
     ]);
+
 });
 
 // Public event routes
@@ -112,11 +121,13 @@ Route::prefix('news')->group(function () {
     Route::get('/{news}', [NewsController::class, 'show']);
 });
 
+
 // Public music routes
 Route::prefix('music')->group(function () {
     Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
+
 
 // Public website content routes
 Route::prefix('about-us')->group(function () {
@@ -131,6 +142,7 @@ Route::prefix('blogs')->group(function () {
     Route::get('/', [BlogController::class, 'index']);
     Route::get('/{blog}', [BlogController::class, 'show']);
 });
+
 
 require __DIR__ . '/api_donations.php';
 
@@ -181,6 +193,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Additional address routes
         Route::get('/user/{userId}', [AddressController::class, 'getUserAddresses']);
         Route::post('/user/{userId}/default', [AddressController::class, 'setDefaultAddress']);
+
     });
 
     // Protected music routes
@@ -225,7 +238,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Website content management routes
     Route::prefix('home-sliders')->group(function () {
-        Route::get('/', [HomeSliderController::class, 'index']);
+        
         Route::post('/', [HomeSliderController::class, 'store']);
         Route::get('/{homeSlider}', [HomeSliderController::class, 'show']);
         Route::post('/{homeSlider}', [HomeSliderController::class, 'update']);
@@ -236,6 +249,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/', [AboutUsController::class, 'store']);
         Route::post('/update', [AboutUsController::class, 'update']);
     });
+
 
     Route::prefix('contact-us')->group(function () {
         Route::post('/', [ContactUsController::class, 'store']);
@@ -249,11 +263,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/{userMessage}', [UserMessageController::class, 'destroy']);
     });
 
+
     Route::prefix('blogs')->group(function () {
         Route::post('/', [BlogController::class, 'store']);
         Route::post('/{blog}', [BlogController::class, 'update']);
         Route::delete('/{blog}', [BlogController::class, 'destroy']);
     });
+
+
 });
 
 Route::fallback(function () {

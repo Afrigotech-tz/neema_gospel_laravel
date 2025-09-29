@@ -22,7 +22,22 @@ class HomeSliderController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/HomeSlider"))
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="image", type="string", nullable=true),
+     *                     @OA\Property(property="title", type="string"),
+     *                     @OA\Property(property="head", type="string"),
+     *                     @OA\Property(property="description", type="string", nullable=true),
+     *                     @OA\Property(property="is_active", type="boolean"),
+     *                     @OA\Property(property="sort_order", type="integer"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time")
+     *                 )
+     *             )
      *         )
      *     )
      * )
@@ -60,7 +75,19 @@ class HomeSliderController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/HomeSlider")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="image", type="string", nullable=true),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="head", type="string"),
+     *                 @OA\Property(property="description", type="string", nullable=true),
+     *                 @OA\Property(property="is_active", type="boolean"),
+     *                 @OA\Property(property="sort_order", type="integer"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     )
      * )
@@ -109,7 +136,19 @@ class HomeSliderController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/HomeSlider")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="image", type="string", nullable=true),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="head", type="string"),
+     *                 @OA\Property(property="description", type="string", nullable=true),
+     *                 @OA\Property(property="is_active", type="boolean"),
+     *                 @OA\Property(property="sort_order", type="integer"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -158,7 +197,19 @@ class HomeSliderController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/HomeSlider")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="image", type="string", nullable=true),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="head", type="string"),
+     *                 @OA\Property(property="description", type="string", nullable=true),
+     *                 @OA\Property(property="is_active", type="boolean"),
+     *                 @OA\Property(property="sort_order", type="integer"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     )
      * )

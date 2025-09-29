@@ -22,7 +22,23 @@ class UserMessageController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/UserMessage"))
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="first_name", type="string"),
+     *                     @OA\Property(property="last_name", type="string"),
+     *                     @OA\Property(property="email", type="string", format="email"),
+     *                     @OA\Property(property="phone", type="string", nullable=true),
+     *                     @OA\Property(property="subject", type="string"),
+     *                     @OA\Property(property="message", type="string"),
+     *                     @OA\Property(property="status", type="string", enum={"pending", "read", "replied", "closed"}),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time")
+     *                 )
+     *             )
      *         )
      *     )
      * )
@@ -52,12 +68,20 @@ class UserMessageController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="Message created successfully",
+     *         response=202,
+     *         description="Message received and will be processed shortly",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/UserMessage")
+     *             @OA\Property(property="message", type="string", example="Your message has been received and will be processed shortly."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="first_name", type="string"),
+     *                 @OA\Property(property="last_name", type="string"),
+     *                 @OA\Property(property="email", type="string", format="email"),
+     *                 @OA\Property(property="subject", type="string")
+     *             )
      *         )
      *     )
      * )
@@ -112,7 +136,20 @@ class UserMessageController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/UserMessage")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="first_name", type="string"),
+     *                 @OA\Property(property="last_name", type="string"),
+     *                 @OA\Property(property="email", type="string", format="email"),
+     *                 @OA\Property(property="phone", type="string", nullable=true),
+     *                 @OA\Property(property="subject", type="string"),
+     *                 @OA\Property(property="message", type="string"),
+     *                 @OA\Property(property="status", type="string", enum={"pending", "read", "replied", "closed"}),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     )
      * )
@@ -149,7 +186,20 @@ class UserMessageController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/UserMessage")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="first_name", type="string"),
+     *                 @OA\Property(property="last_name", type="string"),
+     *                 @OA\Property(property="email", type="string", format="email"),
+     *                 @OA\Property(property="phone", type="string", nullable=true),
+     *                 @OA\Property(property="subject", type="string"),
+     *                 @OA\Property(property="message", type="string"),
+     *                 @OA\Property(property="status", type="string", enum={"pending", "read", "replied", "closed"}),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     )
      * )

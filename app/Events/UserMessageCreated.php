@@ -18,5 +18,6 @@ class UserMessageCreated
     {
         $this->messageData = $messageData;
     }
+
     
 }

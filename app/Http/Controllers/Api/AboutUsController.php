@@ -22,7 +22,17 @@ class AboutUsController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/AboutUs")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="our_story", type="string"),
+     *                 @OA\Property(property="image", type="string", nullable=true),
+     *                 @OA\Property(property="mission", type="string"),
+     *                 @OA\Property(property="vision", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     )
      * )
@@ -61,7 +71,17 @@ class AboutUsController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/AboutUs")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="our_story", type="string"),
+     *                 @OA\Property(property="image", type="string", nullable=true),
+     *                 @OA\Property(property="mission", type="string"),
+     *                 @OA\Property(property="vision", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     )
      * )
@@ -125,7 +145,17 @@ class AboutUsController extends Controller
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/AboutUs")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="our_story", type="string"),
+     *                 @OA\Property(property="image", type="string", nullable=true),
+     *                 @OA\Property(property="mission", type="string"),
+     *                 @OA\Property(property="vision", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
      *         )
      *     )
      * )
@@ -170,4 +200,7 @@ class AboutUsController extends Controller
     {
         // Not needed for single record
     }
+
+
 }
+
