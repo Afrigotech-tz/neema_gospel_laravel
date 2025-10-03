@@ -28,7 +28,9 @@ class User extends Authenticatable
      * The attributes that are mass assignable.
      *
      * @var list<string>
+     * 
      */
+
     protected $fillable = [
         'first_name',
         'surname',
@@ -47,7 +49,9 @@ class User extends Authenticatable
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
+     * 
      */
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -162,7 +166,9 @@ class User extends Authenticatable
 
     /**
      * Check if user has a specific role
+     * 
      */
+
     public function hasRole($role)
     {
         if (is_string($role)) {
@@ -174,6 +180,7 @@ class User extends Authenticatable
 
     /**
      * Check if user has any of the given roles
+     * 
      */
     public function hasAnyRole(...$roles)
     {
@@ -187,6 +194,7 @@ class User extends Authenticatable
 
     /**
      * Check if user has all of the given roles
+     * 
      */
     public function hasAllRoles(...$roles)
     {
@@ -200,6 +208,7 @@ class User extends Authenticatable
 
     /**
      * Assign role(s) to user
+     * 
      */
     public function assignRole(...$roles)
     {
@@ -239,6 +248,7 @@ class User extends Authenticatable
         if (!empty($roles)) {
             $this->roles()->syncWithoutDetaching($roles);
         }
+
     }
 
     /**
@@ -277,6 +287,7 @@ class User extends Authenticatable
             ->toArray();
 
         $this->roles()->sync($roles);
+
     }
 
     /**
@@ -300,8 +311,11 @@ class User extends Authenticatable
             if ($this->hasPermission($permission)) {
                 return true;
             }
+
         }
+
         return false;
+        
     }
 
     /**

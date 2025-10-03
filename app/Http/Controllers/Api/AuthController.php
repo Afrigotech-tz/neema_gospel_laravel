@@ -78,8 +78,7 @@ class AuthController extends Controller
             'surname' => 'required|string|max:255',
             'gender' => 'nullable|in:male,female',
             'phone_number' => 'required_without:email|nullable|string|unique:users,phone_number',
-            // 'email' => 'required_without:phone_number|nullable|string|email|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required_without:phone_number|nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'country_id' => 'required|exists:countries,id',
             'verification_method' => 'required|in:email,mobile',
@@ -148,7 +147,6 @@ class AuthController extends Controller
         //         'verification_method' => $user->verification_method,
         //     ]
         // ], 201);
-
 
         //  Use event driven to send notifications
         event(new UserRegistered($user, $otp));
@@ -321,7 +319,40 @@ class AuthController extends Controller
      *     )
      * )
      */
-    
+
+
+    // public function verifyOtp(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'login' => 'required|string',
+    //         'otp_code' => 'required|string|size:6',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validator->errors()->all()], 422);
+    //     }
+    //     $login = $request->login;
+    //     $loginField = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_number';
+    //     $user = User::where($loginField, $login)->first();
+    //     if (!$user) {
+    //         return response()->json(['success' => false, 'message' => 'User not found'], 404);
+    //     }
+    //     if (!$user->isOtpValid($request->otp_code)) {
+    //         return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 422);
+    //     }
+    //     $user->activate();
+    //     $token = $user->createToken('auth_token')->plainTextToken;
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Account verified successfully',
+    //         'data' => [
+    //             'user' => $user->load('country'),
+    //             'token' => $token,
+    //             'token_type' => 'Bearer'
+    //         ]
+    //     ]);
+    // }
+
+
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -330,7 +361,11 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validator->errors()->all()], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()->all()
+            ], 422);
         }
 
         $login = $request->login;
@@ -339,14 +374,28 @@ class AuthController extends Controller
         $user = User::where($loginField, $login)->first();
 
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
         }
 
         if (!$user->isOtpValid($request->otp_code)) {
-            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired OTP'
+            ], 422);
         }
 
-        $user->activate();
+        if ($loginField === 'email') {
+            $user->email_verified_at = now();
+        } else {
+            $user->phone_verified_at = now();
+        }
+
+        $user->status = 'active';
+        $user->save();
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -361,6 +410,7 @@ class AuthController extends Controller
     }
 
     /** Resend OTP to user's email or phone */
+
     /**
      * @OA\Post(
      *     path="/api/auth/resend-otp",
@@ -412,7 +462,6 @@ class AuthController extends Controller
      *         )
      *     )
      * )
-     * 
      */
     public function resendOtp(Request $request)
     {
@@ -435,7 +484,6 @@ class AuthController extends Controller
 
         $otp = $user->generateOtp();
 
-        
         event(new ResendOTPcode($user, $otp));
 
         // //  synchoronous send notifications
@@ -478,9 +526,8 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "sms sent"
+            'message' => 'sms sent'
         ]);
-
     }
 
     /** Logout user */
@@ -507,6 +554,4 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
-
- 
 }

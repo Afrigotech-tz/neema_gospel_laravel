@@ -19,9 +19,10 @@ return new class extends Migration
                 $table->string('first_name');
                 $table->string('surname');
                 $table->enum('gender', ['male', 'female'])->nullable();
-                $table->string('phone_number')->unique();
-                $table->string('email')->unique();
+                $table->string('phone_number')->nullable()->unique();
+                $table->string('email')->nullable()->unique();
                 $table->timestamp('email_verified_at')->nullable();
+                $table->timestamp('phone_verified_at')->nullable();
                 $table->string('password');
 
                 $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
@@ -30,6 +31,7 @@ return new class extends Migration
                 $table->timestamps();
 
             });
+
 
         }
 
