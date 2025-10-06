@@ -7,7 +7,7 @@
   <div id="blogs"></div>
 
   <script>
-    fetch('http://localhost:8000/api/blogs') 
+    fetch('http://localhost:8000/api/blogs') // your API endpoint
       .then(res => res.json())
       .then(res => {
         const container = document.getElementById('blogs');

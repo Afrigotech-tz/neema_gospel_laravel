@@ -146,6 +146,7 @@ Route::prefix('blogs')->group(function () {
 
 require __DIR__ . '/api_donations.php';
 
+
 // Protected routes with API key authentication
 Route::middleware(['auth:sanctum'])->group(function () {
     // Auth routes
@@ -266,16 +267,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('blogs')->group(function () {
         Route::post('/', [BlogController::class, 'store']);
-        Route::post('/{blog}', [BlogController::class, 'update']);
-        Route::delete('/{blog}', [BlogController::class, 'destroy']);
+        Route::put('/{id}', [BlogController::class, 'update']);
+        Route::delete('/{id}', [BlogController::class, 'destroy']);
     });
 
 
+
 });
+
 
 Route::fallback(function () {
     return response()->json([
         'success' => false,
         'message' => 'API endpoint not found'
     ], 404);
+
 });
+

@@ -164,7 +164,7 @@ class BlogController extends Controller
     }
 
     /**
-     * @OA\Post(
+     * @OA\Put(
      *     path="/api/blogs/{id}",
      *     operationId="updateBlog",
      *     tags={"Blogs"},
@@ -244,8 +244,11 @@ class BlogController extends Controller
 
         $blog->update($data);
         return response()->json(['success' => true, 'data' => $blog]);
+
     }
 
+    
+    
     /**
      * @OA\Delete(
      *     path="/api/blogs/{id}",
