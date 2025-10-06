@@ -267,8 +267,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('blogs')->group(function () {
         Route::post('/', [BlogController::class, 'store']);
-        Route::put('/{id}', [BlogController::class, 'update']);
-        Route::delete('/{id}', [BlogController::class, 'destroy']);
+        Route::post('/{blog}', [BlogController::class, 'update']);
+        Route::delete('/{blog}', [BlogController::class, 'destroy']);
     });
 
 

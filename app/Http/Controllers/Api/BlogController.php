@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -213,6 +214,9 @@ class BlogController extends Controller
      */
     public function update(Request $request, string $id)
     {
+
+         
+
         $blog = Blog::find($id);
         if (!$blog) {
             return response()->json(['success' => false, 'message' => 'Blog not found'], 404);
@@ -224,7 +228,7 @@ class BlogController extends Controller
             'description' => 'sometimes|required|string',
             'date' => 'sometimes|required|date',
             'location' => 'sometimes|required|string|max:255',
-            'is_active' => 'boolean',
+            'is_active' => ['sometimes', 'in:true,false,1,0', 'boolean'],
         ]);
 
         if ($validator->fails()) {
@@ -232,6 +236,10 @@ class BlogController extends Controller
         }
 
         $data = $request->only(['title', 'description', 'date', 'location', 'is_active']);
+
+        if (isset($data['is_active'])) {
+            $data['is_active'] = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        }
 
         if ($request->hasFile('image')) {
             // Delete old image
@@ -243,6 +251,7 @@ class BlogController extends Controller
         }
 
         $blog->update($data);
+        $blog->touch(); // Force update timestamps
         return response()->json(['success' => true, 'data' => $blog]);
 
     }
