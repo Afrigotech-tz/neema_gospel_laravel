@@ -39,7 +39,7 @@ class AuthController extends Controller
      *             @OA\Property(property="password_confirmation", type="string", format="password", example="secret123"),
      *             @OA\Property(property="country_id", type="integer", example=1),
      *             @OA\Property(property="verification_method", type="string", enum={"email","mobile"}),
-     *             @OA\Property(property="role_id", type="integer", example=2)
+     *
      *         )
      *     ),
      *     @OA\Response(
@@ -319,8 +319,6 @@ class AuthController extends Controller
      *     )
      * )
      */
-
-
     // public function verifyOtp(Request $request)
     // {
     //     $validator = Validator::make($request->all(), [
@@ -351,8 +349,6 @@ class AuthController extends Controller
     //         ]
     //     ]);
     // }
-
-
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -387,9 +383,9 @@ class AuthController extends Controller
             ], 422);
         }
 
-        if ($loginField === 'email') {
+        if ($user->verification_method === 'email' && is_null($user->email_verified_at)) {
             $user->email_verified_at = now();
-        } else {
+        } elseif ($user->verification_method === 'mobile' && is_null($user->phone_verified_at)) {
             $user->phone_verified_at = now();
         }
 
@@ -482,6 +478,10 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
+        if ($user->status == 'active') {
+            return response()->json(['success' => false, 'message' => 'Your account is Active']);
+        }
+
         $otp = $user->generateOtp();
 
         event(new ResendOTPcode($user, $otp));
@@ -524,10 +524,18 @@ class AuthController extends Controller
         //     }
         // }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'sms sent'
-        ]);
+        if ($user->verification_method == 'email') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Please verify your account using the OTP sent to your email.'
+            ]);
+        } else {
+            return response()->json([
+                'success' => true,
+                'message' => 'Please verify your account using the OTP sent to your phone.'
+            ]);
+        }
+        
     }
 
     /** Logout user */
@@ -554,4 +562,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
+
+
 }
+

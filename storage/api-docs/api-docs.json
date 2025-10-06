@@ -806,10 +806,6 @@
                                             "email",
                                             "mobile"
                                         ]
-                                    },
-                                    "role_id": {
-                                        "type": "integer",
-                                        "example": 2
                                     }
                                 },
                                 "type": "object"

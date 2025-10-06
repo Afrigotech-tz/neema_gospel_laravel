@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blogs Preview</title>
+</head>
+<body>
+  <div id="blogs"></div>
+
+  <script>
+    fetch('http://localhost:8000/api/blogs') 
+      .then(res => res.json())
+      .then(res => {
+        const container = document.getElementById('blogs');
+        res.data.forEach(blog => {
+          const div = document.createElement('div');
+          div.innerHTML = `
+            <h2>${blog.title}</h2>
+            <p>${blog.description}</p>
+            <p><strong>Location:</strong> ${blog.location}</p>
+            <p><strong>Date:</strong> ${new Date(blog.date).toLocaleString()}</p>
+            <p><strong>Active:</strong> ${blog.is_active}</p>
+            <img src="http://localhost:8000/storage/${blog.image}" alt="${blog.title}" style="max-width:300px;">
+            <hr>
+          `;
+          container.appendChild(div);
+        });
+      });
+  </script>
+</body>
+</html>

@@ -1,33 +1,32 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        DB::statement('ALTER TABLE user_messages DROP CONSTRAINT IF EXISTS user_messages_status_check');
-
-        DB::statement("ALTER TABLE user_messages ADD CONSTRAINT user_messages_status_check CHECK (status::text = ANY (ARRAY['pending'::character varying, 'read'::character varying, 'replied'::character varying, 'closed'::character varying]::text[]))");
-
-        // Update default if needed, but since we're changing constraint, set default via raw if necessary
-        DB::statement("UPDATE user_messages SET status = 'pending' WHERE status IS NULL");
+        Schema::table('user_messages', function (Blueprint $table) {
+            $table->enum('status', ['pending', 'read', 'replied', 'closed'])
+                  ->default('pending')
+                  ->change();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
+
     public function down(): void
     {
-        DB::statement('ALTER TABLE user_messages DROP CONSTRAINT IF EXISTS user_messages_status_check');
-
-        DB::statement("ALTER TABLE user_messages ADD CONSTRAINT user_messages_status_check CHECK (status::text = ANY (ARRAY['read'::character varying, 'replied'::character varying, 'completed'::character varying]::text[]))");
+        Schema::table('user_messages', function (Blueprint $table) {
+            $table->enum('status', ['read', 'replied', 'completed'])
+                  ->default('read')
+                  ->change();
+        });
     }
 
 
 };
+
 
