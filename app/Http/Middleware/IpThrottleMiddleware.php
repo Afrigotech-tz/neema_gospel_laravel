@@ -5,8 +5,10 @@ namespace App\Http\Middleware;
 use App\Models\IpThrottle;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
+use Torann\GeoIP\Facades\GeoIP;
 
 class IpThrottleMiddleware
 {
@@ -14,13 +16,15 @@ class IpThrottleMiddleware
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * 
      */
+    
     public function handle(Request $request, Closure $next): Response
     {
         $ip = $request->ip();
 
         // Maximum requests allowed per window
-        $maxAttempts = 5;
+        $maxAttempts = 600;
         // Window duration in minutes
         $decayMinutes = 1;
 
@@ -34,6 +38,12 @@ class IpThrottleMiddleware
             $throttle->total_hits = 0;
             $throttle->last_seen = Carbon::now();
             $throttle->block_until = null;
+            $throttle->country = $this->getCountryFromIP($ip);
+            $throttle->save();
+            
+        } elseif (!$throttle->country) {
+            // Update existing record if country is null
+            $throttle->country = $this->getCountryFromIP($ip);
             $throttle->save();
         }
 
@@ -77,5 +87,25 @@ class IpThrottleMiddleware
 
     }
 
+    /**
+     * Get country name from IP address using GeoIP
+     *
+     * @param string $ip
+     * @return string|null
+     */
+    private function getCountryFromIP(string $ip): ?string
+    {
+        try {
+            $location = GeoIP::getLocation($ip);
+            return $location['country'] ?? null;
+        } catch (\Exception $e) {
+            // Log the error but don't fail the request
+            Log::warning("Failed to get country for IP {$ip}: " . $e->getMessage());
+            return null;
+        }
+    }
+
 }
+
+
 

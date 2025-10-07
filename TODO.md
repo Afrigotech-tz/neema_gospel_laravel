@@ -1,1 +1,8 @@
 - [x] Fix IpThrottleMiddleware to handle last_seen on new records
+- [x] Add country field to IpThrottle table
+- [x] Publish GeoIP config
+- [x] Update IpThrottleMiddleware to populate country from IP
+- [x] Create command to update existing IpThrottle records with country
+- [x] Run command to update existing records
+- [x] Remove laravel/horizon from dependencies (Windows compatibility)
+- [x] Install and verify all packages without errors

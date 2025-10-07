@@ -12,5 +12,7 @@ class IpThrottle extends Model
         'last_seen',
         'block_until',
         'total_hits',
+        'country',
     ];
+    
 }

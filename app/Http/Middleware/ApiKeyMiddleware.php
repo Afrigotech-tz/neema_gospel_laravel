@@ -60,5 +60,9 @@ class ApiKeyMiddleware
         ]);
 
         return $next($request);
+
     }
+
+    
 }
+
