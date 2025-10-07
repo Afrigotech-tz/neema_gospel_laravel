@@ -14,61 +14,68 @@ class IpThrottleMiddleware
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     *
-     *
      */
-
     public function handle(Request $request, Closure $next): Response
     {
         $ip = $request->ip();
 
-        // Allow 5 requests per minute per IP
+        // Maximum requests allowed per window
         $maxAttempts = 5;
+        // Window duration in minutes
         $decayMinutes = 1;
 
         $throttle = IpThrottle::where('ip_address', $ip)->first();
 
         if (!$throttle) {
+            // Create a new record for this IP
             $throttle = new IpThrottle();
             $throttle->ip_address = $ip;
+            $throttle->counts = 0;
+            $throttle->total_hits = 0;
             $throttle->last_seen = Carbon::now();
+            $throttle->block_until = null;
             $throttle->save();
         }
 
-        // Increment total hits
+        // Increment total hits regardless
         $throttle->increment('total_hits');
 
-        // Check if blocked
-        if ($throttle->block_until && Carbon::now()->lessThan($throttle->block_until)) {
+        $now = Carbon::now();
+
+        // Reset counts if block has expired
+        if ($throttle->block_until && $now->greaterThanOrEqualTo($throttle->block_until)) {
+            $throttle->counts = 0;
+            $throttle->block_until = null;
+        }
+
+        // Check if currently blocked
+        if ($throttle->block_until && $now->lessThan($throttle->block_until)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Too many requests. Please try again later.',
-                'retry_after' => Carbon::now()->diffInSeconds($throttle->block_until)
+                'retry_after' => $now->diffInSeconds($throttle->block_until)
             ], 429);
         }
 
-        // Reset counts if window has passed
-        if ($throttle->last_seen && Carbon::now()->diffInMinutes($throttle->last_seen) >= $decayMinutes) {
+        // Reset counts if decay window has passed since last_seen
+        if ($throttle->last_seen && $now->diffInMinutes($throttle->last_seen) >= $decayMinutes) {
             $throttle->counts = 0;
         }
 
         // Increment counts and update last_seen
-        $throttle->increment('counts');
-        $throttle->last_seen = Carbon::now();
+        $throttle->counts++;
+        $throttle->last_seen = $now;
 
-        // Check if exceeded
+        // Block IP if exceeded max attempts
         if ($throttle->counts > $maxAttempts) {
-            $throttle->block_until = Carbon::now()->addMinutes($decayMinutes);
+            $throttle->block_until = $now->copy()->addMinutes($decayMinutes);
         }
 
         $throttle->save();
 
         return $next($request);
-        
+
     }
 
 }
-
-
-
 
