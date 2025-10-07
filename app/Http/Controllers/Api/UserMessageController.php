@@ -14,7 +14,7 @@ class UserMessageController extends Controller
      * @OA\Get(
      *     path="/api/user-messages",
      *     operationId="getUserMessages",
-     *     tags={"User Messages"},
+     *     tags={"CMS User Messages"},
      *     summary="Get list of user messages",
      *     @OA\Response(
      *         response=200,
@@ -53,7 +53,7 @@ class UserMessageController extends Controller
      * @OA\Post(
      *     path="/api/user-messages",
      *     operationId="createUserMessage",
-     *     tags={"User Messages"},
+     *     tags={"CMS User Messages"},
      *     summary="Create a new user message",
      *     @OA\RequestBody(
      *         required=true,
@@ -122,7 +122,7 @@ class UserMessageController extends Controller
      * @OA\Get(
      *     path="/api/user-messages/{id}",
      *     operationId="getUserMessage",
-     *     tags={"User Messages"},
+     *     tags={"CMS User Messages"},
      *     summary="Get a specific user message",
      *     @OA\Parameter(
      *         name="id",
@@ -167,7 +167,7 @@ class UserMessageController extends Controller
      * @OA\Put(
      *     path="/api/user-messages/{id}",
      *     operationId="updateUserMessage",
-     *     tags={"User Messages"},
+     *     tags={"CMS User Messages"},
      *     summary="Update a user message",
      *     @OA\Parameter(
      *         name="id",
@@ -227,7 +227,7 @@ class UserMessageController extends Controller
      * @OA\Delete(
      *     path="/api/user-messages/{id}",
      *     operationId="deleteUserMessage",
-     *     tags={"User Messages"},
+     *     tags={"CMS User Messages"},
      *     summary="Delete a user message",
      *     @OA\Parameter(
      *         name="id",

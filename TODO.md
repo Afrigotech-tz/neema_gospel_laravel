@@ -1,0 +1,1 @@
+- [x] Fix IpThrottleMiddleware to handle last_seen on new records

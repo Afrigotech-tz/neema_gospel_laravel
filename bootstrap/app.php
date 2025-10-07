@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ApiKeyMiddleware;
 use App\Http\Middleware\Cors;
+use App\Http\Middleware\IpThrottleMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Application;
@@ -20,10 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
             Cors::class,
+            IpThrottleMiddleware::class,
         ]);
 
         $middleware->alias([
             'api.key' => ApiKeyMiddleware::class,
+            'ip.throttle' => IpThrottleMiddleware::class,
         ]);
     })
     ->withExceptions(function ($exceptions) {

@@ -148,7 +148,7 @@ require __DIR__ . '/api_donations.php';
 
 
 // Protected routes with API key authentication
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -283,4 +283,5 @@ Route::fallback(function () {
     ], 404);
 
 });
+
 

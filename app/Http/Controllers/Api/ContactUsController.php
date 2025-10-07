@@ -13,7 +13,7 @@ class ContactUsController extends Controller
      * @OA\Get(
      *     path="/api/contact-us",
      *     operationId="getContactUs",
-     *     tags={"Contact Us"},
+     *     tags={"CMS Contact Us"},
      *     summary="Get contact us information",
      *     @OA\Response(
      *         response=200,
@@ -49,7 +49,7 @@ class ContactUsController extends Controller
      * @OA\Post(
      *     path="/api/contact-us",
      *     operationId="createContactUs",
-     *     tags={"Contact Us"},
+     *     tags={"CMS Contact Us"},
      *     summary="Create contact us information",
      *     @OA\RequestBody(
      *         required=true,
@@ -115,7 +115,7 @@ class ContactUsController extends Controller
      * @OA\Post(
      *     path="/api/contact-us/update",
      *     operationId="updateContactUs",
-     *     tags={"Contact Us"},
+     *     tags={"CMS Contact Us"},
      *     summary="Update contact us information",
      *     @OA\RequestBody(
      *         @OA\JsonContent(

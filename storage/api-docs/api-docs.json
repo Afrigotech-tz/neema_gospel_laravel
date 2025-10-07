@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Neema Gospel Choir APIs",
-        "description": "This is the API documentation for the Neema Gospel Choir system. \n *         It provides access to user authentication, donations, donation categories, \n *         profiles, and other resources.",
+        "description": "This is the API documentation for the Neema Gospel Choir system. \n *      ",
         "contact": {
             "name": "API Support",
             "email": "bennycive@gmail.com"
@@ -1268,7 +1268,7 @@
         "/api/blogs": {
             "get": {
                 "tags": [
-                    "Blogs"
+                    "CMS Blogs"
                 ],
                 "summary": "Get list of blogs",
                 "operationId": "getBlogs",
@@ -1333,7 +1333,7 @@
             },
             "post": {
                 "tags": [
-                    "Blogs"
+                    "CMS Blogs"
                 ],
                 "summary": "Create a new blog",
                 "operationId": "createBlog",
@@ -1441,7 +1441,7 @@
         "/api/blogs/{id}": {
             "get": {
                 "tags": [
-                    "Blogs"
+                    "CMS Blogs"
                 ],
                 "summary": "Get a specific blog",
                 "operationId": "getBlog",
@@ -1513,7 +1513,7 @@
             },
             "put": {
                 "tags": [
-                    "Blogs"
+                    "CMS Blogs"
                 ],
                 "summary": "Update a blog",
                 "operationId": "updateBlog",
@@ -1622,7 +1622,7 @@
             },
             "delete": {
                 "tags": [
-                    "Blogs"
+                    "CMS Blogs"
                 ],
                 "summary": "Delete a blog",
                 "operationId": "deleteBlog",
@@ -1938,7 +1938,7 @@
         "/api/contact-us": {
             "get": {
                 "tags": [
-                    "Contact Us"
+                    "CMS Contact Us"
                 ],
                 "summary": "Get contact us information",
                 "operationId": "getContactUs",
@@ -1993,7 +1993,7 @@
             },
             "post": {
                 "tags": [
-                    "Contact Us"
+                    "CMS Contact Us"
                 ],
                 "summary": "Create contact us information",
                 "operationId": "createContactUs",
@@ -2085,7 +2085,7 @@
         "/api/contact-us/update": {
             "post": {
                 "tags": [
-                    "Contact Us"
+                    "CMS Contact Us"
                 ],
                 "summary": "Update contact us information",
                 "operationId": "updateContactUs",
@@ -4014,7 +4014,7 @@
         "/api/home-sliders": {
             "get": {
                 "tags": [
-                    "Home Sliders"
+                    "CMS Home Sliders"
                 ],
                 "summary": "Get list of home sliders",
                 "operationId": "getHomeSliders",
@@ -4079,7 +4079,7 @@
             },
             "post": {
                 "tags": [
-                    "Home Sliders"
+                    "CMS Home Sliders"
                 ],
                 "summary": "Create a new home slider",
                 "operationId": "createHomeSlider",
@@ -4184,7 +4184,7 @@
         "/api/home-sliders/{id}": {
             "get": {
                 "tags": [
-                    "Home Sliders"
+                    "CMS Home Sliders"
                 ],
                 "summary": "Get a specific home slider",
                 "operationId": "getHomeSlider",
@@ -4259,7 +4259,7 @@
             },
             "post": {
                 "tags": [
-                    "Home Sliders"
+                    "CMS Home Sliders"
                 ],
                 "summary": "Update a home slider",
                 "operationId": "updateHomeSlider",
@@ -4367,7 +4367,7 @@
             },
             "delete": {
                 "tags": [
-                    "Home Sliders"
+                    "CMS Home Sliders"
                 ],
                 "summary": "Delete a home slider",
                 "operationId": "deleteHomeSlider",
@@ -10839,7 +10839,7 @@
         "/api/user-messages": {
             "get": {
                 "tags": [
-                    "User Messages"
+                    "CMS User Messages"
                 ],
                 "summary": "Get list of user messages",
                 "operationId": "getUserMessages",
@@ -10913,7 +10913,7 @@
             },
             "post": {
                 "tags": [
-                    "User Messages"
+                    "CMS User Messages"
                 ],
                 "summary": "Create a new user message",
                 "operationId": "createUserMessage",
@@ -11006,7 +11006,7 @@
         "/api/user-messages/{id}": {
             "get": {
                 "tags": [
-                    "User Messages"
+                    "CMS User Messages"
                 ],
                 "summary": "Get a specific user message",
                 "operationId": "getUserMessage",
@@ -11087,7 +11087,7 @@
             },
             "put": {
                 "tags": [
-                    "User Messages"
+                    "CMS User Messages"
                 ],
                 "summary": "Update a user message",
                 "operationId": "updateUserMessage",
@@ -11189,7 +11189,7 @@
             },
             "delete": {
                 "tags": [
-                    "User Messages"
+                    "CMS User Messages"
                 ],
                 "summary": "Delete a user message",
                 "operationId": "deleteUserMessage",
@@ -11256,16 +11256,16 @@
             "description": "Authentication"
         },
         {
-            "name": "Blogs",
-            "description": "Blogs"
+            "name": "CMS Blogs",
+            "description": "CMS Blogs"
         },
         {
             "name": "Cart",
             "description": "Cart"
         },
         {
-            "name": "Contact Us",
-            "description": "Contact Us"
+            "name": "CMS Contact Us",
+            "description": "CMS Contact Us"
         },
         {
             "name": "Countries",
@@ -11280,8 +11280,8 @@
             "description": "Events"
         },
         {
-            "name": "Home Sliders",
-            "description": "Home Sliders"
+            "name": "CMS Home Sliders",
+            "description": "CMS Home Sliders"
         },
         {
             "name": "Music",
@@ -11332,8 +11332,8 @@
             "description": "Users"
         },
         {
-            "name": "User Messages",
-            "description": "User Messages"
+            "name": "CMS User Messages",
+            "description": "CMS User Messages"
         }
     ]
 }

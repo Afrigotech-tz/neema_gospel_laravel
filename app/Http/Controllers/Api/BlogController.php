@@ -9,13 +9,16 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
+
+
+
 class BlogController extends Controller
 {
     /**
      * @OA\Get(
      *     path="/api/blogs",
      *     operationId="getBlogs",
-     *     tags={"Blogs"},
+     *     tags={"CMS Blogs"},
      *     summary="Get list of blogs",
      *     @OA\Response(
      *         response=200,
@@ -53,7 +56,7 @@ class BlogController extends Controller
      * @OA\Post(
      *     path="/api/blogs",
      *     operationId="createBlog",
-     *     tags={"Blogs"},
+     *     tags={"CMS Blogs"},
      *     summary="Create a new blog",
      *     @OA\RequestBody(
      *         required=true,
@@ -124,7 +127,7 @@ class BlogController extends Controller
      * @OA\Get(
      *     path="/api/blogs/{id}",
      *     operationId="getBlog",
-     *     tags={"Blogs"},
+     *     tags={"CMS Blogs"},
      *     summary="Get a specific blog",
      *     @OA\Parameter(
      *         name="id",
@@ -168,7 +171,7 @@ class BlogController extends Controller
      * @OA\Put(
      *     path="/api/blogs/{id}",
      *     operationId="updateBlog",
-     *     tags={"Blogs"},
+     *     tags={"CMS Blogs"},
      *     summary="Update a blog",
      *     @OA\Parameter(
      *         name="id",
@@ -262,7 +265,7 @@ class BlogController extends Controller
      * @OA\Delete(
      *     path="/api/blogs/{id}",
      *     operationId="deleteBlog",
-     *     tags={"Blogs"},
+     *     tags={"CMS Blogs"},
      *     summary="Delete a blog",
      *     @OA\Parameter(
      *         name="id",

@@ -14,7 +14,7 @@ class HomeSliderController extends Controller
      * @OA\Get(
      *     path="/api/home-sliders",
      *     operationId="getHomeSliders",
-     *     tags={"Home Sliders"},
+     *     tags={"CMS Home Sliders"},
      *     summary="Get list of home sliders",
      *     @OA\Response(
      *         response=200,
@@ -52,7 +52,7 @@ class HomeSliderController extends Controller
      * @OA\Post(
      *     path="/api/home-sliders",
      *     operationId="createHomeSlider",
-     *     tags={"Home Sliders"},
+     *     tags={"CMS Home Sliders"},
      *     summary="Create a new home slider",
      *     @OA\RequestBody(
      *         required=true,
@@ -122,7 +122,7 @@ class HomeSliderController extends Controller
      * @OA\Get(
      *     path="/api/home-sliders/{id}",
      *     operationId="getHomeSlider",
-     *     tags={"Home Sliders"},
+     *     tags={"CMS Home Sliders"},
      *     summary="Get a specific home slider",
      *     @OA\Parameter(
      *         name="id",
@@ -170,7 +170,7 @@ class HomeSliderController extends Controller
      * @OA\Post(
      *     path="/api/home-sliders/{id}",
      *     operationId="updateHomeSlider",
-     *     tags={"Home Sliders"},
+     *     tags={"CMS Home Sliders"},
      *     summary="Update a home slider",
      *     @OA\Parameter(
      *         name="id",
@@ -253,7 +253,7 @@ class HomeSliderController extends Controller
      * @OA\Delete(
      *     path="/api/home-sliders/{id}",
      *     operationId="deleteHomeSlider",
-     *     tags={"Home Sliders"},
+     *     tags={"CMS Home Sliders"},
      *     summary="Delete a home slider",
      *     @OA\Parameter(
      *         name="id",
