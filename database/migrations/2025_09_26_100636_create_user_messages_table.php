@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('message');
             $table->enum('status', ['pending', 'read', 'replied', 'closed'])->default('pending');
             $table->timestamps();
+            
         });
     }
 

@@ -24,7 +24,7 @@ class IpThrottleMiddleware
         $ip = $request->ip();
 
         // Maximum requests allowed per window
-        $maxAttempts = 600;
+        $maxAttempts = 10;
         // Window duration in minutes
         $decayMinutes = 1;
 
@@ -100,12 +100,12 @@ class IpThrottleMiddleware
             return $location['country'] ?? null;
         } catch (\Exception $e) {
             // Log the error but don't fail the request
-            Log::warning("Failed to get country for IP {$ip}: " . $e->getMessage());
             return null;
         }
     }
 
 }
+
 
 
 
