@@ -4,17 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Department;
 
-class Permission extends Model
+class Department extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
-        'display_name',
         'description',
-        'module',
         'is_active'
     ];
 
@@ -22,24 +19,18 @@ class Permission extends Model
         'is_active' => 'boolean',
     ];
 
-    public function roles()
+    public function users()
     {
-        return $this->belongsToMany(Role::class, 'role_permissions');
+        return $this->hasMany(User::class);
     }
 
-    public function departments()
+    public function permissions()
     {
-        return $this->belongsToMany(Department::class, 'department_permissions');
-    }
-
-    public function scopeModule($query, $module)
-    {
-        return $query->where('module', $module);
+        return $this->belongsToMany(Permission::class, 'department_permissions');
     }
 
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
-    
 }

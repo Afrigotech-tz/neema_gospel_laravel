@@ -19,8 +19,10 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserMessageController;
+use App\Http\Controllers\Api\DepartmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 /*
  * |--------------------------------------------------------------------------
@@ -32,6 +34,7 @@ use Illuminate\Support\Facades\Route;
  * | be assigned to the "api" middleware group. Make something great!
  * |
  */
+
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -66,6 +69,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
+
 });
 
 
@@ -98,8 +102,10 @@ Route::get('/languages', function () {
                 'is_default' => false,
             ],
         ],
+        
         'message' => 'Languages retrieved successfully'
     ]);
+
 
 });
 
@@ -273,6 +279,18 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
 
 
 
+});
+
+Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
+    // Department routes
+    Route::get('/departments', [DepartmentController::class, 'index']);
+    Route::post('/departments', [DepartmentController::class, 'store']);
+    Route::get('/departments/{department}', [DepartmentController::class, 'show']);
+    Route::put('/departments/{department}', [DepartmentController::class, 'update']);
+    Route::delete('/departments/{department}', [DepartmentController::class, 'destroy']);
+
+    Route::post('/departments/{department}/assign-user', [DepartmentController::class, 'assignUser']);
+    Route::post('/departments/{department}/remove-user', [DepartmentController::class, 'removeUser']);
 });
 
 

@@ -16,6 +16,7 @@ class Donation extends Model
      */
     protected $fillable = [
         'user_id',
+        'partner_id',
         'campaign_id',
         'donor_name',
         'donor_email',
@@ -26,6 +27,8 @@ class Donation extends Model
         'transaction_reference',
         'status',
         'message',
+        'donation_type',
+        'is_manual_entry',
     ];
 
     /**
@@ -46,6 +49,14 @@ class Donation extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the partner associated with this donation.
+     */
+    public function partner()
+    {
+        return $this->belongsTo(User::class, 'partner_id');
     }
 
     /**

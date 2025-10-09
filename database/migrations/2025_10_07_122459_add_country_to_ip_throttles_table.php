@@ -8,12 +8,15 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * 
      */
+
     public function up(): void
     {
         Schema::table('ip_throttles', function (Blueprint $table) {
             $table->string('country')->nullable();
         });
+
     }
 
     /**
@@ -25,4 +28,12 @@ return new class extends Migration
             $table->dropColumn('country');
         });
     }
+
+
 };
+
+
+
+
+
+

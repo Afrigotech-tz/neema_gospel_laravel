@@ -24,9 +24,9 @@ class IpThrottleMiddleware
         $ip = $request->ip();
 
         // Maximum requests allowed per window
-        $maxAttempts = 10;
+        $maxAttempts = 200;
         // Window duration in minutes
-        $decayMinutes = 1;
+        $decayMinutes = 0.5;
 
         $throttle = IpThrottle::where('ip_address', $ip)->first();
 
@@ -45,6 +45,7 @@ class IpThrottleMiddleware
             // Update existing record if country is null
             $throttle->country = $this->getCountryFromIP($ip);
             $throttle->save();
+
         }
 
         // Increment total hits regardless
@@ -85,6 +86,8 @@ class IpThrottleMiddleware
 
         return $next($request);
 
+        
+
     }
 
     /**
@@ -92,7 +95,10 @@ class IpThrottleMiddleware
      *
      * @param string $ip
      * @return string|null
+     * 
+     * 
      */
+
     private function getCountryFromIP(string $ip): ?string
     {
         try {
@@ -103,6 +109,7 @@ class IpThrottleMiddleware
             return null;
         }
     }
+
 
 }
 

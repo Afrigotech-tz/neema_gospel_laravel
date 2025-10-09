@@ -11,6 +11,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Department;
+use App\Models\Donation;
 
 class User extends Authenticatable
 {
@@ -39,6 +41,9 @@ class User extends Authenticatable
         'email',
         'password',
         'country_id',
+        'department_id',
+        'is_partner',
+        'partner_registration_method',
         'status',
         'otp_code',
         'otp_expires_at',
@@ -86,6 +91,22 @@ class User extends Authenticatable
     public function profile()
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    /**
+     * Get the user's department.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * Get donations made by this user as a partner.
+     */
+    public function partnerDonations()
+    {
+        return $this->hasMany(Donation::class, 'partner_id');
     }
 
     /**
