@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+
+use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Permission;
 use Illuminate\Http\Request;
@@ -52,9 +54,18 @@ class DepartmentController extends Controller
      *     )
      * )
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $departments = Department::with(['users', 'permissions'])->get();
+        $perPage = $request->get('per_page', 5);
+        $withRelations = $request->get('with_relations', false);
+
+        $query = Department::query();
+
+        if ($withRelations) {
+            $query->with(['users:id,first_name,surname,department_id', 'permissions:id,name']);
+        }
+
+        $departments = $query->paginate($perPage);
 
         return response()->json([
             'success' => true,

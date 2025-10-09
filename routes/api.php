@@ -23,7 +23,6 @@ use App\Http\Controllers\Api\DepartmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
 /*
  * |--------------------------------------------------------------------------
  * | API Routes
@@ -35,14 +34,12 @@ use Illuminate\Support\Facades\Route;
  * |
  */
 
-
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/password/forgot', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
-
 
 // Reports routes
 Route::prefix('reports')->group(function () {
@@ -53,8 +50,6 @@ Route::prefix('reports')->group(function () {
     Route::get('/stock', [ReportsController::class, 'stockReport']);
 });
 
-
-
 require __DIR__ . '/api_products_public.php';
 
 // Public user message route (for sending messages)
@@ -63,15 +58,12 @@ Route::post('/user-messages', [UserMessageController::class, 'store']);
 // public home sliders
 Route::get('/home-sliders', [HomeSliderController::class, 'index']);
 
-
 // OTP verification routes
 Route::prefix('auth')->group(function () {
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
-
 });
-
 
 // Countries public routes (for dropdowns, etc.)
 Route::get('/countries', [CountryController::class, 'index']);
@@ -102,11 +94,8 @@ Route::get('/languages', function () {
                 'is_default' => false,
             ],
         ],
-        
         'message' => 'Languages retrieved successfully'
     ]);
-
-
 });
 
 // Public event routes
@@ -127,13 +116,11 @@ Route::prefix('news')->group(function () {
     Route::get('/{news}', [NewsController::class, 'show']);
 });
 
-
 // Public music routes
 Route::prefix('music')->group(function () {
     Route::get('/', [App\Http\Controllers\Api\MusicController::class, 'index']);
     Route::get('/{music}', [App\Http\Controllers\Api\MusicController::class, 'show']);
 });
-
 
 // Public website content routes
 Route::prefix('about-us')->group(function () {
@@ -149,9 +136,7 @@ Route::prefix('blogs')->group(function () {
     Route::get('/{blog}', [BlogController::class, 'show']);
 });
 
-
 require __DIR__ . '/api_donations.php';
-
 
 // Protected routes with API key authentication
 Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
@@ -178,7 +163,9 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
         Route::post('/', [EventController::class, 'store']);
         Route::put('/{event}', [EventController::class, 'update']);
         Route::delete('/{event}', [EventController::class, 'destroy']);
+
     });
+    
 
     // Profile routes
     Route::prefix('profile')->group(function () {
@@ -200,7 +187,6 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
         // Additional address routes
         Route::get('/user/{userId}', [AddressController::class, 'getUserAddresses']);
         Route::post('/user/{userId}/default', [AddressController::class, 'setDefaultAddress']);
-
     });
 
     // Protected music routes
@@ -245,7 +231,6 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
 
     // Website content management routes
     Route::prefix('home-sliders')->group(function () {
-        
         Route::post('/', [HomeSliderController::class, 'store']);
         Route::get('/{homeSlider}', [HomeSliderController::class, 'show']);
         Route::post('/{homeSlider}', [HomeSliderController::class, 'update']);
@@ -256,7 +241,6 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
         Route::post('/', [AboutUsController::class, 'store']);
         Route::post('/update', [AboutUsController::class, 'update']);
     });
-
 
     Route::prefix('contact-us')->group(function () {
         Route::post('/', [ContactUsController::class, 'store']);
@@ -270,15 +254,11 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
         Route::delete('/{userMessage}', [UserMessageController::class, 'destroy']);
     });
 
-
     Route::prefix('blogs')->group(function () {
         Route::post('/', [BlogController::class, 'store']);
         Route::post('/{blog}', [BlogController::class, 'update']);
         Route::delete('/{blog}', [BlogController::class, 'destroy']);
     });
-
-
-
 });
 
 Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
@@ -291,6 +271,9 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
 
     Route::post('/departments/{department}/assign-user', [DepartmentController::class, 'assignUser']);
     Route::post('/departments/{department}/remove-user', [DepartmentController::class, 'removeUser']);
+
+    
+
 });
 
 
@@ -299,8 +282,5 @@ Route::fallback(function () {
         'success' => false,
         'message' => 'API endpoint not found'
     ], 404);
-
 });
-
-
 

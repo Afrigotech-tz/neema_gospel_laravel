@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('tracking')->middleware(['auth:api'])->group(function () {
+Route::prefix('tracking')->middleware(['auth:sanctum'])->group(function () {
 
     // Order tracking endpoints
     Route::get('/orders/{orderId}', [OrderTrackingController::class, 'trackOrder']);
@@ -46,7 +46,7 @@ Route::post('/webhooks/shipment-updates', [OrderTrackingController::class, 'hand
     ->middleware('webhook.signature');
 
 // Admin-specific endpoints
-Route::prefix('admin/tracking')->middleware(['auth:api', 'role:admin'])->group(function () {
+Route::prefix('admin/tracking')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     Route::get('/dashboard', [OrderTrackingController::class, 'getAdminDashboard']);
     Route::get('/reports/sales', [OrderTrackingController::class, 'getSalesReport']);
