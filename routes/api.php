@@ -272,6 +272,11 @@ Route::middleware(['auth:sanctum', 'ip.throttle'])->group(function () {
     Route::post('/departments/{department}/assign-user', [DepartmentController::class, 'assignUser']);
     Route::post('/departments/{department}/remove-user', [DepartmentController::class, 'removeUser']);
 
+    Route::post('/departments/{department}/assign-permission', [DepartmentController::class, 'assignPermission']);
+    Route::post('/departments/{department}/remove-permission', [DepartmentController::class, 'removePermission']);
+    Route::put('/departments/{department}/update-permissions', [DepartmentController::class, 'updatePermissions']);
+
+
     
 
 });

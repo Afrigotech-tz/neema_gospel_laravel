@@ -3099,8 +3099,8 @@
                 "tags": [
                     "Departments"
                 ],
-                "summary": "Assign a user to a department",
-                "description": "Assign user to department.",
+                "summary": "Assign user(s) to a department",
+                "description": "Assign user(s) to department.",
                 "operationId": "b55eb65a8884fa8f3a01aa4986dfd3b7",
                 "parameters": [
                     {
@@ -3122,8 +3122,22 @@
                                 ],
                                 "properties": {
                                     "user_id": {
-                                        "type": "integer",
-                                        "example": 1
+                                        "oneOf": [
+                                            {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer"
+                                                },
+                                                "example": [
+                                                    1,
+                                                    2
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -3133,7 +3147,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User assigned to department successfully",
+                        "description": "User(s) assigned to department successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3144,7 +3158,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "User assigned to department successfully"
+                                            "example": "User(s) assigned to department successfully"
                                         }
                                     },
                                     "type": "object"
@@ -3214,6 +3228,233 @@
                                         "message": {
                                             "type": "string",
                                             "example": "User removed from department successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/departments/{department}/assign-permission": {
+            "post": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Assign permission(s) to a department",
+                "description": "Assign permission(s) to department.",
+                "operationId": "b3f01d79dfaf47abbc06682666062529",
+                "parameters": [
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "permission_id"
+                                ],
+                                "properties": {
+                                    "permission_id": {
+                                        "oneOf": [
+                                            {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer"
+                                                },
+                                                "example": [
+                                                    1,
+                                                    2
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Permission(s) assigned to department successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Permission(s) assigned to department successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/departments/{department}/remove-permission": {
+            "post": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Remove a permission from a department",
+                "description": "Remove permission from department.",
+                "operationId": "724e144860980191183bdfb2373087da",
+                "parameters": [
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "permission_id"
+                                ],
+                                "properties": {
+                                    "permission_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Permission removed from department successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Permission removed from department successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/departments/{department}/update-permissions": {
+            "put": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Update permissions for a department",
+                "description": "Update permissions for department.",
+                "operationId": "61d108710a769bba4d6948424d21fb00",
+                "parameters": [
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "permission_ids"
+                                ],
+                                "properties": {
+                                    "permission_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Permissions updated for department successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Permissions updated for department successfully"
                                         }
                                     },
                                     "type": "object"
