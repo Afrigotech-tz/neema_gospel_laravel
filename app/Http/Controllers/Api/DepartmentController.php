@@ -648,7 +648,7 @@ class DepartmentController extends Controller
             'message' => 'Permission removed from department successfully'
         ]);
 
-        
+
     }
 
     /**
@@ -711,7 +711,7 @@ class DepartmentController extends Controller
         ]);
     }
     
-    
+
 }
 
 
