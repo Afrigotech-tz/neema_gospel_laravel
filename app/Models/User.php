@@ -41,7 +41,6 @@ class User extends Authenticatable
         'email',
         'password',
         'country_id',
-        'department_id',
         'is_partner',
         'partner_registration_method',
         'status',
@@ -96,11 +95,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's department.
+     * Get the user's departments.
      */
-    public function department()
+    public function departments()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsToMany(Department::class, 'user_departments');
     }
 
     /**

@@ -62,7 +62,7 @@ class DepartmentController extends Controller
         $query = Department::query();
 
         if ($withRelations) {
-            $query->with(['users:id,first_name,surname,department_id', 'permissions:id,name']);
+            $query->with(['users:id,first_name,surname', 'permissions:id,name']);
         }
 
         $departments = $query->paginate($perPage);
@@ -206,7 +206,9 @@ class DepartmentController extends Controller
             'success' => true,
             'data' => $department->load(['users', 'permissions'])
         ]);
+
     }
+
 
     /**
      * Update the specified department.
@@ -345,12 +347,12 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Assign user to department.
+     * Assign user(s) to department.
      *
      * @OA\Post(
      *     path="/api/departments/{department}/assign-user",
      *     tags={"Departments"},
-     *     summary="Assign a user to a department",
+     *     summary="Assign user(s) to a department",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="department",
@@ -362,16 +364,17 @@ class DepartmentController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"user_id"},
+     *             @OA\Property(property="user_id", type="array", @OA\Items(type="integer"), example={1,2}),
      *             @OA\Property(property="user_id", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="User assigned to department successfully",
+     *         description="User(s) assigned to department successfully",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="User assigned to department successfully")
+     *             @OA\Property(property="message", type="string", example="User(s) assigned to department successfully")
      *         )
      *     ),
      *     @OA\Response(
@@ -382,26 +385,56 @@ class DepartmentController extends Controller
      */
     public function assignUser(Request $request, Department $department): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id'
-        ]);
+        // Allow single user_id as integer or array
+        $userIds = is_array($request->user_id) ? $request->user_id : [$request->user_id];
 
-        if ($validator->fails()) {
+        if (empty($userIds)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => ['user_id' => ['The user_id field is required.']]
             ], 422);
         }
 
-        $user = \App\Models\User::find($request->user_id);
-        $user->update(['department_id' => $department->id]);
+        // Filter valid user_ids (skip invalid ones)
+        $validUserIds = \App\Models\User::whereIn('id', $userIds)->pluck('id')->toArray();
+
+        if (empty($validUserIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => ['user_id' => ['All provided user_ids are invalid.']]
+            ], 422);
+        }
+
+        // Check which users are already assigned
+        $alreadyAssigned = [];
+        $newAssignments = [];
+        foreach ($validUserIds as $userId) {
+            if ($department->users()->where('user_id', $userId)->exists()) {
+                $alreadyAssigned[] = $userId;
+            } else {
+                $newAssignments[] = $userId;
+            }
+        }
+
+        if (empty($newAssignments)) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User(s) already assigned to department'
+            ]);
+        }
+
+        // Attach new users to the department (many-to-many)
+        $department->users()->syncWithoutDetaching($newAssignments);
 
         return response()->json([
             'success' => true,
-            'message' => 'User assigned to department successfully'
+            'message' => 'User(s) assigned to department successfully'
         ]);
     }
+    
+
 
     /**
      * Remove user from department.
@@ -439,6 +472,7 @@ class DepartmentController extends Controller
      *     )
      * )
      */
+
     public function removeUser(Request $request, Department $department): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -453,14 +487,18 @@ class DepartmentController extends Controller
             ], 422);
         }
 
-        $user = \App\Models\User::find($request->user_id);
-        if ($user->department_id === $department->id) {
-            $user->update(['department_id' => null]);
-        }
+        // Detach user from the department (many-to-many)
+        $department->users()->detach($request->user_id);
 
         return response()->json([
             'success' => true,
             'message' => 'User removed from department successfully'
         ]);
+        
+        
     }
+    
+    
 }
+
+
