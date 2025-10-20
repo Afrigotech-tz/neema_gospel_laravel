@@ -22,18 +22,20 @@ class IpThrottleMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $ip = $request->ip();
+        $fingerprint = $this->generateDeviceFingerprint($request);
 
         // Maximum requests allowed per window
-        $maxAttempts = 200;
+        $maxAttempts = 5;
         // Window duration in minutes
-        $decayMinutes = 0.5;
+        $decayMinutes = 1;
 
-        $throttle = IpThrottle::where('ip_address', $ip)->first();
+        $throttle = IpThrottle::where('ip_address', $ip)->where('fingerprint', $fingerprint)->first();
 
         if (!$throttle) {
-            // Create a new record for this IP
+            // Create a new record for this IP and fingerprint
             $throttle = new IpThrottle();
             $throttle->ip_address = $ip;
+            $throttle->fingerprint = $fingerprint;
             $throttle->counts = 0;
             $throttle->total_hits = 0;
             $throttle->last_seen = Carbon::now();
@@ -95,8 +97,8 @@ class IpThrottleMiddleware
      *
      * @param string $ip
      * @return string|null
-     * 
-     * 
+     *
+     *
      */
 
     private function getCountryFromIP(string $ip): ?string
@@ -108,6 +110,28 @@ class IpThrottleMiddleware
             // Log the error but don't fail the request
             return null;
         }
+    }
+
+    /**
+     * Generate a device fingerprint based on request headers
+     *
+     * @param Request $request
+     * @return string
+     */
+    private function generateDeviceFingerprint(Request $request): string
+    {
+        $headers = [
+            $request->header('User-Agent'),
+            $request->header('Accept'),
+            $request->header('Accept-Language'),
+            $request->header('Accept-Encoding'),
+        ];
+
+        // Filter out null values and join
+        $headerString = implode('|', array_filter($headers));
+
+        // Return a hash of the combined headers
+        return hash('sha256', $headerString);
     }
 
 

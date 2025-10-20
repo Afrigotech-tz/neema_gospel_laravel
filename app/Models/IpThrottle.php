@@ -8,6 +8,7 @@ class IpThrottle extends Model
 {
     protected $fillable = [
         'ip_address',
+        'fingerprint',
         'counts',
         'last_seen',
         'block_until',

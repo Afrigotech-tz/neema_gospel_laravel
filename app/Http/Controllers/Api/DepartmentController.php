@@ -62,7 +62,7 @@ class DepartmentController extends Controller
         $query = Department::query();
 
         if ($withRelations) {
-            $query->with(['users:id,first_name,surname,department_id', 'permissions:id,name']);
+            $query->with(['users:id,first_name,surname', 'permissions:id,name']);
         }
 
         $departments = $query->paginate($perPage);
@@ -206,7 +206,9 @@ class DepartmentController extends Controller
             'success' => true,
             'data' => $department->load(['users', 'permissions'])
         ]);
+
     }
+
 
     /**
      * Update the specified department.
@@ -345,12 +347,12 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Assign user to department.
+     * Assign user(s) to department.
      *
      * @OA\Post(
      *     path="/api/departments/{department}/assign-user",
      *     tags={"Departments"},
-     *     summary="Assign a user to a department",
+     *     summary="Assign user(s) to a department",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="department",
@@ -362,16 +364,19 @@ class DepartmentController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"user_id"},
-     *             @OA\Property(property="user_id", type="integer", example=1)
+     *             @OA\Property(property="user_id", oneOf={
+     *                 @OA\Schema(type="integer", example=1),
+     *                 @OA\Schema(type="array", @OA\Items(type="integer"), example={1,2})
+     *             })
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="User assigned to department successfully",
+     *         description="User(s) assigned to department successfully",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="User assigned to department successfully")
+     *             @OA\Property(property="message", type="string", example="User(s) assigned to department successfully")
      *         )
      *     ),
      *     @OA\Response(
@@ -382,26 +387,56 @@ class DepartmentController extends Controller
      */
     public function assignUser(Request $request, Department $department): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id'
-        ]);
+        // Allow single user_id as integer or array
+        $userIds = is_array($request->user_id) ? $request->user_id : [$request->user_id];
 
-        if ($validator->fails()) {
+        if (empty($userIds)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => ['user_id' => ['The user_id field is required.']]
             ], 422);
         }
 
-        $user = \App\Models\User::find($request->user_id);
-        $user->update(['department_id' => $department->id]);
+        // Filter valid user_ids (skip invalid ones)
+        $validUserIds = \App\Models\User::whereIn('id', $userIds)->pluck('id')->toArray();
+
+        if (empty($validUserIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => ['user_id' => ['All provided user_ids are invalid.']]
+            ], 422);
+        }
+
+        // Check which users are already assigned
+        $alreadyAssigned = [];
+        $newAssignments = [];
+        foreach ($validUserIds as $userId) {
+            if ($department->users()->where('user_id', $userId)->exists()) {
+                $alreadyAssigned[] = $userId;
+            } else {
+                $newAssignments[] = $userId;
+            }
+        }
+
+        if (empty($newAssignments)) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User(s) already assigned to department'
+            ]);
+        }
+
+        // Attach new users to the department (many-to-many)
+        $department->users()->syncWithoutDetaching($newAssignments);
 
         return response()->json([
             'success' => true,
-            'message' => 'User assigned to department successfully'
+            'message' => 'User(s) assigned to department successfully'
         ]);
     }
+    
+
 
     /**
      * Remove user from department.
@@ -439,6 +474,7 @@ class DepartmentController extends Controller
      *     )
      * )
      */
+
     public function removeUser(Request $request, Department $department): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -453,14 +489,229 @@ class DepartmentController extends Controller
             ], 422);
         }
 
-        $user = \App\Models\User::find($request->user_id);
-        if ($user->department_id === $department->id) {
-            $user->update(['department_id' => null]);
-        }
+        // Detach user from the department (many-to-many)
+        $department->users()->detach($request->user_id);
 
         return response()->json([
             'success' => true,
             'message' => 'User removed from department successfully'
         ]);
+
+
     }
+
+    /**
+     * Assign permission(s) to department.
+     *
+     * @OA\Post(
+     *     path="/api/departments/{department}/assign-permission",
+     *     tags={"Departments"},
+     *     summary="Assign permission(s) to a department",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="department",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"permission_id"},
+     *             @OA\Property(property="permission_id", oneOf={
+     *                 @OA\Schema(type="integer", example=1),
+     *                 @OA\Schema(type="array", @OA\Items(type="integer"), example={1,2})
+     *             })
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Permission(s) assigned to department successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Permission(s) assigned to department successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation failed"
+     *     )
+     * )
+     */
+    public function assignPermission(Request $request, Department $department): JsonResponse
+    {
+        // Allow single permission_id as integer or array
+        $permissionIds = is_array($request->permission_id) ? $request->permission_id : [$request->permission_id];
+
+        if (empty($permissionIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => ['permission_id' => ['The permission_id field is required.']]
+            ], 422);
+        }
+
+        // Filter valid permission_ids (skip invalid ones)
+        $validPermissionIds = \App\Models\Permission::whereIn('id', $permissionIds)->pluck('id')->toArray();
+
+        if (empty($validPermissionIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => ['permission_id' => ['All provided permission_ids are invalid.']]
+            ], 422);
+        }
+
+        // Check which permissions are already assigned
+        $alreadyAssigned = [];
+        $newAssignments = [];
+        foreach ($validPermissionIds as $permissionId) {
+            if ($department->permissions()->where('permission_id', $permissionId)->exists()) {
+                $alreadyAssigned[] = $permissionId;
+            } else {
+                $newAssignments[] = $permissionId;
+            }
+        }
+
+        if (empty($newAssignments)) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission(s) already assigned to department'
+            ]);
+        }
+
+        // Attach new permissions to the department (many-to-many)
+        $department->permissions()->syncWithoutDetaching($newAssignments);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permission(s) assigned to department successfully'
+        ]);
+    }
+
+    /**
+     * Remove permission from department.
+     *
+     * @OA\Post(
+     *     path="/api/departments/{department}/remove-permission",
+     *     tags={"Departments"},
+     *     summary="Remove a permission from a department",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="department",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"permission_id"},
+     *             @OA\Property(property="permission_id", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Permission removed from department successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Permission removed from department successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation failed"
+     *     )
+     * )
+     */
+    public function removePermission(Request $request, Department $department): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'permission_id' => 'required|exists:permissions,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Detach permission from the department (many-to-many)
+        $department->permissions()->detach($request->permission_id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permission removed from department successfully'
+        ]);
+
+
+    }
+
+    /**
+     * Update permissions for department.
+     *
+     * @OA\Put(
+     *     path="/api/departments/{department}/update-permissions",
+     *     tags={"Departments"},
+     *     summary="Update permissions for a department",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="department",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"permission_ids"},
+     *             @OA\Property(property="permission_ids", type="array", @OA\Items(type="integer"), example={1,2})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Permissions updated for department successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Permissions updated for department successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation failed"
+     *     )
+     * )
+     */
+    public function updatePermissions(Request $request, Department $department): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'permission_ids' => 'required|array',
+            'permission_ids.*' => 'exists:permissions,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Sync permissions for the department (many-to-many)
+        $department->permissions()->sync($request->permission_ids);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permissions updated for department successfully'
+        ]);
+    }
+    
+
 }
+
+

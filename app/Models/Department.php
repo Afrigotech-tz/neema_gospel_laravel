@@ -21,7 +21,7 @@ class Department extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'user_departments');
     }
 
     public function permissions()
@@ -33,4 +33,9 @@ class Department extends Model
     {
         return $query->where('is_active', true);
     }
+
+
 }
+
+
+
