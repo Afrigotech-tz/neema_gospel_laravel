@@ -74,16 +74,19 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
+            
+            'first_name' => 'required|string|max:255|min:3',
+            'surname' => 'required|string|max:255|min:3',
             'gender' => 'nullable|in:male,female',
-            'phone_number' => 'required_without:email|nullable|string|unique:users,phone_number',
+            'phone_number' => 'required_without:email|nullable|string|unique:users,phone_number|min:9',
             'email' => 'required_without:phone_number|nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'country_id' => 'required|exists:countries,id',
             'verification_method' => 'required|in:email,mobile',
             'role_id' => 'nullable|exists:roles,id',
+
         ]);
+
 
         if ($validator->fails()) {
             return response()->json([

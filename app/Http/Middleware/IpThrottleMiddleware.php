@@ -25,7 +25,7 @@ class IpThrottleMiddleware
         $fingerprint = $this->generateDeviceFingerprint($request);
 
         // Maximum requests allowed per window
-        $maxAttempts = 5;
+        $maxAttempts = 200;
         // Window duration in minutes
         $decayMinutes = 1;
 
@@ -68,7 +68,9 @@ class IpThrottleMiddleware
                 'message' => 'Too many requests. Please try again later.',
                 'retry_after' => $now->diffInSeconds($throttle->block_until)
             ], 429);
+
         }
+
 
         // Reset counts if decay window has passed since last_seen
         if ($throttle->last_seen && $now->diffInMinutes($throttle->last_seen) >= $decayMinutes) {
@@ -83,14 +85,14 @@ class IpThrottleMiddleware
         if ($throttle->counts > $maxAttempts) {
             $throttle->block_until = $now->copy()->addMinutes($decayMinutes);
         }
-
+        
         $throttle->save();
 
         return $next($request);
 
-        
 
     }
+
 
     /**
      * Get country name from IP address using GeoIP
