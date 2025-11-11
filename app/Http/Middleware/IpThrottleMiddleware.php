@@ -25,7 +25,7 @@ class IpThrottleMiddleware
         $fingerprint = $this->generateDeviceFingerprint($request);
 
         // Maximum requests allowed per window
-        $maxAttempts = 200;
+        $maxAttempts = 2000;
         // Window duration in minutes
         $decayMinutes = 1;
 
@@ -134,7 +134,10 @@ class IpThrottleMiddleware
 
         // Return a hash of the combined headers
         return hash('sha256', $headerString);
+
     }
+
+    
 
 
 }
