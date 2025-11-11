@@ -32,10 +32,11 @@ class SuperAdminSeeder extends Seeder
         ]);
 
         // Assign super_admin role
+        
         $superAdmin->assignRole('super_admin');
 
 
     }
 
-    
+
 }
