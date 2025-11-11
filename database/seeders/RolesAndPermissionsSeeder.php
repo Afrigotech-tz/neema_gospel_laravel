@@ -141,5 +141,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_products', 'view_events', 'view_news', 'view_donations', 'view_music'
         ])->get();
         $user->permissions()->sync($userPermissions);
+
+
     }
+
+
 }
+
+

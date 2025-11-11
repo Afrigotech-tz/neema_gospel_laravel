@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             NewsSeeder::class,
             RolesAndPermissionsSeeder::class,
+            SuperAdminSeeder::class,
             ApiKeySeeder::class,
             DonationCategorySeeder::class,
             ProductCategorySeeder::class,
