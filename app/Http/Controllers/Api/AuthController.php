@@ -74,19 +74,17 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            
-            'first_name' => 'required|string|max:255|min:3',
-            'surname' => 'required|string|max:255|min:3',
+            'first_name' => 'required|regex:/^[A-Za-z\s]+$/|max:255|min:3',
+            'surname' => 'required|regex:/^[A-Za-z\s]+$/|max:255|min:3',
             'gender' => 'nullable|in:male,female',
-            'phone_number' => 'required_without:email|nullable|string|unique:users,phone_number|min:9',
+            // 'phone_number' => 'required_without:email|nullable|string|unique:users,phone_number|min:9',
+            'phone_number' => 'required_without:email|nullable|regex:/^[0-9]+$/|unique:users,phone_number|min:9',
             'email' => 'required_without:phone_number|nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'country_id' => 'required|exists:countries,id',
             'verification_method' => 'required|in:email,mobile',
             'role_id' => 'nullable|exists:roles,id',
-
         ]);
-
 
         if ($validator->fails()) {
             return response()->json([
@@ -538,7 +536,6 @@ class AuthController extends Controller
                 'message' => 'Please verify your account using the OTP sent to your phone.'
             ]);
         }
-        
     }
 
     /** Logout user */
@@ -565,7 +562,4 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
-
-
 }
-
