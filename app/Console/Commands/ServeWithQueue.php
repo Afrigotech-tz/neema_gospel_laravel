@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class ServeWithQueue extends Command
 {
-    protected $signature = 'run:events';
+    protected $signature = 'run';
     protected $description = 'Run Laravel server and queue worker together (non-stop)';
 
     public function handle()
