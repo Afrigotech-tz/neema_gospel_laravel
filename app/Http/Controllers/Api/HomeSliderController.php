@@ -291,4 +291,5 @@ class HomeSliderController extends Controller
         $slider->delete();
         return response()->json(['success' => true, 'message' => 'Slider deleted successfully']);
     }
+    
 }

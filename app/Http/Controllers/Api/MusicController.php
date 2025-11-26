@@ -238,7 +238,7 @@ class MusicController extends Controller
                     : 0;
 
                 $musicData['duration'] = $durationSeconds;
-                
+
             }
 
             $music = Music::create($musicData);
@@ -248,6 +248,7 @@ class MusicController extends Controller
                 'message' => 'Music uploaded successfully',
                 'data' => new MusicResource($music)
             ], 201);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -255,6 +256,7 @@ class MusicController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+  
     }
 
     /**
@@ -467,4 +469,6 @@ class MusicController extends Controller
             ], 500);
         }
     }
+
 }
+
