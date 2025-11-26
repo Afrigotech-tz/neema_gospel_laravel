@@ -60,25 +60,8 @@ class PasswordResetController extends Controller
      * )
      * send reset password link
      */
-    // public function sendResetLink(Request $request)
-    // {
-    //     $request->validate([
-    //         'login' => 'required|string',
-    //     ]);
-    //     $login = $request->input('login');
-    //     $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_number';
-    //     $user = User::where($fieldType, $login)->first();
-    //     if (!$user) {
-    //         return response()->json([
-    //             'message' => 'User not found'
-    //         ], 404);
-    //     }
-    //     $status = Password::sendResetLink(['email' => $user->email]);
-    //     return $status === Password::RESET_LINK_SENT
-    //         ? response()->json(['message' => __($status)], 200)
-    //         : response()->json(['message' => __($status)], 400);
-    // }
-    
+   
+
     public function sendResetLink(Request $request)
     {
         $request->validate([
@@ -103,7 +86,9 @@ class PasswordResetController extends Controller
             'message' => 'Password reset link will be sent if the user exists.'
         ], 200);
 
+
     }
+    
 
 
     /**
