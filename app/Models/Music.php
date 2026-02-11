@@ -45,4 +45,5 @@ class Music extends Model
     {
         return $this->audio_file ? asset('storage/' . $this->audio_file) : null;
     }
+    
 }

@@ -59,6 +59,6 @@ class OrderItem extends Model
     }
 
 
-
 }
+
 

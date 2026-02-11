@@ -30,7 +30,7 @@ return new class extends Migration
 
                 $table->rememberToken();
                 $table->timestamps();
-                
+
 
             });
 
@@ -56,7 +56,10 @@ return new class extends Migration
                 $table->integer('last_activity')->index();
             });
         }
+
+
     }
+    
 
     /**
      * Reverse the migrations.

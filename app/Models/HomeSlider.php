@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class HomeSlider extends Model
 {
     protected $fillable = [
@@ -23,5 +22,16 @@ class HomeSlider extends Model
         ];
     }
 
+    /**
+     * Override the image attribute when returning JSON
+     */
+    public function getImageAttribute($value): ?string
+    {
+        return $value ? asset('storage/' . $value) : null;
+    }
+
 
 }
+
+
+

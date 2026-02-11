@@ -121,7 +121,10 @@ class BlogController extends Controller
 
         $blog = Blog::create($data);
         return response()->json(['success' => true, 'data' => $blog], 201);
+
+
     }
+    
 
     /**
      * @OA\Get(

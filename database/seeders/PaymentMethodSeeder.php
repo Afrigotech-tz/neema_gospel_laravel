@@ -77,6 +77,10 @@ class PaymentMethodSeeder extends Seeder
 
         DB::table('payment_methods')->insert($paymentMethods);
     }
+ 
+
 
 }
+
+
 

@@ -49,6 +49,13 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    /**
+     * Override the image attribute when returning JSON
+     */
+    public function getImageAttribute($value): ?string
+    {
+        return $value ? asset('storage/' . $value) : null;
+    }
 
 
 }
