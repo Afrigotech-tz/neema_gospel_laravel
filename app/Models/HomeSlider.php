@@ -25,10 +25,10 @@ class HomeSlider extends Model
     /**
      * Override the image attribute when returning JSON
      */
-    // public function getImageAttribute($value): ?string
-    // {
-    //     return $value ? asset('storage/' . $value) : null;
-    // }
+    public function getImageAttribute($value): ?string
+    {
+        return $value ? asset('storage/' . $value) : null;
+    }
 
 
 }
