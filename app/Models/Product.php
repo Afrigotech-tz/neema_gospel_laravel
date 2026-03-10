@@ -63,7 +63,18 @@ class Product extends Model
  */
 public function getImageUrlAttribute($value): ?string
 {
-    return $value ? asset('storage/' . $value) : null;
+    if ($value) {
+        return asset('storage/' . $value);
+    }
+
+    $images = $this->images; 
+
+    if (is_array($images) && count($images) > 0) {
+        return $images[0];
+    }
+
+    return null;
+
 }
 
 /**
@@ -77,8 +88,7 @@ public function getImagesAttribute($value): array
     return array_map(function ($image) {
         return asset('storage/' . $image);
     }, $images);
-}
-
 
 }
 
+}
