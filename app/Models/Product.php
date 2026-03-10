@@ -52,10 +52,32 @@ class Product extends Model
     /**
      * Override the image attribute when returning JSON
      */
-    public function getImageAttribute($value): ?string
-    {
-        return $value ? asset('storage/' . $value) : null;
-    }
+    // public function getImageAttribute($value): ?string
+    // {
+    //     return $value ? asset('storage/' . $value) : null;
+    // }
+
+
+    /**
+ * Get full path for the primary image_url
+ */
+public function getImageUrlAttribute($value): ?string
+{
+    return $value ? asset('storage/' . $value) : null;
+}
+
+/**
+ * Get full paths for the array of gallery images
+ */
+public function getImagesAttribute($value): array
+{
+    // Decode the JSON from DB (already handled by $casts)
+    $images = is_array($value) ? $value : json_decode($value, true) ?? [];
+
+    return array_map(function ($image) {
+        return asset('storage/' . $image);
+    }, $images);
+}
 
 
 }
